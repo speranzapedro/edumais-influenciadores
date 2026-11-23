@@ -1,0 +1,29 @@
+{
+  "name": "@edu/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ingestao": "./src/ingestao.ts",
+    "./feedback": "./src/feedback/index.ts",
+    "./tutor": "./src/tutor/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@edu/core": "workspace:*",
+    "mammoth": "^1.13.0",
+    "unpdf": "^1.8.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@edu/config": "workspace:*",
+    "@types/node": "^22",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}
