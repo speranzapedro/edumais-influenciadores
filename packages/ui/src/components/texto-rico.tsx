@@ -6,6 +6,7 @@ export function TextoComNegrito({ texto }: { texto: string }) {
     <>
       {texto
         .split(/(\*\*[^*]+\*\*)/g)
+        // biome-ignore lint/suspicious/noArrayIndexKey: as partes vêm de um split fixo do texto e nunca mudam de ordem.
         .map((parte, i) =>
           parte.startsWith("**") && parte.endsWith("**") && parte.length > 4 ? (
             <strong key={i}>{parte.slice(2, -2)}</strong>

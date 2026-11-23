@@ -66,7 +66,7 @@ export function GraficoArea({
       <path d={linha} fill="none" stroke={cor} strokeWidth="3" strokeLinecap="round" />
       {dados.map((d, i) =>
         i % passo === 0 || i === dados.length - 1 ? (
-          <text key={i} x={x(i)} y={H - 4} textAnchor="middle" fontSize="11" fill="#8b8aa6">
+          <text key={d.rotulo} x={x(i)} y={H - 4} textAnchor="middle" fontSize="11" fill="#8b8aa6">
             {d.rotulo}
           </text>
         ) : null,
