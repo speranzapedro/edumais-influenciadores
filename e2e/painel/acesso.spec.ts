@@ -76,7 +76,8 @@ test("redefinição de senha pelo e-mail", async ({ page }) => {
   await page.getByRole("link", { name: "Esqueci minha senha" }).click();
   await page.getByLabel("E-mail").fill(email);
   await page.getByRole("button", { name: "Enviar link" }).click();
-  await expect(page.getByText("Se houver uma conta com este e-mail")).toBeVisible();
+  // O Supabase Auth envia o e-mail antes de responder; o primeiro envio ao SMTP local pode demorar.
+  await expect(page.getByText("Se houver uma conta com este e-mail")).toBeVisible({ timeout: 30_000 });
 
   // O link do e-mail passa pelo Supabase Auth e volta para /auth/confirmar, que abre a sessão.
   await page.goto(await linkDoEmail(email));
