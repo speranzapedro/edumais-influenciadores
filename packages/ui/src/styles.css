@@ -25,6 +25,14 @@
   --color-marca-800: #4434a8;
   --color-marca-900: #2b2680;
 
+  /* Destaque do produto (white-label). No Edu+, é a própria marca. */
+  --color-destaque: #6c5ce7;
+  --color-destaque-claro: #ebe7ff;
+  --color-destaque-escuro: #5a48d1;
+  --color-destaque-contraste: #ffffff;
+  /* Moldura em volta da coluna do app do fã no desktop. */
+  --color-moldura: #e9e8f3;
+
   /* tiles pastel: fundo + traço */
   --color-lilas-bg: #efeafe;
   --color-lilas: #7c5cf0;
@@ -45,7 +53,7 @@
   --radius-tile: 0.875rem;
 
   --shadow-card: 0 1px 2px rgb(29 26 58 / 0.04), 0 8px 24px -12px rgb(29 26 58 / 0.08);
-  --shadow-flutuante: 0 12px 40px -12px rgb(76 59 207 / 0.35);
+  --shadow-flutuante: 0 12px 40px -12px color-mix(in srgb, var(--marca-sombra) 35%, transparent);
 
   --animate-surgir: surgir 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-pulsar: pulsar 2s ease-in-out infinite;
@@ -66,10 +74,10 @@
   @keyframes pulsar {
     0%,
     100% {
-      box-shadow: 0 0 0 0 rgb(108 92 231 / 0.45);
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-marca-600) 45%, transparent);
     }
     50% {
-      box-shadow: 0 0 0 14px rgb(108 92 231 / 0);
+      box-shadow: 0 0 0 14px color-mix(in srgb, var(--color-marca-600) 0%, transparent);
     }
   }
   @keyframes brilho {
@@ -99,6 +107,19 @@
 }
 
 @layer base {
+  /*
+   * Cores da marca fora da escala marca-*: gradientes, noite (celebração), sombra e confete. O app do
+   * fã sobrescreve estas variáveis (e as do @theme) com o tema do produto (@edu/core gerarTema).
+   */
+  :root {
+    --marca-gradiente-de: #7d6cf5;
+    --marca-gradiente-ate: #5847d6;
+    --marca-noite-1: #5a4ae0;
+    --marca-noite-2: #33289a;
+    --marca-noite-3: #221b6e;
+    --marca-sombra: #4c3bcf;
+    --marca-confete: #c9bfff;
+  }
   html {
     -webkit-tap-highlight-color: transparent;
   }
@@ -114,10 +135,10 @@
 }
 
 @utility gradiente-marca {
-  background-image: linear-gradient(135deg, #7d6cf5 0%, #6c5ce7 45%, #5847d6 100%);
+  background-image: linear-gradient(135deg, var(--marca-gradiente-de) 0%, var(--color-marca-600) 45%, var(--marca-gradiente-ate) 100%);
 }
 @utility gradiente-noite {
-  background-image: radial-gradient(120% 80% at 50% 0%, #5a4ae0 0%, #33289a 55%, #221b6e 100%);
+  background-image: radial-gradient(120% 80% at 50% 0%, var(--marca-noite-1) 0%, var(--marca-noite-2) 55%, var(--marca-noite-3) 100%);
 }
 @utility esqueleto {
   background-image: linear-gradient(90deg, #efeff6 0%, #f8f8fc 50%, #efeff6 100%);

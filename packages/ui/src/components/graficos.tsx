@@ -21,7 +21,7 @@ export function GraficoArea({
   dados,
   altura = 160,
   className,
-  cor = "#6c5ce7",
+  cor = "var(--color-marca-600)",
   rotulosX = 4,
   sufixo = "",
 }: {
@@ -43,15 +43,15 @@ export function GraficoArea({
   const linha = caminhoSuave(pts);
   const area = `${linha} L ${x(dados.length - 1)},${H - pad.b} L ${x(0)},${H - pad.b} Z`;
   const ult = pts[pts.length - 1];
-  const idGrad = `grad-${cor.replace("#", "")}`;
+  const idGrad = `grad-${cor.replace(/[^a-z0-9]/gi, "")}`;
   const passo = Math.max(1, Math.floor((dados.length - 1) / Math.max(1, rotulosX - 1)));
 
   return (
     <svg viewBox={`0 0 ${L} ${H}`} className={cn("w-full overflow-visible", className)} aria-hidden="true">
       <defs>
         <linearGradient id={idGrad} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={cor} stopOpacity="0.28" />
-          <stop offset="100%" stopColor={cor} stopOpacity="0" />
+          <stop offset="0%" stopOpacity="0.28" style={{ stopColor: cor }} />
+          <stop offset="100%" stopOpacity="0" style={{ stopColor: cor }} />
         </linearGradient>
       </defs>
       {[0, 0.25, 0.5, 0.75, 1].map((f) => (
@@ -63,7 +63,7 @@ export function GraficoArea({
         </g>
       ))}
       <path d={area} fill={`url(#${idGrad})`} />
-      <path d={linha} fill="none" stroke={cor} strokeWidth="3" strokeLinecap="round" />
+      <path d={linha} fill="none" strokeWidth="3" strokeLinecap="round" style={{ stroke: cor }} />
       {dados.map((d, i) =>
         i % passo === 0 || i === dados.length - 1 ? (
           <text key={d.rotulo} x={x(i)} y={H - 4} textAnchor="middle" fontSize="11" fill="#8b8aa6">
@@ -73,8 +73,8 @@ export function GraficoArea({
       )}
       {ult && (
         <g>
-          <circle cx={ult[0]} cy={ult[1]} r="6" fill="white" stroke={cor} strokeWidth="3" />
-          <rect x={ult[0] - 26} y={ult[1] - 30} width="52" height="20" rx="6" fill={cor} />
+          <circle cx={ult[0]} cy={ult[1]} r="6" fill="white" strokeWidth="3" style={{ stroke: cor }} />
+          <rect x={ult[0] - 26} y={ult[1] - 30} width="52" height="20" rx="6" style={{ fill: cor }} />
           <text x={ult[0]} y={ult[1] - 16} textAnchor="middle" fontSize="11" fontWeight="700" fill="white">
             {dados[dados.length - 1].valor}
             {sufixo}

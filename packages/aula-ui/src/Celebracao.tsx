@@ -1,6 +1,6 @@
 "use client";
 
-import { CONQUISTAS, type EventoXp } from "@edu/core";
+import { CONQUISTAS, type EventoXp, TEMA_EDU } from "@edu/core";
 import { classesBotao, cn, Icone } from "@edu/ui";
 import confetti from "canvas-confetti";
 import { Flame, Target, Trophy, Zap } from "lucide-react";
@@ -42,7 +42,9 @@ export function Celebracao({ resultado, trilhaId }: { resultado: ResultadoAula; 
   const { rotas } = useAula();
 
   useEffect(() => {
-    const cores = ["#ffffff", "#c9bfff", "#ffd166", "#7ee2a8", "#ff8fc0"];
+    // O confete leva a cor da marca do produto (variável do tema), com o lilás do Edu+ de reserva.
+    const marca = getComputedStyle(document.documentElement).getPropertyValue("--marca-confete").trim() || TEMA_EDU["--marca-confete"];
+    const cores = ["#ffffff", marca, "#ffd166", "#7ee2a8", "#ff8fc0"];
     const disparar = (x: number) => confetti({ particleCount: 70, spread: 75, startVelocity: 42, origin: { x, y: 0.35 }, colors: cores, scalar: 0.9 });
     disparar(0.3);
     const t1 = setTimeout(() => disparar(0.7), 250);
