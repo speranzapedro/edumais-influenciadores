@@ -1,4 +1,4 @@
-import { db, publicarProduto } from "@edu/db";
+import { db } from "@edu/db";
 import { criadorNoAr, novoCriador, novoFa, recarregar, trilhaPronta } from "@edu/testing";
 import { expect, test } from "@playwright/test";
 import { entrarNoPainel } from "../apoio";
@@ -16,6 +16,12 @@ test("perfil e produto: salvar e publicar a página", async ({ page }) => {
   await page.getByRole("button", { name: "Salvar produto" }).click();
   await expect(page.getByText("Produto salvo.")).toBeVisible();
 
+  // Sem trilha publicada, a página não abre para os fãs.
+  await page.getByRole("button", { name: "Publicar minha página" }).click();
+  await expect(page.getByText("Publique pelo menos uma trilha antes de abrir sua página")).toBeVisible();
+
+  await trilhaPronta(c.escopo);
+  await page.reload();
   await page.getByRole("button", { name: "Publicar minha página" }).click();
   await expect(page.getByText("Página publicada!")).toBeVisible();
 
@@ -33,7 +39,7 @@ test("primeira trilha: tour do estúdio, depois o formulário e o estúdio", asy
 
   // Na primeira vez, o tour com a trilha de exemplo vem antes (nada ali é salvo).
   await expect(page).toHaveURL(/\/trilhas\/tour/);
-  await page.getByRole("button", { name: "Pular tour" }).first().click();
+  await page.getByRole("dialog").getByRole("button", { name: "Pular tour" }).click();
   await expect(page).toHaveURL(/\/trilhas\/nova$/);
 
   await page.locator('input[name="titulo"]').fill("Orçamento do zero");
@@ -49,11 +55,10 @@ test("primeira trilha: tour do estúdio, depois o formulário e o estúdio", asy
 });
 
 test("publicar a trilha avisa os assinantes e mostra a prévia", async ({ page }) => {
-  const c = await novoCriador();
-  await publicarProduto(c.escopo, true);
-  const { escopo } = await recarregar(c);
-  const fa = await novoFa(escopo.produto.id, { origem: "instagram" });
-  const trilha = await trilhaPronta(escopo, { titulo: "Investir com calma", publicar: false });
+  // A página só abre com uma trilha publicada; o fã entra antes da segunda trilha.
+  const c = await criadorNoAr();
+  const fa = await novoFa(c.escopo.produto.id, { origem: "instagram" });
+  const trilha = await trilhaPronta(c.escopo, { titulo: "Investir com calma", publicar: false });
 
   await entrarNoPainel(page, c.email);
   await page.goto(`/trilhas/${trilha.id}/editar`);
@@ -94,8 +99,10 @@ test("criador não abre a trilha de outro criador", async ({ page }) => {
   const outro = await criadorNoAr({ nome: "Outra Criadora" });
   const c = await novoCriador();
   await entrarNoPainel(page, c.email);
-  const resposta = await page.goto(`/trilhas/${outro.trilha.id}`);
-  expect(resposta?.status()).toBe(404);
+  // A página tem loading.tsx: o status já saiu (200) quando o notFound() acontece; vale o conteúdo.
+  await page.goto(`/trilhas/${outro.trilha.id}`);
+  await expect(page.getByText("Página não encontrada")).toBeVisible();
+  await expect(page.getByText(outro.trilha.titulo)).toHaveCount(0);
   const api = await page.request.post(`/api/trilhas/${outro.trilha.id}/agente`, { data: { etapa: "ementa", modo: "geracao" } });
   expect(api.status()).toBe(404);
 });
