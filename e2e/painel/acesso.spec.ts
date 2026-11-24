@@ -44,7 +44,7 @@ test.describe("login", () => {
     const { email } = await novoCriador();
     await page.goto("/login");
     await page.getByLabel("E-mail").fill(email);
-    await page.getByLabel("Senha").fill("SenhaErrada123");
+    await page.getByLabel("Senha", { exact: true }).fill("SenhaErrada123");
     await page.getByRole("button", { name: "Entrar" }).click();
     await expect(page.getByText("E-mail ou senha incorretos.")).toBeVisible();
   });
@@ -54,7 +54,7 @@ test.describe("login", () => {
     await page.goto("/vendas");
     await expect(page).toHaveURL(/\/login\?next=%2Fvendas/);
     await page.getByLabel("E-mail").fill(email);
-    await page.getByLabel("Senha").fill(SENHA);
+    await page.getByLabel("Senha", { exact: true }).fill(SENHA);
     await page.getByRole("button", { name: "Entrar" }).click();
     await expect(page).toHaveURL(/\/vendas$/);
     await expect(page.getByRole("heading", { name: "Vendas" })).toBeVisible();

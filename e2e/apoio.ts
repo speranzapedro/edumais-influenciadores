@@ -11,7 +11,7 @@ export const SENHA = "Senha123forte";
 export async function entrarNoPainel(page: Page, email: string, senha = SENHA) {
   await page.goto("/login");
   await page.getByLabel("E-mail").fill(email);
-  await page.getByLabel("Senha").fill(senha);
+  await page.getByLabel("Senha", { exact: true }).fill(senha);
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).not.toHaveURL(/\/login/);
 }
