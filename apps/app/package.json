@@ -1,0 +1,37 @@
+{
+  "name": "@edu/app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3007",
+    "build": "next build",
+    "start": "next start --port 3007",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@edu/ai": "workspace:*",
+    "@edu/aula-ui": "workspace:*",
+    "@edu/core": "workspace:*",
+    "@edu/db": "workspace:*",
+    "@edu/ui": "workspace:*",
+    "canvas-confetti": "^1.9.4",
+    "lucide-react": "^1.49.0",
+    "motion": "^13.4.6",
+    "next": "^16.3.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@next/env": "^16.3.8",
+    "@edu/config": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^22",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "5.9.3"
+  }
+}

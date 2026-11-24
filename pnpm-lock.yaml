@@ -60,6 +60,73 @@ importers:
         specifier: 5.0.3
         version: 5.0.3(@types/node@22.20.5)(@vitest/coverage-v8@5.0.3)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
 
+  apps/app:
+    dependencies:
+      '@edu/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
+      '@edu/aula-ui':
+        specifier: workspace:*
+        version: link:../../packages/aula-ui
+      '@edu/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@edu/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@edu/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      canvas-confetti:
+        specifier: ^1.9.4
+        version: 1.9.4
+      lucide-react:
+        specifier: ^1.49.0
+        version: 1.78.0(@types/react@19.3.0)(react@19.3.1)
+      motion:
+        specifier: ^13.4.6
+        version: 13.5.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      next:
+        specifier: ^16.3.8
+        version: 16.4.6(@playwright/test@1.65.0)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react:
+        specifier: ^19.3.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.3.0
+        version: 19.3.1(react@19.3.1)
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.7
+    devDependencies:
+      '@edu/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@next/env':
+        specifier: ^16.3.8
+        version: 16.4.6
+      '@tailwindcss/postcss':
+        specifier: ^4.3.3
+        version: 4.3.5
+      '@types/canvas-confetti':
+        specifier: ^1.9.0
+        version: 1.9.0
+      '@types/node':
+        specifier: ^22
+        version: 22.20.5
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      tailwindcss:
+        specifier: ^4.3.3
+        version: 4.3.5
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   apps/painel:
     dependencies:
       '@edu/ai':

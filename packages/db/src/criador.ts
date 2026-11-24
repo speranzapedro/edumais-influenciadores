@@ -356,6 +356,12 @@ export async function assinar(p: { aluno: Pick<Usuario, "id" | "role">; produtoI
   return a;
 }
 
+/** O fã tem acesso ao produto agora (assinatura cortesia, ativa ou inadimplente)? */
+export async function faTemAcesso(alunoId: string, produtoId: string) {
+  const a = talvez(await db().from("assinaturas").select("status").eq("produto_id", produtoId).eq("aluno_id", alunoId).maybeSingle(), "assinatura");
+  return !!a && temAcessoDb(a.status);
+}
+
 /** Fã novo: cria a conta (confirmada) e a assinatura do produto. */
 export async function cadastrarFa(p: { produtoId: string; nome: string; email: string; senha: string; origem?: string | null; ip: string }) {
   const chave = `cadastro-fa:${p.ip}`;

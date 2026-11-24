@@ -29,7 +29,7 @@ import {
   trilhasDoAluno,
 } from "../src/aluno";
 import { db } from "../src/client";
-import { assinar, cadastrarFa, criadorDaTrilha, criadoresDoFa, publicarProduto, trilhasDasAssinaturas } from "../src/criador";
+import { assinar, cadastrarFa, criadorDaTrilha, criadoresDoFa, faTemAcesso, publicarProduto, trilhasDasAssinaturas } from "../src/criador";
 import { abrirEdu, avaliarRespostaEdu, ErroEdu, eduDisponivel, marcarAvisoEdu, prepararPerguntaEdu, registrarTrocaEdu } from "../src/edu";
 import { ErroAcesso } from "../src/erros";
 import { listarNotificacoes } from "../src/estudio";
@@ -123,8 +123,10 @@ describe("acesso pelas assinaturas", () => {
   it("cancelar corta o acesso; assinar de novo reabre; página fora do ar esconde tudo", async () => {
     const c = await criadorNoAr();
     const { usuario: fa } = await novoFa(c.escopo.produto.id, { origem: "instagram" });
+    expect(await faTemAcesso(fa.id, c.escopo.produto.id)).toBe(true);
     await db().from("assinaturas").update({ status: "cancelada", cancelada_em: new Date().toISOString() }).eq("aluno_id", fa.id);
     expect(await trilhaLiberada(fa, c.trilha.id)).toBe(false);
+    expect(await faTemAcesso(fa.id, c.escopo.produto.id)).toBe(false);
     expect(await criadoresDoFa(fa.id)).toEqual([]);
 
     const reaberta = await assinar({ aluno: fa, produtoId: c.escopo.produto.id, origem: "youtube" });
@@ -133,8 +135,10 @@ describe("acesso pelas assinaturas", () => {
 
     await db().from("assinaturas").update({ status: "pendente" }).eq("aluno_id", fa.id);
     expect(await trilhaLiberada(fa, c.trilha.id)).toBe(false);
+    expect(await faTemAcesso(fa.id, c.escopo.produto.id)).toBe(false);
     await db().from("assinaturas").update({ status: "inadimplente" }).eq("aluno_id", fa.id);
     expect(await trilhaLiberada(fa, c.trilha.id)).toBe(true);
+    expect(await faTemAcesso(fa.id, c.escopo.produto.id)).toBe(true);
 
     await publicarProduto(c.escopo, false);
     expect(await trilhaLiberada(fa, c.trilha.id)).toBe(false);
@@ -395,6 +399,7 @@ describe("ainda sem nada", () => {
     const u = await criarConta({ role: "aluno", nome: "Fã Solitário", email: emailUnico(), senha: SENHA });
     expect(await trilhasDoAluno(u)).toEqual([]);
     expect(await criadoresDoFa(u.id)).toEqual([]);
+    expect(await faTemAcesso(u.id, randomUUID())).toBe(false);
     expect((await painelDoAluno(u.id)).xpTotal).toBe(0);
   });
 });

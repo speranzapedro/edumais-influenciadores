@@ -1,5 +1,5 @@
 import { db, ok, talvez } from "./client";
-import type { Json, JsonNaoNulo, Row, UserRoleDb } from "./database.types";
+import type { JsonNaoNulo, Row, UserRoleDb } from "./database.types";
 import { ErroAcesso } from "./erros";
 import type { AppSessao } from "./sessao";
 
