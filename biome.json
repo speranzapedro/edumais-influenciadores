@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/.next", "!**/coverage", "!**/playwright-report", "!**/test-results", "!**/*.json.tmp"]
+    "includes": ["**", "!**/node_modules", "!**/.next", "!**/coverage", "!**/playwright-report", "!**/test-results", "!**/*.json.tmp", "!apps/*/public"]
   },
   "formatter": {
     "enabled": true,
