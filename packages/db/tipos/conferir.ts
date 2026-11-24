@@ -8,7 +8,8 @@ import type { Database as Manual } from "../src/database.types";
 import type { Database as Gerado } from "./database.gerado";
 
 type Igual<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
-type Verdade<T extends true> = T;
+/** Falha com o nome do que divergiu: "Type '"trilhas.ordem"' does not satisfy the constraint 'never'". */
+type Nada<T extends never> = T;
 type Anulavel<T> = null extends T ? true : false;
 
 type TG = Gerado["public"]["Tables"];
@@ -21,16 +22,13 @@ type ColunasDivergentes<G, M> = {
   [K in keyof G | keyof M]: K extends keyof G ? (K extends keyof M ? (ColunaConfere<G[K], M[K]> extends true ? never : K) : K) : K;
 }[keyof G | keyof M];
 
-/** Tabelas que faltam, sobram ou têm alguma coluna divergente. */
-type TabelasDivergentes = {
-  [T in keyof TG | keyof TM]: T extends keyof TG
-    ? T extends keyof TM
-      ? [ColunasDivergentes<TG[T]["Row"], TM[T]["Row"]>] extends [never]
-        ? never
-        : T
-      : T
-    : T;
-}[keyof TG | keyof TM];
+/** "tabela" que falta ou sobra, ou "tabela.coluna" que diverge. */
+type TabelasDivergentes =
+  | Exclude<keyof TG, keyof TM>
+  | Exclude<keyof TM, keyof TG>
+  | {
+      [T in keyof TG & keyof TM & string]: `${T}.${ColunasDivergentes<TG[T]["Row"], TM[T]["Row"]> & string}`;
+    }[keyof TG & keyof TM & string];
 
 type EG = Gerado["public"]["Enums"];
 type EM = Manual["public"]["Enums"];
@@ -42,7 +40,6 @@ type FG = Gerado["public"]["Functions"];
 type FM = Manual["public"]["Functions"];
 type FuncoesDivergentes = Exclude<keyof FG, keyof FM> | Exclude<keyof FM, keyof FG>;
 
-// Se algum destes falhar, o tsc mostra o nome do que divergiu no lugar de `never`.
-export type TabelasOk = Verdade<Igual<TabelasDivergentes, never>>;
-export type EnumsOk = Verdade<Igual<EnumsDivergentes, never>>;
-export type FuncoesOk = Verdade<Igual<FuncoesDivergentes, never>>;
+export type TabelasOk = Nada<TabelasDivergentes>;
+export type EnumsOk = Nada<EnumsDivergentes>;
+export type FuncoesOk = Nada<FuncoesDivergentes>;

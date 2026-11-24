@@ -49,12 +49,17 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Subir o Supabase local (aplica as migrations)
+        id: supabase
         run: pnpm exec supabase start -x studio,imgproxy,realtime,edge-runtime,logflare,vector,supavisor
+      # Os passos seguintes rodam mesmo se um anterior falhar: cada um aponta um problema diferente.
       - name: Lint do schema
+        if: ${{ !cancelled() && steps.supabase.outcome == 'success' }}
         run: pnpm exec supabase db lint --level error --fail-on error
       - name: Tipos escritos à mão batem com o schema
+        if: ${{ !cancelled() && steps.supabase.outcome == 'success' }}
         run: pnpm db:tipos
       - name: Testes de integração do @edu/db, com cobertura mínima
+        if: ${{ !cancelled() && steps.supabase.outcome == 'success' }}
         run: pnpm test:int:cobertura
       - name: Relatório de cobertura
         if: always()
