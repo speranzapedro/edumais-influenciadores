@@ -1,4 +1,8 @@
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+/** Raiz do repositório (onde fica supabase/config.toml), de onde quer que os testes rodem. */
+const RAIZ = fileURLToPath(new URL("../../../", import.meta.url));
 
 /**
  * Liga os testes de integração ao Supabase local (`pnpm exec supabase start`). Lê URL e chaves de
@@ -8,6 +12,7 @@ import { execFileSync } from "node:child_process";
 
 function lerStatus(): Record<string, string> {
   const saida = execFileSync("pnpm", ["exec", "supabase", "status", "-o", "env"], {
+    cwd: RAIZ,
     encoding: "utf8",
     shell: process.platform === "win32",
     stdio: ["ignore", "pipe", "pipe"],

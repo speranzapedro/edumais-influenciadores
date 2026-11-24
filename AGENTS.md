@@ -29,6 +29,7 @@ packages/aula-ui player das aulas e painel do Edu
 packages/ui      design system (tokens, componentes, termos)
 packages/testing fábricas, limpeza e ambiente dos testes de integração
 packages/config  tsconfig base
+e2e/             testes de ponta a ponta (Playwright), um projeto por app
 supabase/        config.toml e migrations (a base é 20261123120000_base.sql)
 ```
 
@@ -48,9 +49,12 @@ pnpm db:resetar         # recria o banco local do zero
 pnpm db:tipos           # gera os tipos do banco local e confere com database.types.ts
 pnpm test:int           # testes de integração do @edu/db (só aceitam Supabase local)
 pnpm test:int:cobertura # idem, com cobertura mínima de 75% em packages/db/src
+pnpm build && pnpm e2e  # Playwright (e2e/) contra o build dos apps e o Supabase local (Mailpit para e-mail)
 ```
 
-O CI roda tudo isso em dois jobs: **Qualidade** (Biome, tipos, unitários) e **Integração** (Supabase local, lint do schema, tipos e testes do banco).
+O CI roda tudo isso em três jobs: **Qualidade** (Biome, tipos, unitários), **Integração** (Supabase local, lint do schema, tipos e testes do banco) e **Build e E2E** (build dos apps e Playwright).
+
+Variáveis de ambiente: um único `.env.local` na raiz (modelo em `.env.example`); os apps carregam esse arquivo no `next.config.ts`.
 
 ## Regras do projeto
 

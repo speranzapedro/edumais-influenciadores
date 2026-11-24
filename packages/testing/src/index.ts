@@ -32,7 +32,7 @@ import {
   salvarVersao,
   type Usuario,
 } from "@edu/db";
-import exemplo from "@edu/estudio/estudio-demo.json";
+import exemplo from "@edu/estudio/estudio-demo.json" with { type: "json" };
 import { ehLocal } from "./ambiente";
 
 /**

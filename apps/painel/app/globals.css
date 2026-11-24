@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "@edu/ui/styles.css";
+@source "../components";
+@source "../app";
+@source "../../../packages/estudio/src";
+@source "../../../packages/aula-ui/src";

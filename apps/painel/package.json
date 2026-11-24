@@ -1,0 +1,40 @@
+{
+  "name": "@edu/painel",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3006",
+    "build": "next build",
+    "start": "next start --port 3006",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@edu/ai": "workspace:*",
+    "@edu/aula-ui": "workspace:*",
+    "@edu/core": "workspace:*",
+    "@edu/db": "workspace:*",
+    "@edu/estudio": "workspace:*",
+    "@edu/ui": "workspace:*",
+    "lucide-react": "^1.49.0",
+    "mammoth": "^1.13.0",
+    "motion": "^13.4.6",
+    "next": "^16.3.8",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "unpdf": "^1.8.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@next/env": "^16.3.8",
+    "@edu/config": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "5.9.3"
+  }
+}
