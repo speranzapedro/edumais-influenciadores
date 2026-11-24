@@ -51,6 +51,7 @@
   --animate-pulsar: pulsar 2s ease-in-out infinite;
   --animate-brilho: brilho 1.6s ease-in-out infinite;
   --animate-destaque: destaque 2.4s ease-out both;
+  --animate-encher: encher var(--duracao-encher, 4s) linear both;
 
   @keyframes surgir {
     from {
@@ -77,6 +78,14 @@
     }
     100% {
       background-position: 200% 0;
+    }
+  }
+  @keyframes encher {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
     }
   }
   @keyframes destaque {

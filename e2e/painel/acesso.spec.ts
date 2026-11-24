@@ -13,7 +13,7 @@ test.describe("cadastro pelo link secreto", () => {
     const handle = handleUnico("e2e");
     await page.goto(`/cadastro/${CHAVE_CADASTRO}`);
     await page.getByLabel("Seu nome").fill("Ana Criadora");
-    await page.getByLabel("Seu @ nas redes").fill(`@${handle}`);
+    await page.getByLabel("Seu principal @ nas redes").fill(`@${handle}`);
     await page.getByLabel("E-mail").fill(email);
     await page.getByLabel("Crie uma senha").fill(SENHA);
     await page.getByLabel("Repita a senha").fill(SENHA);

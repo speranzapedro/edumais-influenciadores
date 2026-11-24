@@ -10,7 +10,7 @@ export function FormCadastro({ chave }: { chave: string }) {
     <form {...form} className="space-y-4">
       <input type="hidden" name="chave" value={chave} />
       <Campo rotulo="Seu nome" name="nome" autoComplete="name" required autoFocus />
-      <Campo rotulo="Seu @ nas redes" name="handle" placeholder="@seuperfil" ajuda="Vira o seu link na Edu+. Dá para trocar depois." />
+      <Campo rotulo="Seu principal @ nas redes" name="handle" placeholder="@seuperfil" ajuda="Vira o seu link na Edu+. Dá para trocar depois." />
       <Campo rotulo="E-mail" name="email" type="email" autoComplete="email" required />
       <CampoSenha
         rotulo="Crie uma senha"
