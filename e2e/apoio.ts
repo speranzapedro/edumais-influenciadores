@@ -16,6 +16,15 @@ export async function entrarNoPainel(page: Page, email: string, senha = SENHA) {
   await expect(page).not.toHaveURL(/\/login/);
 }
 
+/** Entra no app do fã pela tela de login (o projeto "app" do Playwright aponta para a porta 3007). */
+export async function entrarNoApp(page: Page, email: string, senha = SENHA) {
+  await page.goto("/login");
+  await page.getByLabel("E-mail").fill(email);
+  await page.getByLabel("Senha", { exact: true }).fill(senha);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page).not.toHaveURL(/\/login/);
+}
+
 /** Endereço do Mailpit do Supabase local (e-mails do Auth). */
 const MAILPIT = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 

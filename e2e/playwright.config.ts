@@ -39,11 +39,24 @@ export default defineConfig({
       testDir: "painel",
       use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3006" },
     },
+    {
+      // O app do fã é mobile first: roda no viewport de um celular.
+      name: "app",
+      testDir: "app",
+      use: { ...devices["Pixel 7"], baseURL: "http://localhost:3007" },
+    },
   ],
   webServer: [
     {
       command: "pnpm --filter @edu/painel start",
       url: "http://localhost:3006/api/saude",
+      reuseExistingServer: !CI,
+      timeout: 120_000,
+      stdout: "pipe",
+    },
+    {
+      command: "pnpm --filter @edu/app start",
+      url: "http://localhost:3007/api/saude",
       reuseExistingServer: !CI,
       timeout: 120_000,
       stdout: "pipe",
