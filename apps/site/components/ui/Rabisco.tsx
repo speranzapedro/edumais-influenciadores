@@ -1,6 +1,6 @@
 /**
- * Doodles desenhados à mão (traço aberto, pontas arredondadas). O GSAP anima o `stroke`
- * com DrawSVG a partir da classe `.traco`. Todos são decorativos.
+ * Doodles desenhados à mão (traço aberto, pontas arredondadas). O GSAP anima o `stroke` com o
+ * plugin `traco` (ver motion/gsap.ts) a partir da classe `.traco`. Todos são decorativos.
  */
 const TRACOS = {
   circulo: {
@@ -69,6 +69,7 @@ export function Rabisco({
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
+          pathLength={1}
         />
       ))}
     </svg>

@@ -3,7 +3,7 @@
 import { ArrowRight, Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { useConteudo } from "../../conteudo";
-import { gsap, MIDIA, useGSAP } from "../../motion/gsap";
+import { gsap, MIDIA, useGSAPPerto } from "../../motion/gsap";
 import { useRolarPara } from "../../motion/ScrollSuave";
 import { Avatar } from "../../ui/Avatar";
 import { Onda } from "../../ui/Onda";
@@ -15,7 +15,7 @@ export function Faq() {
   const [aberta, setAberta] = useState(0);
   const rolar = useRolarPara();
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       const q = gsap.utils.selector(ref);
       const mm = gsap.matchMedia();

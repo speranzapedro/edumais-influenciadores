@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, MIDIA, useGSAP } from "../motion/gsap";
+import { gsap, MIDIA, useGSAPPerto } from "../motion/gsap";
 
 /**
  * Pares de formas com a mesma estrutura de comandos: o GSAP interpola número a número,
@@ -22,16 +22,19 @@ const FORMAS = [
 export function Onda({ cor, lado = "topo", forma = 0 }: { cor: string; lado?: "topo" | "base"; forma?: 0 | 1 }) {
   const ref = useRef<SVGPathElement>(null);
 
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add(MIDIA.movimento, () => {
-      gsap.to(ref.current, {
-        attr: { d: FORMAS[forma][1] },
-        ease: "none",
-        scrollTrigger: { trigger: ref.current, start: "top bottom", end: "bottom top", scrub: 1.2 },
+  useGSAPPerto(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add(MIDIA.movimento, () => {
+        gsap.to(ref.current, {
+          attr: { d: FORMAS[forma][1] },
+          ease: "none",
+          scrollTrigger: { trigger: ref.current, start: "top bottom", end: "bottom top", scrub: 1.2 },
+        });
       });
-    });
-  });
+    },
+    { scope: ref },
+  );
 
   return (
     <svg

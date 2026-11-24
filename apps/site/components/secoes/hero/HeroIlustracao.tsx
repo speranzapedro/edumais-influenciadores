@@ -81,7 +81,7 @@ export function HeroIlustracao() {
           .from(q(".etapa-chip"), { y: "2em", scale: 0.6, autoAlpha: 0, duration: 0.6, ease: "back.out(2.6)" }, "<0.3")
           .from(q(".cam-avatar .pop"), { scale: 0, rotation: -25, autoAlpha: 0, duration: 0.9, stagger: 0.12, ease: "back.out(2.2)" }, "<-0.4")
           .from(q(".cam-sticker .pop"), { scale: 0.4, y: 30, autoAlpha: 0, duration: 0.8, stagger: 0.1, ease: "back.out(2.4)" }, "<0.25")
-          .from(q(".doodle .traco"), { drawSVG: "0%", duration: 0.9, stagger: 0.08, ease: "power2.out" }, "<0.2")
+          .from(q(".doodle .traco"), { traco: "0%", duration: 0.9, stagger: 0.08, ease: "power2.out" }, "<0.2")
           .from(q(".rotulo-5min"), { autoAlpha: 0, rotation: -14, scale: 0.7, duration: 0.6, ease: "back.out(3)" }, "<0.3");
 
         // ── Flutuação contínua (cada peça com seu próprio ritmo) ─

@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { useConteudo } from "../../conteudo";
-import { gsap, MIDIA, useGSAP } from "../../motion/gsap";
+import { gsap, MIDIA, useGSAPPerto } from "../../motion/gsap";
 import { useLenis } from "../../motion/ScrollSuave";
 import { DemoRecompensa } from "./DemoRecompensa";
 import { DemoAberta, DemoCompletar, DemoOrdenar, DemoQuiz, DemoTexto, type PropsDemo } from "./Demos";
@@ -66,7 +66,7 @@ export function Desafios() {
   const [ativa, setAtiva] = useState(0);
   const lenis = useLenis();
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       const secao = ref.current!;
       const q = gsap.utils.selector(secao);

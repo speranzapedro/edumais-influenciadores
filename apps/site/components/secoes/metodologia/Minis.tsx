@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useRef } from "react";
 import { useConteudo } from "../../conteudo";
-import { gsap, MIDIA, ScrollTrigger, useGSAP } from "../../motion/gsap";
+import { gsap, MIDIA, ScrollTrigger, useGSAPPerto } from "../../motion/gsap";
 import { Rabisco } from "../../ui/Rabisco";
 
 const useMinis = () => useConteudo().metodologia!.minis;
@@ -27,7 +27,7 @@ type Q = (sel: string) => Element[];
 /** Monta um loop de animação que só roda enquanto a mini-ilustração está na tela. */
 function useMini(montar: (q: Q, tl: gsap.core.Timeline) => void) {
   const ref = useRef<HTMLDivElement>(null);
-  useGSAP(
+  useGSAPPerto(
     () => {
       const mm = gsap.matchMedia();
       mm.add(MIDIA.movimento, () => {
@@ -426,10 +426,10 @@ export function MiniFeedback() {
   const ERROS = m.itens;
   const ref = useMini((q, tl) => {
     tl.set(q(".barra-erro"), { scaleX: 0 })
-      .set(q(".circulo-erro .traco"), { drawSVG: "0%" })
+      .set(q(".circulo-erro .traco"), { traco: "0%" })
       .set(q(".post-it"), { scale: 0, rotation: -20, autoAlpha: 0 })
       .to(q(".barra-erro"), { scaleX: 1, duration: 0.9, stagger: 0.15, ease: "power3.out" }, "+=0.3")
-      .to(q(".circulo-erro .traco"), { drawSVG: "100%", duration: 0.7, ease: "power2.inOut" })
+      .to(q(".circulo-erro .traco"), { traco: "100%", duration: 0.7, ease: "power2.inOut" })
       .to(q(".post-it"), { scale: 1, rotation: 5, autoAlpha: 1, duration: 0.6, ease: "back.out(2.4)" }, "-=0.1")
       .to({}, { duration: 1.8 })
       .to([q(".post-it")], { autoAlpha: 0, duration: 0.3 });

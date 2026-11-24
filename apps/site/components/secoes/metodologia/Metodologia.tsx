@@ -4,7 +4,7 @@ import { RefreshCcw, Sparkles } from "lucide-react";
 import { useRef } from "react";
 import type { ChaveMini } from "@/conteudo/tipos";
 import { useConteudo } from "../../conteudo";
-import { gsap, MIDIA, ScrollTrigger, useGSAP } from "../../motion/gsap";
+import { gsap, MIDIA, ScrollTrigger, useGSAPPerto } from "../../motion/gsap";
 import { Escala } from "../../ui/Escala";
 import { Onda } from "../../ui/Onda";
 import { Lapis, PONTA_LAPIS } from "./Lapis";
@@ -108,7 +108,7 @@ function MetodologiaSecao() {
   const ref = useRef<HTMLElement>(null);
   const palcoRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       const palco = palcoRef.current!;
       const q = gsap.utils.selector(palco);

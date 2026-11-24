@@ -3,7 +3,7 @@
 import { ArrowRight, Coins } from "lucide-react";
 import { useRef, useState } from "react";
 import { useConteudo } from "../conteudo";
-import { gsap, MIDIA, SplitText, useGSAP } from "../motion/gsap";
+import { gsap, MIDIA, SplitText, useGSAP, useGSAPPerto } from "../motion/gsap";
 import { useRolarPara } from "../motion/ScrollSuave";
 
 const PRECOS = [19.9, 29.9, 39.9, 49.9, 69.9, 99.9];
@@ -29,7 +29,7 @@ export function Parceria() {
   const total = preco * vendas;
 
   // Entrada e motion contínuo.
-  useGSAP(
+  useGSAPPerto(
     () => {
       if (!c) return;
       const q = gsap.utils.selector(ref);
@@ -209,7 +209,7 @@ export function Parceria() {
                 />
               ))}
               <div className="barra-metade origin-bottom rounded-3xl bg-marca-600 p-5 text-white md:p-6">
-                <p className="font-mono text-[11.5px] uppercase tracking-[0.12em] text-white/75">
+                <p className="font-mono text-[11.5px] uppercase tracking-[0.12em] text-white">
                   {s.suaParte} · {voce.pct}%
                 </p>
                 <p className="valor-voce mt-2 text-[clamp(2.4rem,5vw,3.4rem)] font-extrabold leading-none tracking-[-0.04em]">{reais(total * PARTE_CRIADOR)}</p>

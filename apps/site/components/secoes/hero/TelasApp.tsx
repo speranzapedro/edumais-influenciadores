@@ -109,7 +109,7 @@ function TopoAula({ atual, total, classeBarra = "" }: { atual: number; total: nu
         <div className="h-3 flex-1 overflow-hidden rounded-full bg-marca-100">
           <div className={`h-full rounded-full bg-marca-600 ${classeBarra}`} style={{ width: `${(atual / total) * 100}%` }} />
         </div>
-        <span className="w-10 text-right text-xs font-bold text-suave">
+        <span className="w-10 text-right text-xs font-bold text-tinta-2">
           {atual}/{total}
         </span>
       </div>

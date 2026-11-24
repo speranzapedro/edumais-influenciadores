@@ -4,7 +4,7 @@ import { Check, Coins, FileText, Flame, Play, TrendingUp, Users, Wallet } from "
 import { useRef } from "react";
 import type { Personagem } from "@/lib/avatares";
 import { useConteudo } from "../../conteudo";
-import { gsap, MIDIA, useGSAP } from "../../motion/gsap";
+import { gsap, MIDIA, useGSAPPerto } from "../../motion/gsap";
 import { Avatar, type FundoAvatar } from "../../ui/Avatar";
 import { Celular } from "../../ui/Celular";
 import { Onda } from "../../ui/Onda";
@@ -33,7 +33,7 @@ export function PorQue() {
   const ref = useRef<HTMLElement>(null);
   const c = useConteudo().criador!.porQue;
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       const q = gsap.utils.selector(ref);
       const mm = gsap.matchMedia();
@@ -92,7 +92,7 @@ export function PorQue() {
           .set(k(".tela-quiz-pq"), { yPercent: 100 }, 0)
           .set(dedo, { left: "21em", top: "46em", autoAlpha: 0, scale: 1 }, 0)
           .fromTo(k(".item-ruim"), { y: 16, autoAlpha: 0, rotation: 0, scale: 1 }, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.12, ease: "power3.out" }, 0)
-          .from(k(".risco"), { drawSVG: "0%", duration: 0.3, stagger: 0.18, ease: "power2.inOut" }, "+=0.5")
+          .from(k(".risco"), { traco: "0%", duration: 0.3, stagger: 0.18, ease: "power2.inOut" }, "+=0.5")
           .to(k(".item-ruim"), { y: -38, rotation: (i: number) => (i ? 5 : -5), scale: 0.86, opacity: 0.5, duration: 0.6, ease: "power2.inOut" }, "+=0.3")
           .from(k(".celular-pq"), { y: 280, rotation: 6, duration: 0.9, ease: "back.out(1.1)" }, "<0.15")
           // rola a trilha até a aula atual e toca nela
@@ -175,6 +175,7 @@ export function PorQue() {
             <div
               className="palco-qualidade relative h-[280px] overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_50%_100%,rgb(216_208_255/0.8),white_70%)]"
               aria-hidden
+              inert
             >
               <div className="absolute inset-x-4 top-[58px] grid grid-cols-2 gap-3">
                 <div className="item-ruim relative rounded-2xl border border-linha bg-white p-3 shadow-card" style={{ opacity: 0.5, transform: RUIM_FINAL[0] }}>
@@ -228,14 +229,14 @@ export function PorQue() {
 
           {/* 2. receita */}
           <article className="cartao-pq rounded-[32px] border border-linha bg-fundo p-3">
-            <div className="palco-receita relative flex h-[280px] flex-col gap-2 overflow-hidden rounded-[26px] bg-white p-3.5" aria-hidden>
+            <div className="palco-receita relative flex h-[280px] flex-col gap-2 overflow-hidden rounded-[26px] bg-white p-3.5" aria-hidden inert>
               {/* 1º momento: seguidores viram alunos */}
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-fundo px-2.5 py-1 text-[11.5px] font-bold text-tinta-2">
                     <Users className="size-3.5" /> 12,4 mil {c.receita.seguidores}
                   </span>
-                  <span className="alunos-pq whitespace-nowrap text-[12px] font-extrabold text-verde">
+                  <span className="alunos-pq whitespace-nowrap text-[12px] font-extrabold text-[#11733f]">
                     +<span className="contador-alunos">38</span> {c.receita.alunos}
                   </span>
                 </div>
@@ -305,7 +306,7 @@ export function PorQue() {
 
           {/* 3. comunidade */}
           <article className="cartao-pq rounded-[32px] border border-linha bg-fundo p-3">
-            <div className="palco-comunidade relative flex h-[280px] flex-col justify-center overflow-hidden rounded-[26px] bg-white px-4" aria-hidden>
+            <div className="palco-comunidade relative flex h-[280px] flex-col justify-center overflow-hidden rounded-[26px] bg-white px-4" aria-hidden inert>
               <div className="flex items-center justify-between gap-2">
                 <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-marca-700">{c.comunidade.ranking}</span>
                 <span className="flex items-center gap-1 rounded-full bg-ambar-bg px-2.5 py-1 text-[12px] font-bold text-ambar">
@@ -363,8 +364,8 @@ function Risco() {
       className="pointer-events-none absolute inset-0 size-full overflow-visible"
       fill="none"
     >
-      <path className="risco" d="M12 14 L88 86" stroke="#e8478f" strokeWidth="3.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-      <path className="risco" d="M88 14 L12 86" stroke="#e8478f" strokeWidth="3.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      <path className="risco" d="M12 14 L88 86" stroke="#e8478f" strokeWidth="3.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" pathLength={1} />
+      <path className="risco" d="M88 14 L12 86" stroke="#e8478f" strokeWidth="3.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" pathLength={1} />
     </svg>
   );
 }

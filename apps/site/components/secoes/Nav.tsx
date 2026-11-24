@@ -48,7 +48,7 @@ export function Nav() {
         >
           <Logo />
         </a>
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-0.5 lg:flex">
           {c.links.map((l) => (
             <li key={l.href}>
               <a
@@ -57,10 +57,10 @@ export function Nav() {
                   e.preventDefault();
                   rolar(l.href);
                 }}
-                className="group relative rounded-xl px-4 py-2 text-[14.5px] font-semibold text-tinta-2 transition-colors hover:text-tinta"
+                className="group relative whitespace-nowrap rounded-xl px-3 py-2 text-[14.5px] font-semibold xl:px-4 text-tinta-2 transition-colors hover:text-tinta"
               >
                 {l.rotulo}
-                <span className="absolute inset-x-4 bottom-1 h-[2px] origin-left scale-x-0 rounded-full bg-marca-500 transition-transform duration-300 ease-[var(--ease-suave)] group-hover:scale-x-100" />
+                <span className="absolute inset-x-3 bottom-1 xl:inset-x-4 h-[2px] origin-left scale-x-0 rounded-full bg-marca-500 transition-transform duration-300 ease-[var(--ease-suave)] group-hover:scale-x-100" />
               </a>
             </li>
           ))}

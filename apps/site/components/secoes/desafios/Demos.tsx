@@ -74,7 +74,7 @@ export function DemoTexto({ ativo }: PropsDemo) {
   return (
     <div className="flex h-full flex-col">
       <Progresso passo={ativo ? 2 : 1} />
-      <h4 className="mt-5 text-[19px] font-extrabold leading-tight text-tinta">{d.titulo}</h4>
+      <h3 className="mt-5 text-[19px] font-extrabold leading-tight text-tinta">{d.titulo}</h3>
       <p className="mt-2.5 text-[14px] leading-relaxed text-tinta-2">
         {d.antes}{" "}
         <span

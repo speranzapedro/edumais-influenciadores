@@ -37,9 +37,8 @@ export function Hero({ ilustracao }: { ilustracao?: React.ReactNode } = {}) {
         const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
         tl.from(q(".eyebrow"), { y: 18, autoAlpha: 0, duration: 0.7, ease: "power3.out" }, 0.1)
           .from(q(".palavra"), { yPercent: 118, rotation: 7, duration: 1.15, stagger: 0.065 }, 0.2)
-          .from(q(".rabisco-engaja .traco"), { drawSVG: "0%", duration: 1, ease: "power2.inOut" }, 0.95)
-          .from(q(".rabisco-rotina .traco"), { drawSVG: "0%", duration: 0.7, stagger: 0.15, ease: "power2.inOut" }, 1.3)
-          .from(q(".sub"), { y: 24, autoAlpha: 0, duration: 0.9, ease: "power3.out" }, 0.75)
+          .from(q(".rabisco-engaja .traco"), { traco: "0%", duration: 1, ease: "power2.inOut" }, 0.95)
+          .from(q(".rabisco-rotina .traco"), { traco: "0%", duration: 0.7, stagger: 0.15, ease: "power2.inOut" }, 1.3)
           .from(q(".cta > *"), { y: 26, autoAlpha: 0, scale: 0.94, duration: 0.8, stagger: 0.09, ease: "back.out(2)" }, 0.95)
           .from(q(".selo"), { y: 12, autoAlpha: 0, duration: 0.6, stagger: 0.07, ease: "power3.out" }, 1.2);
 
@@ -52,8 +51,15 @@ export function Hero({ ilustracao }: { ilustracao?: React.ReactNode } = {}) {
         });
       });
 
+      // O subtítulo é o maior texto da primeira tela: no celular ele já nasce visível (sem esperar o
+      // JavaScript), o que antecipa o LCP; no desktop entra com o resto do título.
+      mm.add(MIDIA.desktop, () => {
+        gsap.set(q("[data-revelar-desktop]"), { autoAlpha: 1 });
+        gsap.from(q(".sub"), { y: 24, autoAlpha: 0, duration: 0.9, delay: 0.75, ease: "power3.out" });
+      });
+
       mm.add(MIDIA.reduzido, () => {
-        gsap.set(q("[data-revelar]"), { autoAlpha: 1 });
+        gsap.set(q("[data-revelar], [data-revelar-desktop]"), { autoAlpha: 1 });
       });
     },
     { scope: ref },
@@ -117,7 +123,7 @@ export function Hero({ ilustracao }: { ilustracao?: React.ReactNode } = {}) {
             ))}
           </h1>
 
-          <p data-revelar className="sub mt-7 max-w-[560px] text-[17px] leading-relaxed text-tinta-2 md:text-[19px]">
+          <p data-revelar-desktop className="sub mt-7 max-w-[560px] text-[17px] leading-relaxed text-tinta-2 md:text-[19px]">
             <strong className="font-bold text-tinta">{c.subDestaque}</strong> <span className="max-md:hidden">{c.sub}</span>
           </p>
 

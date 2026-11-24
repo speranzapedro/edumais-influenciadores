@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useConteudo } from "../conteudo";
-import { gsap, MIDIA, useGSAP } from "../motion/gsap";
+import { gsap, MIDIA, useGSAPPerto } from "../motion/gsap";
 import { useRolarPara } from "../motion/ScrollSuave";
 import { Logo } from "../ui/Logo";
 
@@ -21,7 +21,7 @@ export function Rodape() {
   const c = conteudo.rodape;
   const links = conteudo.nav.links ? [...conteudo.nav.links, { href: "#contato", rotulo: "Contato" }] : LINKS;
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       const q = gsap.utils.selector(ref);
       const mm = gsap.matchMedia();

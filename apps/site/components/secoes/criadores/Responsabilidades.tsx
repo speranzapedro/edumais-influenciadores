@@ -3,7 +3,7 @@
 import { BadgeCheck, CreditCard, Headphones, type LucideIcon, Megaphone, ShieldCheck, Smartphone, Tag } from "lucide-react";
 import { useRef } from "react";
 import { useConteudo } from "../../conteudo";
-import { gsap, MIDIA, useGSAP } from "../../motion/gsap";
+import { gsap, MIDIA, useGSAPPerto } from "../../motion/gsap";
 import { Avatar } from "../../ui/Avatar";
 
 /** Ícone de cada item, na ordem do conteúdo: criador e Edu+. */
@@ -18,7 +18,7 @@ export function Responsabilidades() {
   const c = useConteudo().criador!.responsabilidades;
   const pct = useConteudo().parceria?.divisao;
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       const q = gsap.utils.selector(ref);
       const mm = gsap.matchMedia();

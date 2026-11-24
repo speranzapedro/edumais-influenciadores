@@ -3,7 +3,7 @@
 import { ArrowUpRight, CheckCheck, MessageCircle } from "lucide-react";
 import { useRef } from "react";
 import { useConteudo } from "../conteudo";
-import { gsap, MIDIA, useGSAP } from "../motion/gsap";
+import { gsap, MIDIA, useGSAPPerto } from "../motion/gsap";
 import { Magnetico } from "../motion/Magnetico";
 import { Avatar } from "../ui/Avatar";
 import { BotaoChunky } from "../ui/BotaoChunky";
@@ -22,7 +22,7 @@ export function Contato() {
   const ref = useRef<HTMLElement>(null);
   const cartao = useRef<HTMLDivElement>(null);
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       const q = gsap.utils.selector(ref);
       const mm = gsap.matchMedia();
@@ -30,7 +30,7 @@ export function Contato() {
         gsap
           .timeline({ scrollTrigger: { trigger: ref.current, start: "top 65%" } })
           .from(q(".cab-contato > *"), { y: 40, autoAlpha: 0, duration: 0.9, stagger: 0.1, ease: "power3.out" })
-          .from(q(".rabisco-contato .traco"), { drawSVG: "0%", duration: 0.8, ease: "power2.inOut" }, 0.5)
+          .from(q(".rabisco-contato .traco"), { traco: "0%", duration: 0.8, ease: "power2.inOut" }, 0.5)
           .from(cartao.current, { y: 90, rotation: 4, autoAlpha: 0, duration: 1.1, ease: "mola" }, 0.15)
           .from(q(".avatar-contato"), { scale: 0, rotation: -30, duration: 0.8, stagger: 0.12, ease: "back.out(2.4)" }, 0.5);
         q(".avatar-contato").forEach((el, i) => {
@@ -120,7 +120,7 @@ function CartaoWhatsapp({ w }: { w: ReturnType<typeof useConteudo>["contato"]["w
       <div className="rounded-2xl bg-[#efeae2] p-4" aria-hidden>
         <div className="ml-auto w-fit max-w-[88%] rounded-2xl rounded-tr-md bg-[#d9fdd3] px-3.5 py-2.5 text-[15px] leading-snug text-tinta shadow-[0_1px_1px_rgb(0_0_0/0.08)]">
           {w.mensagem}
-          <span className="ml-2 inline-flex translate-y-0.5 items-center gap-0.5 text-[11px] text-suave">
+          <span className="ml-2 inline-flex translate-y-0.5 items-center gap-0.5 text-[11px] text-tinta-2">
             agora <CheckCheck className="size-3.5 text-[#53bdeb]" strokeWidth={2.4} />
           </span>
         </div>
@@ -131,7 +131,7 @@ function CartaoWhatsapp({ w }: { w: ReturnType<typeof useConteudo>["contato"]["w
           {w.botao} <ArrowUpRight className="size-[18px]" />
         </BotaoChunky>
       </Magnetico>
-      <p className="text-center text-[12.5px] text-suave">{w.rodape}</p>
+      <p className="text-center text-[12.5px] text-tinta-2">{w.rodape}</p>
     </div>
   );
 }

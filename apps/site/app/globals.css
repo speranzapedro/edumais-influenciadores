@@ -173,6 +173,13 @@
   visibility: hidden;
 }
 
+/* Só some antes do JavaScript no desktop (no celular o elemento já nasce visível). */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .js-motion [data-revelar-desktop] {
+    visibility: hidden;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .js-motion [data-revelar] {
     visibility: visible;

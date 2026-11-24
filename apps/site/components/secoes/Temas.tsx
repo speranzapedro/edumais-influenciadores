@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useRef } from "react";
 import { useConteudo } from "../conteudo";
-import { gsap, MIDIA, ScrollTrigger, useGSAP } from "../motion/gsap";
+import { gsap, MIDIA, ScrollTrigger, useGSAPPerto } from "../motion/gsap";
 
 const ICONES: Record<string, LucideIcon> = {
   Ciências: Atom,
@@ -70,7 +70,7 @@ export function Temas() {
   const ref = useRef<HTMLElement>(null);
   const c = useConteudo().temas;
 
-  useGSAP(
+  useGSAPPerto(
     () => {
       if (!c) return;
       const q = gsap.utils.selector(ref);
