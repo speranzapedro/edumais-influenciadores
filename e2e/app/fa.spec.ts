@@ -70,7 +70,12 @@ async function jogarAula(page: Page, blocos: Bloco[]) {
   for (const bloco of blocos) {
     if (bloco.tipo === "quiz") {
       const certa = bloco.opcoes.find((o) => o.correta)!.texto;
-      await page.getByRole("button", { name: certa, exact: true }).last().click();
+      // O botão da opção traz a letra (A, B…) antes do texto: casa pelo texto exato dentro dele.
+      await page
+        .getByRole("button")
+        .filter({ has: page.getByText(certa, { exact: true }) })
+        .last()
+        .click();
       await expect(page.getByText("Mandou bem!")).toBeVisible();
     } else if (bloco.tipo === "completar") {
       for (const lacuna of bloco.lacunas) await page.getByRole("button", { name: lacuna.resposta, exact: true }).last().click();
