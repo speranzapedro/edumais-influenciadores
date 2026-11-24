@@ -1,0 +1,26 @@
+node_modules/
+.next/
+out/
+coverage/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# Variáveis de ambiente: só o .env.example vai para o git
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
+# Logs e arquivos locais
+*.log
+*.local.md
+.DS_Store

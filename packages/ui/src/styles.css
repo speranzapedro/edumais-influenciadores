@@ -1,0 +1,121 @@
+/*
+ * Design system — tokens extraídos da referência visual (LMS claro, lilás, cards brancos,
+ * tiles pastel, gradiente violeta). Importado pelos dois apps depois de `@import "tailwindcss"`.
+ */
+@source "./";
+
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  --color-fundo: #f5f5fb;
+  --color-superficie: #ffffff;
+  --color-tinta: #1d1a3a;
+  --color-tinta-2: #4b4868;
+  --color-suave: #8b8aa6;
+  --color-linha: #ebebf3;
+
+  --color-marca-50: #f4f2ff;
+  --color-marca-100: #ebe7ff;
+  --color-marca-200: #d8d0ff;
+  --color-marca-300: #bbaeff;
+  --color-marca-400: #9b87fb;
+  --color-marca-500: #7f6cf3;
+  --color-marca-600: #6c5ce7;
+  --color-marca-700: #5a48d1;
+  --color-marca-800: #4434a8;
+  --color-marca-900: #2b2680;
+
+  /* tiles pastel: fundo + traço */
+  --color-lilas-bg: #efeafe;
+  --color-lilas: #7c5cf0;
+  --color-azul-bg: #e3eeff;
+  --color-azul: #3b82f6;
+  --color-laranja-bg: #fff0dd;
+  --color-laranja: #f59324;
+  --color-verde-bg: #ddf6e8;
+  --color-verde: #1fb768;
+  --color-rosa-bg: #fde6f1;
+  --color-rosa: #e8478f;
+  --color-ambar-bg: #fff4d1;
+  --color-ambar: #e7a300;
+  --color-vermelho-bg: #fee6e6;
+  --color-vermelho: #ef4444;
+
+  --radius-card: 1.25rem;
+  --radius-tile: 0.875rem;
+
+  --shadow-card: 0 1px 2px rgb(29 26 58 / 0.04), 0 8px 24px -12px rgb(29 26 58 / 0.08);
+  --shadow-flutuante: 0 12px 40px -12px rgb(76 59 207 / 0.35);
+
+  --animate-surgir: surgir 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pulsar: pulsar 2s ease-in-out infinite;
+  --animate-brilho: brilho 1.6s ease-in-out infinite;
+  --animate-destaque: destaque 2.4s ease-out both;
+
+  @keyframes surgir {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pulsar {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(108 92 231 / 0.45);
+    }
+    50% {
+      box-shadow: 0 0 0 14px rgb(108 92 231 / 0);
+    }
+  }
+  @keyframes brilho {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes destaque {
+    0% {
+      background-color: var(--cor-destaque, #ddf6e8);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--color-fundo);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--color-marca-200);
+  }
+}
+
+@utility gradiente-marca {
+  background-image: linear-gradient(135deg, #7d6cf5 0%, #6c5ce7 45%, #5847d6 100%);
+}
+@utility gradiente-noite {
+  background-image: radial-gradient(120% 80% at 50% 0%, #5a4ae0 0%, #33289a 55%, #221b6e 100%);
+}
+@utility esqueleto {
+  background-image: linear-gradient(90deg, #efeff6 0%, #f8f8fc 50%, #efeff6 100%);
+  background-size: 200% 100%;
+  animation: var(--animate-brilho);
+}
+@utility rolagem-fina {
+  scrollbar-width: thin;
+  scrollbar-color: #d9d7ea transparent;
+}
