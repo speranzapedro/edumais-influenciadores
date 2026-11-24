@@ -1,0 +1,21 @@
+{
+  "name": "@edu/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@edu/core": "workspace:*",
+    "@edu/db": "workspace:*",
+    "@edu/testing": "workspace:*"
+  },
+  "devDependencies": {
+    "@edu/config": "workspace:*",
+    "@playwright/test": "1.65.0",
+    "@types/node": "^22",
+    "typescript": "5.9.3"
+  }
+}

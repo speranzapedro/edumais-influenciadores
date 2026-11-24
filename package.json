@@ -20,6 +20,7 @@
     "test:int:cobertura": "vitest run --config vitest.integracao.config.ts --coverage",
     "db:iniciar": "supabase start",
     "db:resetar": "supabase db reset",
+    "e2e": "pnpm --filter @edu/e2e test",
     "db:tipos": "supabase gen types typescript --local --schema public > packages/db/tipos/database.gerado.ts && tsc -p packages/db/tipos"
   },
   "devDependencies": {
