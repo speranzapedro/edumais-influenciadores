@@ -1,5 +1,5 @@
 import { db, ok, talvez } from "./client";
-import type { Json, Row, UserRoleDb } from "./database.types";
+import type { Json, JsonNaoNulo, Row, UserRoleDb } from "./database.types";
 import { ErroAcesso } from "./erros";
 import type { AppSessao } from "./sessao";
 
@@ -186,7 +186,7 @@ export async function registrarAuditoria(p: { ator: string | null; acao: string;
   ok(
     await db()
       .from("audit_log")
-      .insert({ ator_id: p.ator, acao: p.acao, entidade: p.entidade, entidade_id: p.entidadeId ?? null, dados: (p.dados ?? {}) as Json }),
+      .insert({ ator_id: p.ator, acao: p.acao, entidade: p.entidade, entidade_id: p.entidadeId ?? null, dados: (p.dados ?? {}) as JsonNaoNulo }),
     "auditoria",
   );
 }

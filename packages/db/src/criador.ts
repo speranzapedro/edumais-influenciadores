@@ -12,7 +12,7 @@ import {
 } from "@edu/core";
 import { apagarConta, criarConta, normalizarNome, registrarAuditoria, registrarTentativa, type Usuario, verificarLimite } from "./acesso";
 import { db, ok, talvez } from "./client";
-import type { AssinaturaStatusDb, Json, Row } from "./database.types";
+import type { AssinaturaStatusDb, Json, JsonNaoNulo, Row } from "./database.types";
 import { ErroAcesso, ErroPermissao } from "./erros";
 
 /**
@@ -147,7 +147,7 @@ export async function salvarPerfilCriador(
       nome_publico: nome.slice(0, 80),
       handle,
       bio: p.bio?.trim().slice(0, 500) || null,
-      redes: redes as unknown as Json,
+      redes: redes as unknown as JsonNaoNulo,
       updated_at: agora,
       ...(p.fotoUrl !== undefined ? { foto_url: p.fotoUrl } : {}),
     })

@@ -2,6 +2,8 @@
 // textos fechados (status, tipos) como uniões literais. O CI gera os tipos a partir do banco e confere
 // que estes batem com eles (packages/db/test/tipos.check.ts): mudou o schema, atualize aqui.
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+/** Coluna jsonb `not null` (o `supabase gen types` gera `NonNullable<Json>`). */
+export type JsonNaoNulo = NonNullable<Json>;
 
 type Etapa = "visao" | "ementa" | "cards" | "aulas";
 type EtapaStatus = "pendente" | "gerando" | "em_revisao" | "aprovada" | "desatualizada";
@@ -70,7 +72,7 @@ export type Database = {
           nome_publico: string;
           bio: string | null;
           foto_url: string | null;
-          redes: Json;
+          redes: JsonNaoNulo;
           created_at: string;
           updated_at: string;
         },
@@ -231,7 +233,7 @@ export type Database = {
           acao: string;
           entidade: string;
           entidade_id: string | null;
-          dados: Json;
+          dados: JsonNaoNulo;
           created_at: string;
         },
         "id" | "ator_id" | "entidade_id" | "dados" | "created_at",
@@ -262,7 +264,7 @@ export type Database = {
           versao_aprovada: number | null;
           qualidade: Json | null;
           gerando_desde: string | null;
-          revisoes: Json;
+          revisoes: JsonNaoNulo;
           updated_at: string;
         },
         "status" | "versao_atual" | "versao_aprovada" | "qualidade" | "gerando_desde" | "revisoes" | "updated_at"
@@ -273,7 +275,7 @@ export type Database = {
           trilha_id: string;
           etapa: Etapa;
           versao: number;
-          snapshot: Json;
+          snapshot: JsonNaoNulo;
           autor: "agente" | "criador";
           resumo: string | null;
           created_at: string;
@@ -287,7 +289,7 @@ export type Database = {
           etapa: Etapa;
           role: string;
           texto: string;
-          eventos: Json;
+          eventos: JsonNaoNulo;
           foco: Json | null;
           versao: number | null;
           created_at: string;
@@ -337,10 +339,10 @@ export type Database = {
           ordem: number;
           titulo: string;
           conceito: string;
-          pontos_chave: Json;
+          pontos_chave: JsonNaoNulo;
           exemplo: string | null;
           topico_ids: string[];
-          fontes: Json;
+          fontes: JsonNaoNulo;
         },
         "id" | "pontos_chave" | "exemplo" | "topico_ids" | "fontes"
       >;
@@ -360,7 +362,7 @@ export type Database = {
         "id" | "modulo_titulo" | "objetivo" | "skill_card_codigos" | "arquivada_em",
         [Rel<"aulas_trilha_id_fkey", "trilha_id", "trilhas">]
       >;
-      aula_blocos: Tabela<{ id: string; aula_id: string; ordem: number; tipo: string; conteudo: Json }, "id">;
+      aula_blocos: Tabela<{ id: string; aula_id: string; ordem: number; tipo: string; conteudo: JsonNaoNulo }, "id">;
       aula_conclusoes: Tabela<{ user_id: string; aula_id: string; acertos: number; total: number; concluida_em: string }, "acertos" | "total" | "concluida_em">;
       trilha_conclusoes: Tabela<{ user_id: string; trilha_id: string; concluida_em: string }, "concluida_em">;
       dias_ativos: Tabela<{ user_id: string; dia: string }>;

@@ -13,7 +13,7 @@ import {
   visaoVazia,
 } from "@edu/core";
 import { db, ok, talvez } from "./client";
-import type { Json, Row } from "./database.types";
+import type { Json, JsonNaoNulo, Row } from "./database.types";
 import { ErroPermissao } from "./erros";
 
 export const ORDEM_ETAPAS: Etapa[] = ["visao", "ementa", "cards", "aulas"];
@@ -225,7 +225,7 @@ export async function salvarVersao(p: { trilhaId: string; etapa: Etapa; snapshot
         trilha_id: p.trilhaId,
         etapa: p.etapa,
         versao,
-        snapshot: p.snapshot as unknown as Json,
+        snapshot: p.snapshot as unknown as JsonNaoNulo,
         autor: p.autor,
         resumo: p.resumo,
       }),
@@ -324,7 +324,7 @@ export async function registrarMensagem(p: {
         etapa: p.etapa,
         role: p.role,
         texto: p.texto,
-        eventos: (p.eventos ?? []) as Json,
+        eventos: (p.eventos ?? []) as JsonNaoNulo,
         foco: (p.foco ?? null) as Json,
         versao: p.versao ?? null,
       })
@@ -447,10 +447,10 @@ export async function materializarCards(trilhaId: string, draft: CardsDraft) {
     ordem: i + 1,
     titulo: c.titulo,
     conceito: c.conceito,
-    pontos_chave: c.pontos_chave as unknown as Json,
+    pontos_chave: c.pontos_chave as unknown as JsonNaoNulo,
     exemplo: c.exemplo,
     topico_ids: c.topico_ids,
-    fontes: c.fontes as unknown as Json,
+    fontes: c.fontes as unknown as JsonNaoNulo,
   }));
   if (linhas.length) ok(await db().from("skill_cards").upsert(linhas, { onConflict: "trilha_id,codigo" }), "cards");
   const codigos = draft.cards.map((c) => c.id);
@@ -485,7 +485,7 @@ export async function materializarAulas(trilhaId: string, ementa: Ementa, draft:
   const ids = [...idPorCodigo.values()];
   if (ids.length) ok(await db().from("aula_blocos").delete().in("aula_id", ids), "limpar blocos");
   const blocos = draft.aulas.flatMap((a) =>
-    a.blocos.map((b, i) => ({ aula_id: idPorCodigo.get(a.id)!, ordem: i + 1, tipo: b.tipo, conteudo: b as unknown as Json })),
+    a.blocos.map((b, i) => ({ aula_id: idPorCodigo.get(a.id)!, ordem: i + 1, tipo: b.tipo, conteudo: b as unknown as JsonNaoNulo })),
   );
   for (let i = 0; i < blocos.length; i += 500) {
     ok(
