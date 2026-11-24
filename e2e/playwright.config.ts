@@ -45,6 +45,11 @@ export default defineConfig({
       testDir: "app",
       use: { ...devices["Pixel 7"], baseURL: "http://localhost:3007" },
     },
+    {
+      name: "site",
+      testDir: "site",
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3000" },
+    },
   ],
   webServer: [
     {
@@ -57,6 +62,13 @@ export default defineConfig({
     {
       command: "pnpm --filter @edu/app start",
       url: "http://localhost:3007/api/saude",
+      reuseExistingServer: !CI,
+      timeout: 120_000,
+      stdout: "pipe",
+    },
+    {
+      command: "pnpm --filter @edu/site start",
+      url: "http://localhost:3000/robots.txt",
       reuseExistingServer: !CI,
       timeout: 120_000,
       stdout: "pipe",
