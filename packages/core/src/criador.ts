@@ -71,3 +71,12 @@ export function lerPrecoEmCentavos(texto: string): number | null {
 
 /** Parte do criador (centavos) de uma receita bruta. */
 export const parteDoCriador = (brutoCentavos: number) => Math.round(brutoCentavos * PARTE_CRIADOR);
+
+/** WhatsApp da Edu+ para dúvidas de criadores (DDI + DDD + número, só dígitos). */
+export const WHATSAPP_EDU = "5521984600257";
+
+/** Link do WhatsApp da Edu+, já com a mensagem escrita quando houver. */
+export function linkWhatsAppEdu(mensagem?: string): string {
+  const base = `https://wa.me/${WHATSAPP_EDU}`;
+  return mensagem ? `${base}?text=${encodeURIComponent(mensagem)}` : base;
+}

@@ -1,6 +1,8 @@
 import { Marca } from "@edu/ui";
 import { notFound, redirect } from "next/navigation";
+import { ContatoWhatsApp } from "@/components/ContatoWhatsApp";
 import { LadoMarca } from "@/components/LadoMarca";
+import { PassosCriador } from "@/components/PassosCriador";
 import { chaveDeCadastroValida } from "@/lib/cadastro";
 import { criadorAtual } from "@/lib/sessao";
 import { FormCadastro } from "./FormCadastro";
@@ -20,9 +22,14 @@ export default async function CadastroPage({ params }: { params: Promise<{ chave
           <div className="lg:hidden">
             <Marca />
           </div>
+          <div className="mt-6 rounded-card border border-linha bg-superficie p-5 lg:hidden">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-marca-600">Como funciona</p>
+            <PassosCriador compacto />
+          </div>
           <h2 className="mt-8 text-2xl font-extrabold lg:mt-0">Crie sua conta de criador</h2>
           <p className="mb-6 mt-1 text-sm text-suave">Em poucos minutos você monta seu perfil e começa a primeira trilha com o Edu.</p>
           <FormCadastro chave={chave} />
+          <ContatoWhatsApp className="mt-8 flex justify-center lg:hidden" />
         </div>
       </section>
     </main>

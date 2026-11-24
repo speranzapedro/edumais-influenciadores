@@ -1,6 +1,7 @@
 import { destinoSeguro } from "@edu/db/next";
 import { Marca } from "@edu/ui";
 import { redirect } from "next/navigation";
+import { ContatoWhatsApp } from "@/components/ContatoWhatsApp";
 import { LadoMarca } from "@/components/LadoMarca";
 import { criadorAtual } from "@/lib/sessao";
 import { FormLogin } from "./FormLogin";
@@ -21,6 +22,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <h2 className="mt-8 text-2xl font-extrabold lg:mt-0">Entrar</h2>
           <p className="mb-6 mt-1 text-sm text-suave">Acesse o painel com seu e-mail e senha.</p>
           <FormLogin next={next} />
+          <ContatoWhatsApp className="mt-8 flex justify-center lg:hidden" />
         </div>
       </section>
     </main>
