@@ -72,7 +72,7 @@ jobs:
         if: failure() && steps.supabase.outcome == 'success'
         run: |
           grep -n -A3 "export type Json" packages/db/tipos/database.gerado.ts || true
-          grep -n -A14 "criador_perfis: {" packages/db/tipos/database.gerado.ts | head -20 || true
+          grep -n -E "redes|eventos|revisoes" packages/db/tipos/database.gerado.ts | head -20 || true
       - name: Logs do Supabase em caso de falha
         if: failure()
         run: docker ps -a && docker logs supabase_db_edumais-influenciadores 2>&1 | tail -100
