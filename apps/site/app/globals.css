@@ -1,0 +1,210 @@
+@import "tailwindcss";
+@import "@edu/ui/styles.css";
+@import "lenis/dist/lenis.css";
+@source "../components";
+@source "../app";
+/* Telas reais do app do aluno (player e cartões de desafio). */
+@source "../../../packages/aula-ui/src";
+
+/*
+ * Tokens da landing. A base (fundo, tinta, escala marca, pares pastel) vem do design system;
+ * aqui entram só o acento mono "tech", o creme do botão secundário e os tons do lápis.
+ */
+@theme {
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+
+  --color-creme: #fffbef;
+  --color-creme-borda: #d6cfbb;
+  --color-noite: #15123a;
+  --color-coral: #ff6b5b;
+  --color-madeira: #ffe1bd;
+
+  --ease-mola: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-piscar: piscar 1.05s steps(1) infinite;
+  --animate-girar: girar 22s linear infinite;
+  --animate-cintilar: cintilar 2.6s ease-in-out infinite;
+
+  @keyframes piscar {
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes girar {
+    to {
+      rotate: 360deg;
+    }
+  }
+  @keyframes cintilar {
+    0%,
+    100% {
+      opacity: 0.25;
+      scale: 0.7;
+    }
+    50% {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: auto;
+  }
+  body {
+    overflow-x: clip;
+  }
+  /* Grão sutil por cima de tudo: dá textura de papel sem pesar. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  /* A aula de demonstração imita o app: sem o grão da landing. */
+  body:has(.sem-grao)::after {
+    display: none;
+  }
+  :focus-visible {
+    outline: 2.5px solid var(--color-marca-500);
+    outline-offset: 3px;
+    border-radius: 10px;
+  }
+}
+
+/* Botão "chunky": face clara, borda e degrau inferior que afunda ao clicar. */
+@utility chunky {
+  --degrau: 6px;
+  --face: var(--color-marca-300);
+  --borda: var(--color-marca-600);
+  --sombra: var(--color-marca-600);
+  --texto: var(--color-tinta);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1.5px solid var(--borda);
+  border-radius: 16px;
+  background: var(--face);
+  color: var(--texto);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.45),
+    0 var(--degrau) 0 0 var(--sombra);
+  transform: translateY(0);
+  transition:
+    transform 0.22s var(--ease-mola),
+    box-shadow 0.22s var(--ease-mola),
+    background-color 0.2s;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.7s var(--ease-suave);
+  }
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 2px 0 rgb(255 255 255 / 0.45),
+      0 calc(var(--degrau) + 2px) 0 0 var(--sombra);
+  }
+  &:hover::before {
+    transform: translateX(120%);
+  }
+  &:active {
+    transform: translateY(var(--degrau));
+    box-shadow:
+      inset 0 2px 0 rgb(255 255 255 / 0.3),
+      0 0 0 0 var(--sombra);
+    transition-duration: 0.07s;
+  }
+}
+
+@utility chunky-creme {
+  --face: var(--color-creme);
+  --borda: var(--color-creme-borda);
+  --sombra: var(--color-creme-borda);
+}
+
+@utility chunky-whatsapp {
+  --face: #25d366;
+  --borda: #128c4a;
+  --sombra: #128c4a;
+}
+
+@utility chunky-escuro {
+  --face: var(--color-marca-600);
+  --borda: var(--color-marca-800);
+  --sombra: var(--color-marca-800);
+  --texto: #fff;
+}
+
+@utility grade-pontos {
+  background-image: radial-gradient(rgb(108 92 231 / 0.22) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+@utility texto-contorno {
+  -webkit-text-stroke: 1.5px currentColor;
+  color: transparent;
+}
+
+/* Estado inicial dos elementos que o GSAP revela: evita "piscar" antes da hidratação. */
+.js-motion [data-revelar] {
+  visibility: hidden;
+}
+
+/* Só some antes do JavaScript no desktop (no celular o elemento já nasce visível). */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .js-motion [data-revelar-desktop] {
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-motion [data-revelar] {
+    visibility: visible;
+  }
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: o movimento reduzido precisa vencer as animações dos componentes */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: o movimento reduzido precisa vencer as animações dos componentes */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: o movimento reduzido precisa vencer as animações dos componentes */
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Entrada do modal da aula de demonstração. */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+}
