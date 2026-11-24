@@ -24,3 +24,7 @@ blob-report/
 *.log
 *.local.md
 .DS_Store
+
+# Tipos gerados do banco local (só para conferir os escritos à mão)
+packages/db/tipos/database.gerado.ts
+coverage-integracao/

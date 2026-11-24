@@ -8,3 +8,4 @@ export * from "./orientacao";
 export * from "./revisao";
 export * from "./tour-estudio";
 export * from "./validacao";
+export * from "./vendas";

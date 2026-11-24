@@ -21,10 +21,15 @@ Este repositório nasceu de uma cópia podada do monorepo `POC-FAETEC` (commit `
 apps/painel     painel do criador (estúdio, vendas, divulgar)   criador.edumais.app.br
 apps/app        app do aluno (página pública /c/@, aulas, Edu)   aprenda.edumais.app.br
 apps/site       landing de criadores                             edumais.app.br
-packages/core   regras puras: conteúdo, validação, gamificação, aula, criador
-packages/ai     agente do estúdio, revisor, feedback, tutor (Anthropic + Voyage)
-packages/ui     design system (tokens, componentes, termos)
-packages/config tsconfig base
+packages/core    regras puras: conteúdo, validação, gamificação, aula, criador, vendas
+packages/ai      agente do estúdio, revisor, feedback, tutor (Anthropic + Voyage)
+packages/db      acesso ao Supabase (só servidor) + testes de integração em packages/db/test
+packages/estudio estúdio da trilha (componentes e rotas do agente)
+packages/aula-ui player das aulas e painel do Edu
+packages/ui      design system (tokens, componentes, termos)
+packages/testing fábricas, limpeza e ambiente dos testes de integração
+packages/config  tsconfig base
+supabase/        config.toml e migrations (a base é 20261123120000_base.sql)
 ```
 
 ## Comandos
@@ -36,15 +41,25 @@ pnpm verificar          # o mesmo que o CI: biome, tipos, testes com cobertura m
 pnpm test               # testes unitários e de componentes
 pnpm test:cobertura     # idem, com relatório em coverage/ e limites por pacote
 pnpm lint:corrigir      # formata e aplica correções seguras do Biome
+
+# Banco local (Docker): sobe o Supabase com as migrations aplicadas
+pnpm db:iniciar
+pnpm db:resetar         # recria o banco local do zero
+pnpm db:tipos           # gera os tipos do banco local e confere com database.types.ts
+pnpm test:int           # testes de integração do @edu/db (só aceitam Supabase local)
+pnpm test:int:cobertura # idem, com cobertura mínima de 75% em packages/db/src
 ```
+
+O CI roda tudo isso em dois jobs: **Qualidade** (Biome, tipos, unitários) e **Integração** (Supabase local, lint do schema, tipos e testes do banco).
 
 ## Regras do projeto
 
 - **Banco só no servidor**, com a chave secreta. Nada de chave de serviço no navegador.
-- **Migrations só aditivas** depois da migration base. Mudou o schema, regenere os tipos (`packages/db/src/database.types.ts`).
-- **Toda função nova do `@edu/db`** ganha teste de integração; toda regra pura nova ganha teste unitário.
+- **Migrations só aditivas** depois da migration base. Mudou o schema, atualize `packages/db/src/database.types.ts` (escrito à mão, com uniões literais) e rode `pnpm db:tipos`: o CI falha se divergir do banco.
+- **Toda função nova do `@edu/db`** ganha teste de integração (`packages/db/test/*.int.test.ts`, com as fábricas de `@edu/testing`); toda regra pura nova ganha teste unitário. Regra de negócio que não precisa do banco (agregações, limites) vai para o `@edu/core`.
 - **A IA nunca é chamada nos testes**: use `definirClienteAnthropic` com o cliente falso de `packages/ai/src/teste/anthropic-falso.ts`, e `VOYAGE_API_URL` para o Voyage.
-- **Cobertura mínima de 80% de linhas** em `core`, `ai` e `ui` (o CI falha abaixo disso).
+- **Cobertura mínima**: 80% de linhas em `core`, `ai` e `ui`; 75% em `db` pelos testes de integração (o CI falha abaixo disso).
+- **Contas nascem pelo servidor** (`criarConta`: Auth primeiro, depois `users`); o cadastro público do Supabase Auth fica desligado. Apagar o login no Auth apaga o resto em cascata.
 - **Identidade visual**: tokens em `packages/ui/src/styles.css` (roxo `#6c5ce7`, Plus Jakarta Sans), componente `Marca`. Não crie cores ou fontes fora dos tokens.
 - **Nomes em português**, como no resto do código. Commits no padrão Conventional Commits (`feat:`, `fix:`, `chore:`…), checados pelo lefthook.
 - `style/noNonNullAssertion` está desligado no Biome: o `!` é aceito quando o valor já foi conferido.

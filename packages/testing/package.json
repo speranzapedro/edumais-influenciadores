@@ -1,0 +1,24 @@
+{
+  "name": "@edu/testing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ambiente": "./src/ambiente.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@edu/ai": "workspace:*",
+    "@edu/core": "workspace:*",
+    "@edu/db": "workspace:*",
+    "@edu/estudio": "workspace:*"
+  },
+  "devDependencies": {
+    "@edu/config": "workspace:*",
+    "@types/node": "^22",
+    "typescript": "5.9.3"
+  }
+}
