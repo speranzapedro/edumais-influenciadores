@@ -1,0 +1,1297 @@
+{
+  "ementa": {
+    "curso": "Eletricidade Básica e Segurança",
+    "objetivo_geral": "Capacitar o aluno a aplicar a Lei de Ohm na análise de circuitos simples e a trabalhar em instalações de baixa tensão com segurança, conforme a NR-10.",
+    "publico_alvo": "Alunos do início do curso técnico, sem experiência prévia com eletricidade, que dominam a matemática do ensino fundamental.",
+    "competencias": [
+      {
+        "id": "K1",
+        "texto": "Aplicar a Lei de Ohm e as leis de associação de resistores em série e paralelo na análise de circuitos simples."
+      },
+      {
+        "id": "K2",
+        "texto": "Reconhecer os riscos do choque elétrico e aplicar medidas de proteção coletiva (EPC) e individual (EPI)."
+      },
+      {
+        "id": "K3",
+        "texto": "Aplicar a sequência de desenergização e reenergização prevista na NR-10."
+      }
+    ],
+    "modulos": [
+      {
+        "id": "M1",
+        "titulo": "Lei de Ohm e circuitos",
+        "descricao": "Ensina a relação entre tensão, corrente e resistência e como analisar circuitos simples, incluindo associações de resistores em série e em paralelo.",
+        "topicos": [
+          {
+            "id": "T1",
+            "titulo": "Lei de Ohm",
+            "descricao": "A relação V = R × I e suas variações (I = V/R, R = V/I), com exemplos numéricos de cálculo de uma grandeza a partir das outras duas, usando a dica do triângulo para memorizar as fórmulas.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 1
+              },
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 2
+              }
+            ],
+            "competencia_ids": ["K1"]
+          },
+          {
+            "id": "T2",
+            "titulo": "Circuito elétrico e curto-circuito",
+            "descricao": "Os elementos de um circuito simples (fonte, condutores, carga, dispositivo de manobra), diferença entre circuito aberto e fechado, e o que caracteriza um curto-circuito e seus riscos.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 2
+              }
+            ],
+            "competencia_ids": ["K1"]
+          },
+          {
+            "id": "T3",
+            "titulo": "Associação de resistores em série",
+            "descricao": "Cálculo da resistência equivalente em série (Req = R1 + R2 + ...), por que a corrente é igual em todos os elementos e a tensão se divide entre eles, com exemplo numérico completo.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 2
+              }
+            ],
+            "competencia_ids": ["K1"]
+          },
+          {
+            "id": "T4",
+            "titulo": "Associação de resistores em paralelo",
+            "descricao": "Cálculo da resistência equivalente em paralelo (1/Req = 1/R1 + 1/R2 + ...), por que a tensão é igual em todos os ramos e a corrente se divide, e por que as tomadas residenciais são ligadas em paralelo.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 2
+              }
+            ],
+            "competencia_ids": ["K1"]
+          }
+        ]
+      },
+      {
+        "id": "M2",
+        "titulo": "Segurança em eletricidade",
+        "descricao": "Aborda os riscos do choque elétrico e as medidas de proteção e procedimentos exigidos pela NR-10 para trabalhar com segurança em instalações elétricas.",
+        "topicos": [
+          {
+            "id": "T5",
+            "titulo": "Efeitos do choque elétrico",
+            "descricao": "Como o choque acontece e os limiares de corrente alternada que causam formigamento, contração muscular, risco de parada respiratória e fibrilação ventricular, além de queimaduras e arco elétrico.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 3
+              }
+            ],
+            "competencia_ids": ["K2"]
+          },
+          {
+            "id": "T6",
+            "titulo": "Medidas de proteção: EPC e EPI",
+            "descricao": "Por que a proteção coletiva (desenergização, isolação, barreiras, sinalização, aterramento temporário) vem antes da proteção individual (luvas isolantes, capacete, óculos, calçado, vestimenta antichama).",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 3
+              }
+            ],
+            "competencia_ids": ["K2"]
+          },
+          {
+            "id": "T7",
+            "titulo": "Aterramento das instalações e dispositivo DR",
+            "descricao": "Para que serve o aterramento permanente das instalações (fio terra, haste de aterramento) e como o dispositivo DR (diferencial residual) detecta fuga de corrente e desliga o circuito automaticamente, protegendo contra choque em tomadas, banheiros e áreas molhadas.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 3
+              }
+            ],
+            "competencia_ids": ["K2"]
+          },
+          {
+            "id": "T8",
+            "titulo": "NR-10: norma de segurança em eletricidade",
+            "descricao": "O que é a NR-10, exigências sobre trabalhadores qualificados, habilitados ou capacitados e autorizados, o curso básico de 40 horas, e a preferência por trabalho com instalação desenergizada.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 3
+              }
+            ],
+            "competencia_ids": ["K3"]
+          },
+          {
+            "id": "T9",
+            "titulo": "Sequência de desenergização e reenergização",
+            "descricao": "As seis etapas da NR-10 para desenergizar uma instalação (seccionamento, impedimento de reenergização, constatação de ausência de tensão, aterramento temporário, proteção e sinalização) e a sequência inversa para religar.",
+            "fontes": [
+              {
+                "material_id": "demo-mat-apostila",
+                "pagina": 3
+              }
+            ],
+            "competencia_ids": ["K3"]
+          }
+        ]
+      }
+    ]
+  },
+  "cards": {
+    "cards": [
+      {
+        "id": "C1",
+        "titulo": "Calcular tensão, corrente e resistência com a Lei de Ohm",
+        "conceito": "A Lei de Ohm afirma que, em muitos materiais, a corrente é diretamente proporcional à tensão aplicada. Sua fórmula é V = R × I, de onde se derivam I = V / R e R = V / I. Para memorizar, use o triângulo: escreva V no topo e R e I embaixo; cubra a grandeza que quer descobrir e veja a operação que sobra. Exemplo: uma resistência de 10 Ω ligada a 12 V gera corrente I = 12/10 = 1,2 A. Se a tensão dobrar para 24 V, mantendo a mesma resistência, a corrente também dobra, para 2,4 A.",
+        "pontos_chave": [
+          "A Lei de Ohm é V = R × I.",
+          "Derivadas: I = V/R (calcular corrente) e R = V/I (calcular resistência).",
+          "O triângulo com V no topo e R, I embaixo ajuda a lembrar qual fórmula usar.",
+          "Em um resistor de 10 Ω com 12 V, a corrente é 1,2 A; dobrando a tensão, a corrente dobra."
+        ],
+        "exemplo": "Para saber a corrente de um resistor de 10 Ω ligado a 12 V, calcula-se I = 12 / 10 = 1,2 A.",
+        "topico_ids": ["T1"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 1
+          },
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 2
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "titulo": "Elementos do circuito elétrico e circuito aberto/fechado",
+        "conceito": "Um circuito elétrico simples é formado por quatro elementos: uma fonte, que fornece a tensão; condutores, os fios que conduzem a corrente; uma carga, o componente que consome energia (como uma lâmpada); e, em geral, um dispositivo de manobra, como um interruptor. A corrente elétrica só circula quando o circuito está fechado, ou seja, quando existe um caminho contínuo entre os terminais da fonte passando pela carga. Com o interruptor aberto, o circuito está aberto e a corrente é interrompida — por isso usamos interruptores para ligar e desligar aparelhos.",
+        "pontos_chave": [
+          "Um circuito tem fonte, condutores, carga e, geralmente, dispositivo de manobra.",
+          "A fonte fornece a tensão; a carga consome a energia.",
+          "Circuito fechado: há caminho contínuo e a corrente circula.",
+          "Circuito aberto: o caminho está interrompido e não há corrente."
+        ],
+        "exemplo": "Ao apagar a luz do quarto, você abre o interruptor, interrompendo o circuito e cortando a corrente para a lâmpada.",
+        "topico_ids": ["T2"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 2
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "titulo": "Curto-circuito: causas e riscos",
+        "conceito": "Curto-circuito é a situação em que a corrente encontra um caminho de resistência quase zero, sem passar pela carga prevista do circuito. Pela Lei de Ohm (I = V/R), com R muito pequena, a corrente resultante fica extremamente alta, o que aquece os fios rapidamente e pode causar incêndio ou danificar equipamentos. Disjuntores e fusíveis existem justamente para detectar essa corrente anormalmente alta e interromper o circuito antes que o aquecimento cause danos maiores.",
+        "pontos_chave": [
+          "Curto-circuito: corrente passa por caminho de resistência quase zero, sem a carga.",
+          "Com R muito pequena, a Lei de Ohm mostra que a corrente fica muito alta.",
+          "A corrente alta aquece os fios rapidamente e pode causar incêndio.",
+          "Disjuntores e fusíveis interrompem o circuito em caso de curto-circuito."
+        ],
+        "exemplo": "Um prego que atravessa a parede e fura um fio encostando no outro condutor cria um curto-circuito, fazendo o disjuntor desarmar na hora.",
+        "topico_ids": ["T2"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 2
+          }
+        ]
+      },
+      {
+        "id": "C4",
+        "titulo": "Associação de resistores em série",
+        "conceito": "Na associação em série, os resistores ficam um depois do outro, formando um único caminho para a corrente. Por isso, a corrente é a mesma em todos os resistores, e a tensão da fonte se divide entre eles proporcionalmente ao valor de cada um. A resistência equivalente é a soma das resistências: Req = R1 + R2 + R3 + ... Exemplo: 100 Ω e 220 Ω em série formam Req = 320 Ω; com 12 V aplicados, a corrente é I = 12/320 = 0,0375 A (37,5 mA); a tensão em R1 é 100 × 0,0375 = 3,75 V e em R2 é 8,25 V, somando os 12 V da fonte. Uma desvantagem é que, se um elemento queimar, todo o circuito abre — era o caso dos antigos piscas de Natal.",
+        "pontos_chave": [
+          "Em série, a corrente é igual em todos os resistores.",
+          "Req = R1 + R2 + R3 + ... (soma das resistências).",
+          "A tensão da fonte se divide entre os resistores, proporcional a cada R.",
+          "Se um elemento queimar, o circuito inteiro abre (ex.: piscas de Natal antigos)."
+        ],
+        "exemplo": "Nos antigos piscas de Natal ligados em série, quando uma lâmpada queimava, todas as outras apagavam junto, porque o circuito inteiro abria.",
+        "topico_ids": ["T3"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 2
+          }
+        ]
+      },
+      {
+        "id": "C5",
+        "titulo": "Associação de resistores em paralelo",
+        "conceito": "Na associação em paralelo, os resistores ficam lado a lado, ligados aos mesmos dois pontos. A tensão é igual em todos os ramos, e a corrente total se divide entre eles. A resistência equivalente é calculada por 1/Req = 1/R1 + 1/R2 + ...; para dois resistores, Req = (R1 × R2)/(R1 + R2). O resultado é sempre menor que o menor dos resistores. Exemplo: 6 Ω e 3 Ω em paralelo formam Req = 18/9 = 2 Ω. As tomadas de uma casa são ligadas em paralelo: por isso todas recebem a mesma tensão (127 V) e desligar um aparelho não interfere nos demais.",
+        "pontos_chave": [
+          "Em paralelo, a tensão é igual em todos os ramos.",
+          "1/Req = 1/R1 + 1/R2 + ...; para dois resistores, Req = (R1×R2)/(R1+R2).",
+          "Req em paralelo é sempre menor que o menor resistor envolvido.",
+          "As tomadas de uma casa são ligadas em paralelo, por isso recebem a mesma tensão."
+        ],
+        "exemplo": "6 Ω e 3 Ω em paralelo resultam em Req = 2 Ω, menor que os dois resistores originais.",
+        "topico_ids": ["T4"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 2
+          }
+        ]
+      },
+      {
+        "id": "C6",
+        "titulo": "Efeitos do choque elétrico",
+        "conceito": "O choque elétrico acontece quando a corrente elétrica passa pelo corpo humano. O que causa o dano é a corrente, que depende da tensão aplicada e da resistência do corpo — menor quando a pele está molhada, o que torna o choque mais perigoso. Para corrente alternada de 60 Hz, os efeitos aproximados são: até 1 mA, apenas um formigamento (limiar de percepção); de 10 a 30 mA, contração muscular, podendo a pessoa não conseguir soltar o condutor; acima de 30 mA, risco de parada respiratória; e acima de 75 mA, risco de fibrilação ventricular, que pode ser fatal. Além do choque, a eletricidade pode causar queimaduras e arco elétrico, que gera calor intenso e luz capaz de ferir gravemente.",
+        "pontos_chave": [
+          "O dano do choque é causado pela corrente, não diretamente pela tensão.",
+          "Pele molhada reduz a resistência do corpo e piora o choque.",
+          "De 10 a 30 mA: contração muscular; acima de 30 mA: risco de parada respiratória.",
+          "Acima de 75 mA: risco de fibrilação ventricular, que pode ser fatal."
+        ],
+        "exemplo": "Usar uma furadeira elétrica com as mãos molhadas de chuva aumenta muito o risco de choque grave, pois a resistência do corpo cai bastante.",
+        "topico_ids": ["T5"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 3
+          }
+        ]
+      },
+      {
+        "id": "C7",
+        "titulo": "Medidas de proteção: EPC e EPI",
+        "conceito": "Na segurança em eletricidade, a prioridade é sempre a proteção coletiva (EPC), que elimina ou reduz o risco para todos no local: desenergização do circuito, isolação de partes vivas, barreiras e obstáculos, sinalização e aterramento temporário. Somente depois de esgotadas as medidas de EPC é que entra a proteção individual (EPI), que protege apenas quem a usa: luvas isolantes adequadas à classe de tensão do circuito, capacete com proteção para eletricista, óculos de proteção, calçado sem partes metálicas e vestimenta antichama.",
+        "pontos_chave": [
+          "EPC (proteção coletiva) vem antes do EPI (proteção individual).",
+          "EPC inclui desenergização, isolação, barreiras, sinalização e aterramento temporário.",
+          "EPI inclui luvas isolantes, capacete, óculos, calçado sem partes metálicas e vestimenta antichama.",
+          "As luvas isolantes devem ser adequadas à classe de tensão do circuito."
+        ],
+        "exemplo": "Antes de vestir luvas isolantes (EPI), o eletricista desenergiza e sinaliza o circuito (EPC).",
+        "topico_ids": ["T6"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 3
+          }
+        ]
+      },
+      {
+        "id": "C8",
+        "titulo": "Aterramento permanente e dispositivo DR",
+        "conceito": "A apostila cita o aterramento temporário usado durante serviços de manutenção (dentro da sequência da NR-10). De forma complementar, vale saber que as instalações elétricas também têm um aterramento permanente: um condutor (fio terra) ligado a uma haste cravada no solo, que oferece um caminho de baixa resistência para a corrente de fuga escoar com segurança, evitando que a carcaça de um equipamento fique energizada em caso de defeito. Junto com o aterramento, o dispositivo DR (diferencial residual) monitora se a corrente que entra em um circuito é igual à que sai; qualquer diferença indica fuga de corrente, e o DR desliga o circuito automaticamente em frações de segundo. Por isso o DR é obrigatório em tomadas de banheiros, áreas externas e outros locais molhados.",
+        "pontos_chave": [
+          "O aterramento permanente usa um fio terra ligado a uma haste no solo.",
+          "O aterramento dá um caminho seguro para a corrente de fuga, evitando que a carcaça fique energizada.",
+          "O dispositivo DR compara a corrente de entrada e saída do circuito.",
+          "Ao detectar uma diferença (fuga), o DR desliga o circuito automaticamente, protegendo contra choque."
+        ],
+        "exemplo": "Em um banheiro, se o chuveiro tiver um defeito e a água entrar em contato com a parte elétrica, o DR detecta a fuga e desliga antes que alguém tome um choque grave.",
+        "topico_ids": ["T7"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": null
+          }
+        ]
+      },
+      {
+        "id": "C9",
+        "titulo": "NR-10: norma de segurança em eletricidade",
+        "conceito": "A NR-10 é a Norma Regulamentadora do Ministério do Trabalho que trata da segurança em instalações e serviços em eletricidade. Ela estabelece exigências para proteger quem trabalha com eletricidade, como a obrigatoriedade de que os trabalhadores sejam qualificados, habilitados ou capacitados e autorizados para a função que exercem. Também exige que esses profissionais tenham concluído o curso básico de segurança em eletricidade, com carga horária de 40 horas. Além disso, a norma determina que os serviços em instalações elétricas sejam realizados preferencialmente com a instalação desenergizada, reduzindo o risco de acidentes.",
+        "pontos_chave": [
+          "NR-10 é a norma do Ministério do Trabalho sobre segurança em eletricidade.",
+          "Exige trabalhadores qualificados, habilitados ou capacitados, e autorizados.",
+          "Exige curso básico de segurança em eletricidade de 40 horas.",
+          "Determina que os serviços sejam feitos preferencialmente com a instalação desenergizada."
+        ],
+        "exemplo": "Um eletricista só pode fazer manutenção em um quadro de distribuição depois de concluir o curso básico de 40 horas da NR-10.",
+        "topico_ids": ["T8"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 3
+          }
+        ]
+      },
+      {
+        "id": "C10",
+        "titulo": "Sequência de desenergização pela NR-10",
+        "conceito": "A NR-10 só considera uma instalação desenergizada depois de seguir, nesta ordem, seis etapas: 1) seccionamento — abrir o circuito, desligando o disjuntor ou a chave; 2) impedimento de reenergização — bloquear e etiquetar o dispositivo com cadeado e etiqueta, para que ninguém religue por engano; 3) constatação da ausência de tensão — medir com instrumento adequado para confirmar que realmente não há tensão; 4) instalação de aterramento temporário, com equipotencialização dos condutores do circuito; 5) proteção dos elementos energizados existentes na zona controlada; e 6) instalação da sinalização de impedimento de reenergização.",
+        "pontos_chave": [
+          "1) Seccionamento: abrir o disjuntor ou chave.",
+          "2) Impedimento de reenergização: bloquear e etiquetar (cadeado e etiqueta).",
+          "3) Constatação da ausência de tensão: medir com instrumento adequado.",
+          "4) Aterramento temporário; 5) proteção dos elementos energizados; 6) sinalização."
+        ],
+        "exemplo": "Antes de trocar um disjuntor, o eletricista desliga a chave, trava com cadeado, mede com o multímetro e só então instala o aterramento temporário.",
+        "topico_ids": ["T9"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 3
+          }
+        ]
+      },
+      {
+        "id": "C11",
+        "titulo": "Sequência de reenergização pela NR-10",
+        "conceito": "Depois de concluído o serviço em uma instalação desenergizada, a reenergização também segue uma sequência definida pela NR-10, na ordem inversa da desenergização: primeiro, retirar todas as ferramentas e pessoas da zona de trabalho; em seguida, remover o aterramento temporário instalado; depois, retirar a sinalização e os bloqueios (cadeados e etiquetas) colocados antes do serviço; e só então religar o circuito. Seguir essa ordem evita acidentes, como religar a instalação com alguém ainda em contato com partes do circuito ou com o aterramento temporário ainda conectado.",
+        "pontos_chave": [
+          "Antes de religar, retire ferramentas e pessoas da zona de trabalho.",
+          "Remova o aterramento temporário antes de religar.",
+          "Retire a sinalização e os bloqueios (cadeados e etiquetas).",
+          "Só religue o circuito depois de cumprir todos os passos anteriores, nesta ordem."
+        ],
+        "exemplo": "Depois de consertar o quadro, o eletricista retira as ferramentas, remove o aterramento temporário, tira a etiqueta e só então liga o disjuntor.",
+        "topico_ids": ["T9"],
+        "fontes": [
+          {
+            "material_id": "demo-mat-apostila",
+            "pagina": 3
+          }
+        ]
+      }
+    ]
+  },
+  "aulas": {
+    "aulas": [
+      {
+        "id": "A1",
+        "modulo_id": "M1",
+        "titulo": "Lei de Ohm: o segredo de V, I e R",
+        "objetivo": "Calcular tensão, corrente ou resistência de um circuito simples usando a Lei de Ohm.",
+        "skill_card_ids": ["C1"],
+        "blocos": [
+          {
+            "id": "B28",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Um eletricista precisa saber: se eu ligar essa resistência nessa tomada, quanta corrente vai passar? Dá pra descobrir sem medir nada. ⚡",
+            "dica": null
+          },
+          {
+            "id": "B29",
+            "tipo": "texto",
+            "titulo": "Conceito",
+            "texto": "A Lei de Ohm liga as três grandezas: V = R × I. Dela saem I = V/R e R = V/I.",
+            "dica": "Triângulo: V em cima, R e I embaixo. Cubra o que quer descobrir e veja a conta que sobra."
+          },
+          {
+            "id": "B30",
+            "tipo": "quiz",
+            "pergunta": "Um resistor de 10 Ω é ligado a uma tensão de 20 V. Qual é a corrente que passa por ele?",
+            "opcoes": [
+              {
+                "texto": "2 A",
+                "correta": true,
+                "feedback": "Isso! I = V/R = 20/10 = 2 A."
+              },
+              {
+                "texto": "0,5 A",
+                "correta": false,
+                "feedback": "Quase: você calculou R/V em vez de V/R. Para achar corrente, divida a tensão pela resistência."
+              },
+              {
+                "texto": "200 A",
+                "correta": false,
+                "feedback": "Você multiplicou V por R. Para achar a corrente, é preciso dividir V por R, não multiplicar."
+              },
+              {
+                "texto": "30 A",
+                "correta": false,
+                "feedback": "Não dá pra somar tensão e resistência, são grandezas diferentes. Use I = V/R."
+              }
+            ],
+            "skill_card_id": "C1"
+          },
+          {
+            "id": "B31",
+            "tipo": "texto",
+            "titulo": "Na prática",
+            "texto": "Se a tensão dobra e a resistência não muda, a corrente também dobra. Com 12 V e 10 Ω, I = 1,2 A; com 24 V, I = 2,4 A.",
+            "dica": null
+          },
+          {
+            "id": "B113",
+            "tipo": "completar",
+            "texto": "Pela Lei de Ohm, V = R × [[1]]. Para descobrir a corrente, use I = V ÷ [[2]].",
+            "lacunas": [
+              {
+                "resposta": "I"
+              },
+              {
+                "resposta": "R"
+              }
+            ],
+            "distratores": ["P", "V"],
+            "explicacao": "Tensão é resistência vezes corrente (V = R × I). Isolando a corrente, I = V ÷ R: cubra o I no triângulo e sobra V sobre R.",
+            "skill_card_id": "C1"
+          },
+          {
+            "id": "B32",
+            "tipo": "quiz",
+            "pergunta": "Uma resistência de aquecimento de 5 Ω é ligada a uma tomada de 220 V, como em um chuveiro elétrico. Qual a corrente aproximada que passa por ela?",
+            "opcoes": [
+              {
+                "texto": "44 A",
+                "correta": true,
+                "feedback": "Isso! I = V/R = 220/5 = 44 A."
+              },
+              {
+                "texto": "1.100 A",
+                "correta": false,
+                "feedback": "Você multiplicou V por R. Para achar corrente, divida a tensão pela resistência, não multiplique."
+              },
+              {
+                "texto": "4,4 A",
+                "correta": false,
+                "feedback": "Confira a divisão: 220 dividido por 5 não dá 4,4. Repita a conta com atenção às casas."
+              },
+              {
+                "texto": "215 A",
+                "correta": false,
+                "feedback": "Você subtraiu R de V. A Lei de Ohm pede uma divisão: I = V/R, não uma subtração."
+              }
+            ],
+            "skill_card_id": "C1"
+          },
+          {
+            "id": "B33",
+            "tipo": "texto",
+            "titulo": "Resumo",
+            "texto": "V = R × I é a base de tudo em circuitos. Decore o triângulo e você resolve corrente, tensão ou resistência na hora.",
+            "dica": null
+          }
+        ]
+      },
+      {
+        "id": "A2",
+        "modulo_id": "M1",
+        "titulo": "Circuito elétrico: aberto, fechado e em curto",
+        "objetivo": "Identificar os elementos de um circuito e reconhecer uma situação de curto-circuito e seus riscos.",
+        "skill_card_ids": ["C2", "C3"],
+        "blocos": [
+          {
+            "id": "B34",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Você aperta o interruptor e a luz acende na hora. Mas o que realmente acontece ali dentro, no fio, para isso funcionar?",
+            "dica": null
+          },
+          {
+            "id": "B35",
+            "tipo": "texto",
+            "titulo": "Conceito",
+            "texto": "Todo circuito tem: fonte (dá a tensão), condutores (fios), carga (consome energia, como uma lâmpada) e um dispositivo de manobra (interruptor). Só circula corrente com o circuito fechado.",
+            "dica": null
+          },
+          {
+            "id": "B36",
+            "tipo": "quiz",
+            "pergunta": "Em um circuito com o interruptor aberto, o que acontece com a corrente?",
+            "opcoes": [
+              {
+                "texto": "A corrente continua passando, só que mais fraca",
+                "correta": false,
+                "feedback": "Com o caminho interrompido não há corrente nenhuma, nem fraca. O circuito aberto corta a passagem."
+              },
+              {
+                "texto": "A corrente para de circular, porque o caminho foi interrompido",
+                "correta": true,
+                "feedback": "Isso! Circuito aberto significa que não há caminho contínuo, então a corrente não passa."
+              },
+              {
+                "texto": "A corrente aumenta, porque o circuito ficou mais curto",
+                "correta": false,
+                "feedback": "Abrir o interruptor não encurta o circuito, interrompe o caminho. Sem caminho fechado, não há corrente."
+              },
+              {
+                "texto": "A tensão da fonte desaparece",
+                "correta": false,
+                "feedback": "A fonte continua fornecendo tensão. O que muda é que a corrente deixa de circular, pois falta um caminho fechado."
+              }
+            ],
+            "skill_card_id": "C2"
+          },
+          {
+            "id": "B37",
+            "tipo": "texto",
+            "titulo": "Atenção!",
+            "texto": "Curto-circuito é quando a corrente acha um caminho de resistência quase zero, sem passar pela carga. Pela Lei de Ohm, R quase zero gera corrente enorme.",
+            "dica": "Corrente muito alta esquenta o fio rapidamente e pode causar incêndio."
+          },
+          {
+            "id": "B38",
+            "tipo": "quiz",
+            "pergunta": "O que caracteriza um curto-circuito?",
+            "opcoes": [
+              {
+                "texto": "A corrente encontra um caminho de resistência quase zero, sem passar pela carga",
+                "correta": true,
+                "feedback": "Isso mesmo! Com R quase zero, a Lei de Ohm mostra que a corrente dispara."
+              },
+              {
+                "texto": "A carga passa a receber uma tensão menor que o normal",
+                "correta": false,
+                "feedback": "No curto, a corrente nem chega a passar pela carga prevista. O problema é um caminho de resistência quase nula."
+              },
+              {
+                "texto": "A resistência do circuito inteiro aumenta muito",
+                "correta": false,
+                "feedback": "É o contrário: no curto-circuito a resistência do caminho fica quase zero, não alta."
+              },
+              {
+                "texto": "O circuito fica aberto e a corrente para de circular",
+                "correta": false,
+                "feedback": "Curto-circuito não é circuito aberto. É um caminho fechado de resistência quase nula, com corrente altíssima."
+              }
+            ],
+            "skill_card_id": "C3"
+          },
+          {
+            "id": "B39",
+            "tipo": "texto",
+            "titulo": "Na prática",
+            "texto": "Disjuntores e fusíveis existem para detectar essa corrente anormal e desligar o circuito antes que o aquecimento vire um incêndio.",
+            "dica": null
+          },
+          {
+            "id": "B40",
+            "tipo": "quiz",
+            "pergunta": "Um fio desencapado encosta direto em outro condutor, sem passar pela lâmpada do circuito. O que deve acontecer para proteger a instalação?",
+            "opcoes": [
+              {
+                "texto": "O fio deve aguentar normalmente, já que a resistência caiu",
+                "correta": false,
+                "feedback": "Resistência baixa gera corrente alta, que aquece o fio rapidamente. O fio não 'aguenta normal', ele corre risco de derreter a isolação."
+              },
+              {
+                "texto": "A lâmpada deve acender mais forte, já que a corrente aumentou",
+                "correta": false,
+                "feedback": "No curto, a corrente nem passa pela lâmpada, ela segue pelo caminho de resistência quase zero. A lâmpada não acende mais forte."
+              },
+              {
+                "texto": "O disjuntor deve desarmar, interrompendo a corrente alta do curto-circuito",
+                "correta": true,
+                "feedback": "Exatamente! É a função do disjuntor: cortar essa corrente alta antes que os fios esquentem demais."
+              },
+              {
+                "texto": "A tensão da fonte deve cair a zero automaticamente",
+                "correta": false,
+                "feedback": "Quem dispara é o disjuntor, cortando a corrente. A fonte não zera sozinha sem um dispositivo de proteção atuando."
+              }
+            ],
+            "skill_card_id": "C3"
+          }
+        ]
+      },
+      {
+        "id": "A3",
+        "modulo_id": "M1",
+        "titulo": "Resistores em série: um caminho só",
+        "objetivo": "Calcular a resistência equivalente e a corrente de resistores associados em série.",
+        "skill_card_ids": ["C4"],
+        "blocos": [
+          {
+            "id": "B41",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Nos antigos piscas de Natal, quando uma lâmpada queimava, todas as outras apagavam junto. Por quê? A ligação entre elas explica tudo.",
+            "dica": null
+          },
+          {
+            "id": "B42",
+            "tipo": "texto",
+            "titulo": "Conceito",
+            "texto": "Em série, os resistores ficam um atrás do outro, num caminho só. A corrente é igual em todos, e a resistência equivalente é a soma: Req = R1 + R2 + ...",
+            "dica": null
+          },
+          {
+            "id": "B43",
+            "tipo": "quiz",
+            "pergunta": "O que acontece com o circuito se um dos resistores queimar numa associação em série?",
+            "opcoes": [
+              {
+                "texto": "Só aquele resistor para de funcionar, os outros continuam normais",
+                "correta": false,
+                "feedback": "Em série existe um caminho só. Se ele quebra em um ponto, a corrente para em todo o circuito."
+              },
+              {
+                "texto": "O circuito inteiro abre, e a corrente para em todos os resistores",
+                "correta": true,
+                "feedback": "Isso! Como há um caminho único, queimar um resistor interrompe a corrente para todos."
+              },
+              {
+                "texto": "A corrente aumenta nos resistores restantes",
+                "correta": false,
+                "feedback": "Com o caminho interrompido não há corrente alguma, nem nos resistores restantes."
+              },
+              {
+                "texto": "A tensão da fonte cai a zero, mas a corrente continua",
+                "correta": false,
+                "feedback": "A fonte continua fornecendo tensão. O que falta é um caminho fechado, então a corrente é que para."
+              }
+            ],
+            "skill_card_id": "C4"
+          },
+          {
+            "id": "B44",
+            "tipo": "texto",
+            "titulo": "Exemplo",
+            "texto": "100 Ω e 220 Ω em série: Req = 320 Ω. Com 12 V na fonte, a corrente é 0,0375 A; a tensão fica 3,75 V no primeiro e 8,25 V no segundo, somando 12 V.",
+            "dica": "A soma das tensões em cada resistor sempre fecha com a tensão total da fonte."
+          },
+          {
+            "id": "B45",
+            "tipo": "quiz",
+            "pergunta": "Dois resistores, 100 Ω e 220 Ω, estão ligados em série a uma fonte de 12 V. Qual é a corrente que circula no circuito?",
+            "opcoes": [
+              {
+                "texto": "120 mA",
+                "correta": false,
+                "feedback": "Esse valor vem de usar só o resistor de 100 Ω (12/100). Some as duas resistências antes de calcular a corrente."
+              },
+              {
+                "texto": "37,5 mA",
+                "correta": true,
+                "feedback": "Isso! Req = 320 Ω, e I = 12/320 = 0,0375 A, ou 37,5 mA."
+              },
+              {
+                "texto": "375 mA",
+                "correta": false,
+                "feedback": "A conta está certa na ideia, mas a casa decimal fugiu. Refaça 12/320 com cuidado."
+              },
+              {
+                "texto": "12 A",
+                "correta": false,
+                "feedback": "Esse valor ignora os resistores do circuito. Primeiro some as resistências, depois divida a tensão pelo total."
+              }
+            ],
+            "skill_card_id": "C4"
+          },
+          {
+            "id": "B46",
+            "tipo": "texto",
+            "titulo": "Resumo",
+            "texto": "Em série, um caminho só para a corrente: mesma corrente em todos, resistências somadas. Por isso, se um elo quebra, tudo para.",
+            "dica": null
+          }
+        ]
+      },
+      {
+        "id": "A4",
+        "modulo_id": "M1",
+        "titulo": "Resistores em paralelo: caminhos lado a lado",
+        "objetivo": "Calcular a resistência equivalente de resistores associados em paralelo e explicar por que as tomadas da casa usam essa ligação.",
+        "skill_card_ids": ["C5"],
+        "blocos": [
+          {
+            "id": "B47",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Você desliga a TV e a geladeira continua ligada normalmente. As tomadas da sua casa não dependem umas das outras. Por quê?",
+            "dica": null
+          },
+          {
+            "id": "B48",
+            "tipo": "texto",
+            "titulo": "Conceito",
+            "texto": "Em paralelo, os resistores ficam lado a lado, ligados aos mesmos dois pontos. A tensão é igual em todos, e a corrente total se divide entre os ramos.",
+            "dica": null
+          },
+          {
+            "id": "B49",
+            "tipo": "quiz",
+            "pergunta": "Em uma associação de resistores em paralelo, o que é igual em todos os ramos?",
+            "opcoes": [
+              {
+                "texto": "A corrente",
+                "correta": false,
+                "feedback": "A corrente se divide entre os ramos, não é igual em todos. Quem é igual é a tensão."
+              },
+              {
+                "texto": "A tensão",
+                "correta": true,
+                "feedback": "Isso! Como os resistores ligam aos mesmos dois pontos, a tensão é a mesma em todos os ramos."
+              },
+              {
+                "texto": "A potência",
+                "correta": false,
+                "feedback": "Cada resistor pode dissipar uma potência diferente, dependendo do seu valor. O que se mantém igual é a tensão."
+              },
+              {
+                "texto": "A resistência equivalente",
+                "correta": false,
+                "feedback": "A resistência equivalente é um valor único do conjunto, não de cada ramo. O que é igual em cada ramo é a tensão."
+              }
+            ],
+            "skill_card_id": "C5"
+          },
+          {
+            "id": "B50",
+            "tipo": "texto",
+            "titulo": "Exemplo",
+            "texto": "1/Req = 1/R1 + 1/R2 + ... Para dois resistores, Req = (R1×R2)/(R1+R2). O resultado é sempre menor que o menor resistor.",
+            "dica": "6 Ω e 3 Ω em paralelo: Req = 18/9 = 2 Ω, menor que os dois."
+          },
+          {
+            "id": "B51",
+            "tipo": "quiz",
+            "pergunta": "Dois resistores de 6 Ω e 3 Ω estão ligados em paralelo. Qual é a resistência equivalente?",
+            "opcoes": [
+              {
+                "texto": "9 Ω",
+                "correta": false,
+                "feedback": "Essa seria a soma, que vale para série. Em paralelo use Req = (R1×R2)/(R1+R2)."
+              },
+              {
+                "texto": "4,5 Ω",
+                "correta": false,
+                "feedback": "Isso seria a média simples dos dois valores. A fórmula do paralelo é (R1×R2)/(R1+R2), não a média."
+              },
+              {
+                "texto": "2 Ω",
+                "correta": true,
+                "feedback": "Isso! Req = (6×3)/(6+3) = 18/9 = 2 Ω."
+              },
+              {
+                "texto": "3 Ω",
+                "correta": false,
+                "feedback": "Esse é só o menor resistor. Faça a conta: Req = (6×3)/(6+3)."
+              }
+            ],
+            "skill_card_id": "C5"
+          },
+          {
+            "id": "B52",
+            "tipo": "texto",
+            "titulo": "Resumo",
+            "texto": "Em paralelo, a tensão é igual para todos e a resistência equivalente cai. É por isso que as tomadas de casa usam essa ligação.",
+            "dica": null
+          }
+        ]
+      },
+      {
+        "id": "A5",
+        "modulo_id": "M2",
+        "titulo": "Choque elétrico: o perigo e como se proteger",
+        "objetivo": "Reconhecer os efeitos do choque elétrico conforme a intensidade da corrente e aplicar a prioridade EPC antes de EPI.",
+        "skill_card_ids": ["C6", "C7"],
+        "blocos": [
+          {
+            "id": "B84",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Numa oficina, um colega encosta sem querer num fio desencapado e leva um susto. Às vezes é só um arrepio, às vezes pode ser fatal. Por quê? ⚡",
+            "dica": null
+          },
+          {
+            "id": "B85",
+            "tipo": "texto",
+            "titulo": "O que causa o dano",
+            "texto": "O choque é causado pela corrente que passa pelo seu corpo, não só pela tensão. A corrente depende também da resistência do corpo — e pele molhada reduz bastante essa resistência.",
+            "dica": "Por isso nunca se deve mexer em eletricidade com as mãos molhadas."
+          },
+          {
+            "id": "B86",
+            "tipo": "quiz",
+            "pergunta": "O que determina a gravidade de um choque elétrico no corpo?",
+            "opcoes": [
+              {
+                "texto": "Somente a tensão da rede elétrica",
+                "correta": false,
+                "feedback": "Quase: a tensão sozinha não conta a história toda. O que realmente machuca é a corrente que passa pelo corpo."
+              },
+              {
+                "texto": "A corrente que efetivamente passa pelo corpo",
+                "correta": true,
+                "feedback": "Isso! É a corrente — e não só a tensão — que determina o dano causado pelo choque."
+              },
+              {
+                "texto": "A potência do aparelho que causou o choque",
+                "correta": false,
+                "feedback": "A potência mostra o quanto de energia o aparelho usa, mas não é ela que define a gravidade do choque no corpo."
+              },
+              {
+                "texto": "A resistência do fio que conduz a eletricidade",
+                "correta": false,
+                "feedback": "O que importa aqui é a resistência do corpo da pessoa, não a do fio condutor."
+              }
+            ],
+            "skill_card_id": "C6"
+          },
+          {
+            "id": "B87",
+            "tipo": "texto",
+            "titulo": "Os limites da corrente",
+            "texto": "Em corrente alternada de 60 Hz: até 1 mA é só formigamento; de 10 a 30 mA os músculos travam; acima de 30 mA há risco de parada respiratória; acima de 75 mA, risco de fibrilação ventricular — que pode ser fatal.",
+            "dica": "Além do choque, o arco elétrico também queima e pode cegar: mantenha distância de partes energizadas."
+          },
+          {
+            "id": "B88",
+            "tipo": "quiz",
+            "pergunta": "Um eletricista não consegue soltar o fio porque os músculos travaram. Em que faixa de corrente ele está?",
+            "opcoes": [
+              {
+                "texto": "Abaixo de 1 mA, limiar de percepção",
+                "correta": false,
+                "feedback": "Nessa faixa o efeito é só formigamento leve — não impede soltar o condutor."
+              },
+              {
+                "texto": "Entre 10 e 30 mA, contração muscular",
+                "correta": true,
+                "feedback": "Isso! Entre 10 e 30 mA a contração muscular pode travar a mão no condutor."
+              },
+              {
+                "texto": "Acima de 75 mA, risco de fibrilação",
+                "correta": false,
+                "feedback": "Essa faixa é mais grave, com risco cardíaco — mas travar o músculo sem soltar é típico de correntes menores."
+              },
+              {
+                "texto": "Acima de 30 mA, risco respiratório",
+                "correta": false,
+                "feedback": "Essa faixa já traz risco respiratório, mas o travamento muscular descrito aparece antes, em correntes menores."
+              }
+            ],
+            "skill_card_id": "C6"
+          },
+          {
+            "id": "B114",
+            "tipo": "aberta",
+            "pergunta": "Na oficina, um colega encosta num fio desencapado e fica \"grudado\", sem conseguir soltar. O que você faz primeiro e por quê?",
+            "dica": "Pense no que trava os músculos dele e no caminho que a corrente faria se você encostasse nele.",
+            "gabarito": {
+              "resposta_modelo": "Não encosto nele, porque a corrente passaria para o meu corpo também. A primeira coisa é cortar a corrente: desligar o disjuntor ou a chave do circuito. Ele não consegue soltar porque a corrente (de 10 a 30 mA) trava os músculos; acima de 30 mA há risco de parada respiratória, então, depois de desligar a energia, chamo socorro imediatamente.",
+              "criterios": [
+                {
+                  "descricao": "Não toca no colega enquanto o circuito estiver energizado",
+                  "essencial": true
+                },
+                {
+                  "descricao": "Interrompe a corrente desligando o disjuntor ou a chave do circuito",
+                  "essencial": true
+                },
+                {
+                  "descricao": "Explica que a corrente trava os músculos e por isso a pessoa não consegue soltar o fio",
+                  "essencial": false
+                },
+                {
+                  "descricao": "Chama socorro após cortar a energia, pelo risco de parada respiratória acima de 30 mA",
+                  "essencial": false
+                }
+              ],
+              "erros_comuns": ["Achar que basta puxar a pessoa rápido para soltá-la", "Esperar o colega se soltar sozinho"],
+              "alertas_criticos": ["Puxar ou tocar o colega com as mãos enquanto o circuito está energizado (a corrente passa para quem socorre)"]
+            },
+            "skill_card_id": "C6"
+          },
+          {
+            "id": "B89",
+            "tipo": "texto",
+            "titulo": "A ordem da proteção",
+            "texto": "Em segurança elétrica, a prioridade é sempre a proteção coletiva (EPC): ela reduz o risco para todo mundo no local. Só depois de esgotar o EPC é que entra a proteção individual (EPI).",
+            "dica": null
+          },
+          {
+            "id": "B90",
+            "tipo": "texto",
+            "titulo": "Na prática",
+            "texto": "EPC: desenergização, isolação de partes vivas, barreiras, sinalização e aterramento temporário. EPI: luvas isolantes, capacete, óculos, calçado sem partes metálicas e roupa antichama.",
+            "dica": "As luvas isolantes precisam ser adequadas à classe de tensão do circuito."
+          },
+          {
+            "id": "B91",
+            "tipo": "quiz",
+            "pergunta": "Por que a proteção coletiva (EPC) vem antes da proteção individual (EPI)?",
+            "opcoes": [
+              {
+                "texto": "Porque o EPC é mais barato que o EPI",
+                "correta": false,
+                "feedback": "O custo não é o critério aqui — a lógica é proteger o maior número de pessoas possível primeiro."
+              },
+              {
+                "texto": "Porque o EPC reduz o risco para todas as pessoas no local",
+                "correta": true,
+                "feedback": "Isso! O EPC protege todo mundo no ambiente; o EPI protege só quem está usando o equipamento."
+              },
+              {
+                "texto": "Porque a lei proíbe usar EPI antes do EPC",
+                "correta": false,
+                "feedback": "Não é bem uma proibição legal — é uma hierarquia técnica: eliminar o risco coletivo primeiro."
+              },
+              {
+                "texto": "Porque o EPI só funciona após desenergizar o circuito",
+                "correta": false,
+                "feedback": "O EPI funciona em qualquer situação; a prioridade de uso vem da hierarquia de proteção, não dessa dependência."
+              }
+            ],
+            "skill_card_id": "C7"
+          },
+          {
+            "id": "B92",
+            "tipo": "quiz",
+            "pergunta": "Antes de colocar as luvas isolantes para mexer num quadro, o que o eletricista deve verificar primeiro?",
+            "opcoes": [
+              {
+                "texto": "Se já aplicou as medidas de EPC, como desenergização e sinalização",
+                "correta": true,
+                "feedback": "Isso! O EPI só entra depois que as medidas de EPC, como desenergizar e sinalizar, já foram aplicadas."
+              },
+              {
+                "texto": "Se já avisou o supervisor que vai iniciar o serviço",
+                "correta": false,
+                "feedback": "Avisar o supervisor é importante, mas não substitui aplicar as medidas de EPC antes do EPI."
+              },
+              {
+                "texto": "Se o quadro está energizado, para testar as luvas",
+                "correta": false,
+                "feedback": "Nunca teste luvas isolantes com o circuito energizado de propósito — isso inverte a lógica de segurança."
+              },
+              {
+                "texto": "Se há outro eletricista disponível para substituí-lo",
+                "correta": false,
+                "feedback": "Ter um colega por perto é bom, mas não substitui a aplicação das medidas de EPC antes do EPI."
+              }
+            ],
+            "skill_card_id": "C7"
+          }
+        ]
+      },
+      {
+        "id": "A6",
+        "modulo_id": "M2",
+        "titulo": "Aterramento, DR e a norma que te protege",
+        "objetivo": "Explicar como aterramento e DR previnem choques e reconhecer as exigências da NR-10 para quem trabalha com eletricidade.",
+        "skill_card_ids": ["C8", "C9"],
+        "blocos": [
+          {
+            "id": "B93",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Num banheiro, o chuveiro tem um defeito e a água encosta na parte elétrica. Por que às vezes isso não causa choque nenhum? 🚿",
+            "dica": null
+          },
+          {
+            "id": "B94",
+            "tipo": "texto",
+            "titulo": "O caminho seguro",
+            "texto": "O aterramento permanente usa um fio terra ligado a uma haste cravada no solo. Ele dá um caminho de baixa resistência para a corrente de fuga escoar, evitando que a carcaça do equipamento fique energizada.",
+            "dica": null
+          },
+          {
+            "id": "B95",
+            "tipo": "quiz",
+            "pergunta": "Para que serve o fio terra ligado a uma haste no solo?",
+            "opcoes": [
+              {
+                "texto": "Para dar à corrente de fuga um caminho seguro até o solo",
+                "correta": true,
+                "feedback": "Isso! A corrente de fuga escoa pelo terra em vez de passar pela carcaça e, de lá, pela pessoa."
+              },
+              {
+                "texto": "Para aumentar a corrente que chega ao equipamento ligado",
+                "correta": false,
+                "feedback": "O aterramento não aumenta corrente nenhuma — ele dá um destino seguro para a corrente de fuga."
+              },
+              {
+                "texto": "Para substituir a função de proteção do disjuntor do circuito",
+                "correta": false,
+                "feedback": "O terra não substitui o disjuntor: cada um tem uma função diferente na proteção do circuito."
+              },
+              {
+                "texto": "Para reduzir a tensão que a rede fornece ao equipamento",
+                "correta": false,
+                "feedback": "A tensão da rede não muda por causa do aterramento — o que muda é o caminho da corrente de fuga."
+              }
+            ],
+            "skill_card_id": "C8"
+          },
+          {
+            "id": "B96",
+            "tipo": "texto",
+            "titulo": "O dispositivo DR",
+            "texto": "O DR (diferencial residual) compara a corrente que entra e que sai do circuito. Se houver diferença, é sinal de fuga — e o DR desliga tudo em frações de segundo. Por isso é obrigatório em banheiros e áreas molhadas.",
+            "dica": "DR e aterramento trabalham juntos: um dá o caminho seguro, o outro corta a energia rápido."
+          },
+          {
+            "id": "B97",
+            "tipo": "quiz",
+            "pergunta": "Um chuveiro com defeito deixa a água em contato com a parte elétrica. O que deve desligar o circuito rapidamente?",
+            "opcoes": [
+              {
+                "texto": "O disjuntor comum, por sobrecarga",
+                "correta": false,
+                "feedback": "O disjuntor comum reage a sobrecarga ou curto, não necessariamente a uma pequena fuga de corrente."
+              },
+              {
+                "texto": "O dispositivo DR, ao detectar a diferença de corrente",
+                "correta": true,
+                "feedback": "Isso! O DR percebe a diferença entre a corrente que entra e a que sai e desliga o circuito na hora."
+              },
+              {
+                "texto": "O fio terra, que interrompe a corrente sozinho",
+                "correta": false,
+                "feedback": "O fio terra dá o caminho seguro para a fuga, mas quem efetivamente desliga o circuito é o DR."
+              },
+              {
+                "texto": "O fusível do multímetro usado na instalação",
+                "correta": false,
+                "feedback": "O fusível do multímetro protege o próprio aparelho de medição, não a instalação do banheiro."
+              }
+            ],
+            "skill_card_id": "C8"
+          },
+          {
+            "id": "B98",
+            "tipo": "texto",
+            "titulo": "Quem pode trabalhar com eletricidade",
+            "texto": "A NR-10 é a norma do Ministério do Trabalho sobre segurança em eletricidade. Ela exige que todo trabalhador seja qualificado, habilitado ou capacitado e autorizado para a função que exerce.",
+            "dica": null
+          },
+          {
+            "id": "B99",
+            "tipo": "texto",
+            "titulo": "Na prática",
+            "texto": "A NR-10 exige o curso básico de segurança de 40 horas e determina que os serviços sejam feitos, preferencialmente, com a instalação desenergizada.",
+            "dica": "Sem esse curso, o profissional não está autorizado a mexer em instalações elétricas."
+          },
+          {
+            "id": "B100",
+            "tipo": "quiz",
+            "pergunta": "O que a NR-10 exige de quem vai trabalhar com instalações elétricas?",
+            "opcoes": [
+              {
+                "texto": "Ser qualificado, habilitado ou capacitado e autorizado, com curso básico de 40h",
+                "correta": true,
+                "feedback": "Isso! A NR-10 exige qualificação, habilitação/capacitação, autorização e o curso básico de 40 horas."
+              },
+              {
+                "texto": "Ter no mínimo cinco anos de experiência prática, sem curso formal",
+                "correta": false,
+                "feedback": "Experiência prática é importante, mas a NR-10 exige formalmente o curso básico de segurança."
+              },
+              {
+                "texto": "Apenas usar os EPIs corretos durante o serviço",
+                "correta": false,
+                "feedback": "O EPI é só uma parte da proteção; a norma também exige qualificação formal do trabalhador."
+              },
+              {
+                "texto": "Ter formação superior completa em engenharia elétrica",
+                "correta": false,
+                "feedback": "A NR-10 não exige curso superior — ela exige capacitação específica e autorização para a função."
+              }
+            ],
+            "skill_card_id": "C9"
+          },
+          {
+            "id": "B101",
+            "tipo": "texto",
+            "titulo": "Por que isso importa",
+            "texto": "Trabalhar desenergizado elimina o risco na raiz: sem tensão, não há corrente para machucar ninguém. Por isso essa é sempre a opção preferencial da norma.",
+            "dica": null
+          },
+          {
+            "id": "B102",
+            "tipo": "quiz",
+            "pergunta": "Qual é a condição preferencial que a NR-10 determina para serviços em instalações elétricas?",
+            "opcoes": [
+              {
+                "texto": "Instalação energizada, com todos usando EPI",
+                "correta": false,
+                "feedback": "Trabalhar energizado é exceção, não a regra preferencial da norma, mesmo com EPI."
+              },
+              {
+                "texto": "Instalação desenergizada, seguindo a sequência da norma",
+                "correta": true,
+                "feedback": "Isso! A NR-10 determina que os serviços sejam feitos preferencialmente com a instalação desenergizada."
+              },
+              {
+                "texto": "Instalação parcialmente energizada, só nos pontos necessários",
+                "correta": false,
+                "feedback": "Energizar parcialmente ainda mantém risco: a norma prioriza desenergizar por completo."
+              },
+              {
+                "texto": "Instalação energizada, mas com supervisão de outro eletricista",
+                "correta": false,
+                "feedback": "Ter supervisão ajuda, mas não substitui a prioridade da norma pela desenergização."
+              }
+            ],
+            "skill_card_id": "C9"
+          }
+        ]
+      },
+      {
+        "id": "A7",
+        "modulo_id": "M2",
+        "titulo": "A sequência que salva vidas: desligar e religar certo",
+        "objetivo": "Aplicar, na ordem correta, os passos de desenergização e reenergização previstos na NR-10.",
+        "skill_card_ids": ["C10", "C11"],
+        "blocos": [
+          {
+            "id": "B103",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Antes de trocar um disjuntor, um eletricista desliga a chave, mas ainda não pode tocar no circuito. Faltam passos importantes antes disso. Quais?",
+            "dica": null
+          },
+          {
+            "id": "B104",
+            "tipo": "texto",
+            "titulo": "Os três primeiros passos",
+            "texto": "A NR-10 só considera uma instalação desenergizada depois de: 1) seccionamento — abrir o disjuntor; 2) impedir a reenergização — travar com cadeado e etiqueta; 3) constatar a ausência de tensão, medindo com instrumento adequado.",
+            "dica": null
+          },
+          {
+            "id": "B105",
+            "tipo": "quiz",
+            "pergunta": "Depois de desligar o disjuntor, qual é o próximo passo da sequência de desenergização da NR-10?",
+            "opcoes": [
+              {
+                "texto": "Bloquear e etiquetar o dispositivo, impedindo a reenergização",
+                "correta": true,
+                "feedback": "Isso! Depois do seccionamento, vem o impedimento de reenergização: cadeado e etiqueta no dispositivo."
+              },
+              {
+                "texto": "Instalar o aterramento temporário",
+                "correta": false,
+                "feedback": "O aterramento temporário vem depois, só no quarto passo da sequência."
+              },
+              {
+                "texto": "Medir a tensão para confirmar que está zerada",
+                "correta": false,
+                "feedback": "A medição da ausência de tensão é importante, mas ela é o terceiro passo, não o segundo."
+              },
+              {
+                "texto": "Colocar a sinalização de impedimento de reenergização",
+                "correta": false,
+                "feedback": "A sinalização de impedimento é o sexto e último passo da sequência, não o segundo."
+              }
+            ],
+            "skill_card_id": "C10"
+          },
+          {
+            "id": "B106",
+            "tipo": "texto",
+            "titulo": "Os passos finais",
+            "texto": "Depois de confirmar a ausência de tensão, vem: 4) aterramento temporário com equipotencialização; 5) proteção dos elementos energizados da zona controlada; 6) sinalização de impedimento de reenergização.",
+            "dica": null
+          },
+          {
+            "id": "B107",
+            "tipo": "ordenar",
+            "instrucao": "Coloque na ordem a sequência de desenergização da NR-10, do primeiro ao último passo:",
+            "passos": [
+              "Seccionar: desligar o disjuntor ou a chave",
+              "Impedir a reenergização: travar com cadeado e etiqueta",
+              "Constatar a ausência de tensão com instrumento adequado",
+              "Instalar o aterramento temporário",
+              "Proteger os elementos energizados da zona controlada",
+              "Sinalizar o impedimento de reenergização"
+            ],
+            "explicacao": "Primeiro corte e trave, depois confirme medindo — só então aterre, proteja o que segue energizado e sinalize. Medir antes de travar deixa alguém religar no meio do serviço.",
+            "skill_card_id": "C10"
+          },
+          {
+            "id": "B108",
+            "tipo": "texto",
+            "titulo": "Religando com segurança",
+            "texto": "A reenergização segue a ordem inversa: primeiro retire ferramentas e pessoas da zona de trabalho; depois remova o aterramento temporário; em seguida, retire a sinalização e os bloqueios; só então religue o circuito.",
+            "dica": "Religar fora de ordem pode energizar alguém ainda em contato com o aterramento temporário."
+          },
+          {
+            "id": "B109",
+            "tipo": "quiz",
+            "pergunta": "Qual é o primeiro passo ao reenergizar uma instalação, depois de concluído o serviço?",
+            "opcoes": [
+              {
+                "texto": "Religar o disjuntor imediatamente",
+                "correta": false,
+                "feedback": "Religar é sempre o último passo, nunca o primeiro da reenergização."
+              },
+              {
+                "texto": "Remover o aterramento temporário",
+                "correta": false,
+                "feedback": "Remover o aterramento vem depois de garantir que não há mais ninguém na zona de trabalho."
+              },
+              {
+                "texto": "Retirar a sinalização e os cadeados",
+                "correta": false,
+                "feedback": "Retirar sinalização e cadeados é o penúltimo passo, não o primeiro."
+              },
+              {
+                "texto": "Retirar ferramentas e pessoas da zona de trabalho",
+                "correta": true,
+                "feedback": "Isso! Antes de qualquer outra coisa, é preciso tirar ferramentas e pessoas da zona de trabalho."
+              }
+            ],
+            "skill_card_id": "C11"
+          },
+          {
+            "id": "B110",
+            "tipo": "texto",
+            "titulo": null,
+            "texto": "Depois de garantir que ninguém está mais na zona de trabalho, o próximo cuidado é desfazer, com calma, cada proteção temporária que foi instalada.",
+            "dica": null
+          },
+          {
+            "id": "B111",
+            "tipo": "quiz",
+            "pergunta": "O eletricista já retirou todas as pessoas e ferramentas da área. Qual é o próximo passo?",
+            "opcoes": [
+              {
+                "texto": "Religar o disjuntor direto",
+                "correta": false,
+                "feedback": "Religar ainda não pode: faltam remover o aterramento e os bloqueios antes disso."
+              },
+              {
+                "texto": "Remover o aterramento temporário instalado",
+                "correta": true,
+                "feedback": "Isso! Depois de retirar pessoas e ferramentas, o próximo passo é remover o aterramento temporário."
+              },
+              {
+                "texto": "Instalar a sinalização de impedimento",
+                "correta": false,
+                "feedback": "Instalar sinalização de impedimento faz parte da desenergização, não da reenergização."
+              },
+              {
+                "texto": "Medir novamente a ausência de tensão",
+                "correta": false,
+                "feedback": "Medir a ausência de tensão é passo da desenergização; na reenergização não se repete essa medição."
+              }
+            ],
+            "skill_card_id": "C11"
+          },
+          {
+            "id": "B112",
+            "tipo": "texto",
+            "titulo": "Resumo",
+            "texto": "Desenergizar e religar na ordem certa, sempre, é o que separa um serviço seguro de um acidente grave. Essa sequência da NR-10 é para ser seguida à risca, sem pular etapas. ✅",
+            "dica": null
+          }
+        ]
+      }
+    ]
+  },
+  "materiais": [
+    {
+      "id": "demo-mat-apostila",
+      "nome": "apostila-eletricidade-basica.pdf",
+      "paginas": 42
+    },
+    {
+      "id": "demo-mat-plano",
+      "nome": "plano-de-curso-eletrotecnica.pdf",
+      "paginas": 6
+    }
+  ]
+}
