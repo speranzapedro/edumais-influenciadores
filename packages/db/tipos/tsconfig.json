@@ -1,5 +1,5 @@
 {
   "extends": "@edu/config/tsconfig.base.json",
-  "compilerOptions": { "noEmit": true, "noUnusedLocals": false },
+  "compilerOptions": { "noEmit": true, "noUnusedLocals": false, "noErrorTruncation": true },
   "include": ["conferir.ts", "database.gerado.ts"]
 }

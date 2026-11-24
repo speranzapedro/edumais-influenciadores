@@ -40,6 +40,7 @@ type FG = Gerado["public"]["Functions"];
 type FM = Manual["public"]["Functions"];
 type FuncoesDivergentes = Exclude<keyof FG, keyof FM> | Exclude<keyof FM, keyof FG>;
 
-export type TabelasOk = Nada<TabelasDivergentes>;
-export type EnumsOk = Nada<EnumsDivergentes>;
-export type FuncoesOk = Nada<FuncoesDivergentes>;
+// Atribuir a `never` faz o tsc listar a união inteira (com noErrorTruncation no tsconfig).
+export const tabelasDivergentes: Nada<never> = null as unknown as TabelasDivergentes;
+export const enumsDivergentes: Nada<never> = null as unknown as EnumsDivergentes;
+export const funcoesDivergentes: Nada<never> = null as unknown as FuncoesDivergentes;
