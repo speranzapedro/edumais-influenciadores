@@ -62,6 +62,8 @@ test("publicar a trilha avisa os assinantes e mostra a prévia", async ({ page }
 
   await entrarNoPainel(page, c.email);
   await page.goto(`/trilhas/${trilha.id}/editar`);
+  // Sem material enviado, o estúdio abre em Materiais; as etapas aprovadas liberam o passo Publicar.
+  await page.getByRole("listitem").filter({ hasText: "Publicar" }).getByRole("button").first().click();
   await page.getByRole("button", { name: "Publicar para os assinantes" }).click();
   await expect(page.getByText("Trilha publicada!")).toBeVisible();
 

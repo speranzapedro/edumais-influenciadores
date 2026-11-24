@@ -59,7 +59,7 @@ export function FormProduto({ produto }: { produto: { nome: string; descricao: s
   return (
     <form className="space-y-4" action={(form) => enviar(() => salvarDadosProduto(form))}>
       <div className="grid gap-4 sm:grid-cols-[1.6fr_1fr]">
-        <Campo rotulo="Nome do produto" name="nome" defaultValue={produto.nome} required />
+        <Campo rotulo="Nome do produto" id="produto-nome" name="nome" defaultValue={produto.nome} required />
         <Campo
           rotulo="Preço da assinatura (R$/mês)"
           name="preco"
