@@ -1,6 +1,6 @@
 "use server";
 
-import { sincronizarIndice } from "@edu/ai/tutor";
+import { sincronizarIndice, tutorHabilitado } from "@edu/ai/tutor";
 import {
   assinaturaCards,
   assinaturaModulo,
@@ -165,7 +165,7 @@ export async function duplicar(trilhaId: string) {
   redirect(`${caminho(nova.id)}/editar`);
 }
 
-/** Liga/desliga o Edu nesta trilha. */
+/** Liga/desliga o Edu nesta trilha (sem a flag TUTOR_HABILITADO, o Edu fica desligado em todas). */
 export async function alternarEdu(trilhaId: string, ativo: boolean) {
   const e = await comTrilha(trilhaId);
   await definirEduAtivo(trilhaId, ativo);
@@ -173,8 +173,10 @@ export async function alternarEdu(trilhaId: string, ativo: boolean) {
   revalidatePath(caminho(trilhaId), "layout");
 }
 
+/** Reindexa o Edu na hora. Sem a flag TUTOR_HABILITADO, não gera embeddings. */
 export async function reindexarTutor(trilhaId: string): Promise<"indexada" | "na_fila" | "ignorada"> {
   await comTrilha(trilhaId);
+  if (!tutorHabilitado()) return "ignorada";
   const r = await sincronizarIndice(new ArmazemTutorDb(), trilhaId);
   revalidatePath(caminho(trilhaId), "layout");
   return r.status;

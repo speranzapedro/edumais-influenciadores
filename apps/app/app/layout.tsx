@@ -8,7 +8,7 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakart
 
 export const metadata: Metadata = {
   title: "Edu+",
-  description: "As trilhas dos criadores que você acompanha, em microaulas com XP, ofensiva e o Edu para tirar dúvidas.",
+  description: "As trilhas dos criadores que você acompanha, em microaulas gamificadas, com XP e ofensiva.",
   applicationName: "Edu+",
   appleWebApp: { capable: true, title: "Edu+", statusBarStyle: "default" },
 };
