@@ -27,7 +27,7 @@ import { criarProduto, listarProdutos, publicarProduto, salvarIdentidadeProduto,
 beforeAll(limparBanco);
 
 describe("cadastro do criador", () => {
-  it("cria a conta de criador com a página e um produto em rascunho", async () => {
+  it("cria a conta de criador com a página em rascunho e sem produtos", async () => {
     const base = handleUnico("bia");
     const { usuario, handle } = await cadastrarCriador({
       nome: "Bia História",
@@ -40,9 +40,7 @@ describe("cadastro do criador", () => {
     expect(usuario.role).toBe("criador");
     const e = (await escopoCriador(usuario))!;
     expect(e.perfil).toMatchObject({ handle: base, nome_publico: "Bia História", pagina_status: "rascunho", preco_centavos: null });
-    expect(await listarProdutos(e)).toEqual([
-      expect.objectContaining({ criador_id: usuario.id, status: "rascunho", nome: "Trilhas de Bia", slug: "trilhas-de-bia", cor_primaria: "#6c5ce7" }),
-    ]);
+    expect(await listarProdutos(e)).toEqual([]);
   });
 
   it("sem @, sugere um a partir do nome e evita repetição", async () => {

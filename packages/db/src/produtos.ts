@@ -169,11 +169,20 @@ export async function excluirProduto(e: EscopoCriador, produtoId: string) {
   await registrarAuditoria({ ator: e.usuario.id, acao: "produto.excluido", entidade: "produtos", entidadeId: produtoId });
 }
 
-/**
- * Produto usado pelas telas do painel que ainda supõem um só produto (até a fase 3 do white-label,
- * que traz a lista de produtos): o primeiro da página; cria um se o criador não tiver nenhum.
- */
-export async function produtoPadrao(e: EscopoCriador): Promise<Produto> {
-  const [primeiro] = await listarProdutos(e);
-  return primeiro ?? criarProduto(e, { nome: `Trilhas de ${e.perfil.nome_publico.split(" ")[0]}` });
+export interface ResumoProduto extends Produto {
+  totalTrilhas: number;
+  trilhasPublicadas: number;
+}
+
+/** Produtos do criador na ordem da página, com quantas trilhas (não arquivadas) e publicadas cada um tem. */
+export async function resumoProdutos(e: EscopoCriador): Promise<ResumoProduto[]> {
+  const [produtos, trilhas] = await Promise.all([
+    listarProdutos(e),
+    db().from("trilhas").select("produto_id, status").eq("criador_id", e.usuario.id).neq("status", "arquivada"),
+  ]);
+  const lista = ok(trilhas, "trilhas dos produtos");
+  return produtos.map((p) => {
+    const doProduto = lista.filter((t) => t.produto_id === p.id);
+    return { ...p, totalTrilhas: doProduto.length, trilhasPublicadas: doProduto.filter((t) => t.status === "publicada").length };
+  });
 }

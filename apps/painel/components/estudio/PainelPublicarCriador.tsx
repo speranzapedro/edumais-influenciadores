@@ -19,7 +19,7 @@ export function PainelPublicarCriador({
   produto,
   linkPagina,
 }: PropsPublicar & {
-  produto: { nome: string; publicado: boolean; assinantes: number };
+  produto: { id?: string; nome: string; publicado: boolean; assinantes: number };
   linkPagina: string;
 }) {
   const [pendente, iniciar] = useTransition();
@@ -79,7 +79,7 @@ export function PainelPublicarCriador({
               {produto.nome}
               <span className="font-medium text-suave">
                 {" "}
-                · {produto.assinantes} assinante(s) · página {produto.publicado ? "no ar" : "em rascunho"}
+                · {produto.assinantes} assinante(s) · {produto.publicado ? "visível para os fãs" : "ainda não visível para os fãs"}
               </span>
             </div>
           </div>
@@ -98,9 +98,13 @@ export function PainelPublicarCriador({
                 "Seus assinantes já podem começar."
               ) : (
                 <>
-                  Falta abrir sua página para os alunos em{" "}
-                  <Link href="/perfil#produto" className="font-semibold underline">
-                    Perfil e produto
+                  Para os fãs verem, publique o produto{" "}
+                  <Link href={produto.id ? `/produtos/${produto.id}` : "/produtos"} className="font-semibold underline">
+                    {produto.nome}
+                  </Link>{" "}
+                  e abra sua página em{" "}
+                  <Link href="/perfil#pagina" className="font-semibold underline">
+                    Perfil
                   </Link>
                   .
                 </>

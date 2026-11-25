@@ -23,6 +23,8 @@ test.describe("cadastro pelo link secreto", () => {
     await expect(page).toHaveURL(/\/perfil\?bem-vindo=1/);
     await expect(page.getByLabel("Seu @ na Edu+")).toHaveValue(handle);
     await expect(page.getByLabel("Nome público")).toHaveValue("Ana Criadora");
+    // O cadastro não cria produto: as boas-vindas levam a criar o primeiro.
+    await expect(page.getByText("crie seu primeiro produto em")).toBeVisible();
   });
 
   test("e-mail já usado não cria outra conta", async ({ page }) => {

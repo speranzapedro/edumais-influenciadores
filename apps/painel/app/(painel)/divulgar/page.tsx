@@ -16,11 +16,11 @@ export default async function DivulgarPage() {
       <div className="space-y-6 px-8 pb-10 pt-4">
         {e.perfil.pagina_status !== "publicada" && (
           <Aviso tom="ambar">
-            Sua página ainda está em rascunho: quem abrir o link vê “em breve”. Publique em{" "}
-            <Link href="/perfil#produto" className="font-bold underline">
-              Perfil e produto
-            </Link>{" "}
-            depois de publicar ao menos uma trilha.
+            Sua página ainda está em rascunho: quem abrir o link vê “em breve”. Publique um produto e depois abra a página em{" "}
+            <Link href="/perfil#pagina" className="font-bold underline">
+              Perfil
+            </Link>
+            .
           </Aviso>
         )}
         <LinksDivulgacao

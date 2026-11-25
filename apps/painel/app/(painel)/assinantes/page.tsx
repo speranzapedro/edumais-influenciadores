@@ -34,12 +34,13 @@ export default async function AssinantesPage() {
               </Link>
             </div>
           ) : (
-            <table className="w-full min-w-[640px] text-sm">
+            <table className="w-full min-w-[760px] text-sm">
               <thead className="border-b border-linha bg-fundo/60 text-left text-xs uppercase tracking-wide text-suave">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Assinante</th>
                   <th className="px-5 py-3 font-semibold">Status</th>
                   <th className="px-5 py-3 font-semibold">Origem</th>
+                  <th className="px-5 py-3 font-semibold">Entrou por</th>
                   <th className="px-5 py-3 font-semibold">Desde</th>
                   <th className="px-5 py-3 text-right font-semibold">Aulas concluídas</th>
                   <th className="px-5 py-3 text-right font-semibold">Último estudo</th>
@@ -58,6 +59,7 @@ export default async function AssinantesPage() {
                       <Pill tom={STATUS[a.status].tom}>{STATUS[a.status].rotulo}</Pill>
                     </td>
                     <td className="px-5 py-3 text-tinta-2">{nomeDaOrigem(a.origem)}</td>
+                    <td className="px-5 py-3 text-tinta-2">{a.entrouPor ?? "Sua página"}</td>
                     <td className="px-5 py-3 text-tinta-2">{dataCurta(a.desde)}</td>
                     <td className="px-5 py-3 text-right font-semibold">{a.aulasConcluidas}</td>
                     <td className="px-5 py-3 text-right text-suave">{haQuanto(a.ultimaAula)}</td>

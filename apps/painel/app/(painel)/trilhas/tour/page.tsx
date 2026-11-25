@@ -4,8 +4,8 @@ import { exigirCriador } from "@/lib/sessao";
 
 export const dynamic = "force-dynamic";
 
-/** Só destinos internos de trilhas (evita redirecionar para fora do painel). */
-const destinoSeguro = (d: string | undefined) => (d && /^\/trilhas(\/|\?|$)/.test(d) ? d : "/trilhas/nova");
+/** Só destinos internos de trilhas e produtos (evita redirecionar para fora do painel). */
+const destinoSeguro = (d: string | undefined) => (d && /^\/(trilhas|produtos)(\/|\?|$)/.test(d) ? d : "/produtos");
 
 /**
  * Tour do estúdio com a trilha de exemplo num produto fictício.

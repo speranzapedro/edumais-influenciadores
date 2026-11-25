@@ -2,7 +2,7 @@
 
 import { Aviso, Botao, Campo, CampoSenha } from "@edu/ui";
 import { useState, useTransition } from "react";
-import { alterarSenha, alternarPublicacao, salvarDadosProduto, salvarPerfil } from "./actions";
+import { alterarSenha, alternarPagina, salvarPerfil, salvarPreco } from "./actions";
 
 const classeArea =
   "w-full rounded-2xl border border-linha bg-superficie px-4 py-3 text-[15px] text-tinta outline-none transition placeholder:text-suave/70 focus:border-marca-400 focus:ring-4 focus:ring-marca-100";
@@ -54,33 +54,21 @@ export function FormPerfil({
   );
 }
 
-export function FormProduto({ produto }: { produto: { nome: string; descricao: string | null; preco: string } }) {
-  const { pendente, msg, enviar } = useEnvio("Produto salvo.");
+export function FormPreco({ preco }: { preco: string }) {
+  const { pendente, msg, enviar } = useEnvio("Preço salvo.");
   return (
-    <form className="space-y-4" action={(form) => enviar(() => salvarDadosProduto(form))}>
-      <div className="grid gap-4 sm:grid-cols-[1.6fr_1fr]">
-        <Campo rotulo="Nome do produto" id="produto-nome" name="nome" defaultValue={produto.nome} required />
-        <Campo
-          rotulo="Preço da assinatura (R$/mês)"
-          name="preco"
-          defaultValue={produto.preco}
-          placeholder="29,90"
-          ajuda="Ainda sem cobrança: vale quando os pagamentos chegarem."
-        />
-      </div>
-      <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-tinta-2">O que o aluno vai aprender</span>
-        <textarea
-          name="descricao"
-          rows={3}
-          maxLength={600}
-          defaultValue={produto.descricao ?? ""}
-          className={classeArea}
-          placeholder="Uma promessa curta e clara. Aparece na sua página."
-        />
-      </label>
+    <form className="space-y-3" action={(form) => enviar(() => salvarPreco(form))}>
+      <Campo
+        rotulo="Preço da assinatura (R$/mês)"
+        name="preco"
+        defaultValue={preco}
+        placeholder="29,90"
+        ajuda="Um preço libera todos os seus produtos publicados. Ainda sem cobrança: vale quando os pagamentos chegarem."
+      />
       {msg && <Aviso tom={msg.tom}>{msg.texto}</Aviso>}
-      <Botao disabled={pendente}>{pendente ? "Salvando…" : "Salvar produto"}</Botao>
+      <Botao variante="contorno" disabled={pendente}>
+        {pendente ? "Salvando…" : "Salvar preço"}
+      </Botao>
     </form>
   );
 }
@@ -89,7 +77,7 @@ export function BotaoPublicar({ publicado }: { publicado: boolean }) {
   const { pendente, msg, enviar } = useEnvio(publicado ? "Página fora do ar." : "Página publicada!");
   return (
     <div className="space-y-3">
-      <Botao variante={publicado ? "contorno" : "primario"} disabled={pendente} onClick={() => enviar(() => alternarPublicacao(!publicado))}>
+      <Botao variante={publicado ? "contorno" : "primario"} disabled={pendente} onClick={() => enviar(() => alternarPagina(!publicado))}>
         {pendente ? "Salvando…" : publicado ? "Tirar a página do ar" : "Publicar minha página"}
       </Botao>
       {msg && <Aviso tom={msg.tom}>{msg.texto}</Aviso>}

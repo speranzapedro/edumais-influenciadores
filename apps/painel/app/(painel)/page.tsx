@@ -1,7 +1,7 @@
 import { formatarCentavos } from "@edu/core";
-import { painelVendas, produtoPadrao, trilhasDoCriador } from "@edu/db";
+import { painelVendas, resumoProdutos, trilhasDoCriador } from "@edu/db";
 import { Cartao, classesBotao, GraficoArea, Pill, TileIcone } from "@edu/ui";
-import { BadgeDollarSign, Check, Map as IconeMapa, Megaphone, Rocket, Sparkles, UserRound, Users } from "lucide-react";
+import { BadgeDollarSign, Check, Map as IconeMapa, Megaphone, Package, Rocket, Sparkles, UserRound, Users } from "lucide-react";
 import Link from "next/link";
 import { Topo } from "@/components/Topo";
 import { exigirCriador } from "@/lib/sessao";
@@ -10,13 +10,21 @@ export const dynamic = "force-dynamic";
 
 export default async function InicioPage() {
   const e = await exigirCriador();
-  const [trilhas, vendas] = await Promise.all([trilhasDoCriador(e), painelVendas(e, 30)]);
-  const publicadas = trilhas.filter((t) => t.status === "publicada").length;
+  const [trilhas, vendas, produtos] = await Promise.all([trilhasDoCriador(e), painelVendas(e, 30), resumoProdutos(e)]);
+  const [primeiro] = produtos;
+  // "Nova trilha" entra no produto quando há um só; com vários (ou nenhum), a pessoa escolhe em Produtos.
+  const novaTrilha = produtos.length === 1 ? `/produtos/${primeiro.id}/trilhas/nova` : produtos.length ? "/produtos" : "/produtos/novo";
   const passos = [
     { feito: !!e.perfil.bio, titulo: "Monte seu perfil público", href: "/perfil", icone: <UserRound /> },
-    { feito: trilhas.length > 0, titulo: "Crie a primeira trilha com o Edu", href: "/trilhas/nova", icone: <Sparkles /> },
-    { feito: publicadas > 0, titulo: "Publique a trilha", href: "/trilhas", icone: <IconeMapa /> },
-    { feito: e.perfil.pagina_status === "publicada", titulo: "Abra sua página para os alunos", href: "/perfil#produto", icone: <Rocket /> },
+    { feito: produtos.length > 0, titulo: "Crie seu primeiro produto", href: "/produtos/novo", icone: <Package /> },
+    { feito: trilhas.length > 0, titulo: "Crie a primeira trilha com o Edu", href: novaTrilha, icone: <Sparkles /> },
+    {
+      feito: produtos.some((p) => p.status === "publicado"),
+      titulo: "Publique a trilha e o produto",
+      href: primeiro ? `/produtos/${primeiro.id}` : "/produtos",
+      icone: <IconeMapa />,
+    },
+    { feito: e.perfil.pagina_status === "publicada", titulo: "Abra sua página para os fãs", href: "/perfil#pagina", icone: <Rocket /> },
     { feito: vendas.cortesias + vendas.ativas > 0, titulo: "Divulgue seu link", href: "/divulgar", icone: <Megaphone /> },
   ];
   const pendentes = passos.filter((p) => !p.feito).length;
@@ -24,7 +32,7 @@ export default async function InicioPage() {
 
   return (
     <>
-      <Topo titulo={`Olá, ${primeiroNome}!`} subtitulo={`${(await produtoPadrao(e)).nome} · @${e.perfil.handle}`} />
+      <Topo titulo={`Olá, ${primeiroNome}!`} subtitulo={`@${e.perfil.handle} · ${produtos.length} ${produtos.length === 1 ? "produto" : "produtos"}`} />
       <div className="space-y-6 px-8 pb-10 pt-4">
         {pendentes > 0 && (
           <Cartao className="p-6">
@@ -34,7 +42,7 @@ export default async function InicioPage() {
                 {passos.length - pendentes}/{passos.length}
               </Pill>
             </div>
-            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {passos.map((p) => (
                 <Link
                   key={p.titulo}
@@ -101,7 +109,7 @@ export default async function InicioPage() {
           <Cartao className="p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-extrabold">Suas trilhas</h2>
-              <Link href="/trilhas/nova" className={classesBotao("contorno", "sm")}>
+              <Link href={novaTrilha} className={classesBotao("contorno", "sm")}>
                 <Sparkles className="size-3.5" /> Nova trilha
               </Link>
             </div>

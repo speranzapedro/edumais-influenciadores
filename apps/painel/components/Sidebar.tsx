@@ -1,23 +1,24 @@
 "use client";
 
 import { Avatar, cn, Marca } from "@edu/ui";
-import { BadgeDollarSign, Map as IconeMapa, LayoutDashboard, LogOut, Megaphone, Settings, Users } from "lucide-react";
+import { BadgeDollarSign, LayoutDashboard, LogOut, Megaphone, Package, UserRound, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sair } from "@/app/login/actions";
 
 const ITENS = [
   { href: "/", rotulo: "Início", Icone: LayoutDashboard },
+  { href: "/produtos", rotulo: "Produtos", Icone: Package },
   { href: "/vendas", rotulo: "Vendas", Icone: BadgeDollarSign },
   { href: "/assinantes", rotulo: "Assinantes", Icone: Users },
-  { href: "/trilhas", rotulo: "Trilhas", Icone: IconeMapa },
   { href: "/divulgar", rotulo: "Divulgar", Icone: Megaphone },
-  { href: "/perfil", rotulo: "Perfil e produto", Icone: Settings },
+  { href: "/perfil", rotulo: "Perfil", Icone: UserRound },
 ];
 
 export function Sidebar({ usuario }: { usuario: { id: string; nome: string; handle: string; foto: string | null } }) {
   const path = usePathname();
-  const ativo = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  // As trilhas (estúdio e prévia) ficam dentro dos produtos.
+  const ativo = (href: string) => (href === "/" ? path === "/" : path.startsWith(href) || (href === "/produtos" && path.startsWith("/trilhas")));
   // No estúdio a sidebar vira uma coluna de ícones para dar espaço ao rascunho e ao chat.
   const compacta = /^\/trilhas\/(?!nova)[^/]+/.test(path);
 
