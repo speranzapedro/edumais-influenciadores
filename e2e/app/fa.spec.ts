@@ -56,7 +56,8 @@ test.describe("página do criador", () => {
     await entrarNoApp(page, email);
     await page.goto(`/@${segundo.escopo.perfil.handle}?origem=youtube`);
     await page.getByRole("button", { name: "Começar agora" }).click();
-    await page.waitForURL((u) => u.pathname === `/@${segundo.escopo.perfil.handle}`);
+    // A página já estava em /@segundo: o ?bemvindo=1 só aparece depois de assinar.
+    await page.waitForURL((u) => u.pathname === `/@${segundo.escopo.perfil.handle}` && u.search === "?bemvindo=1");
 
     // Com dois criadores, a entrada do app pede para escolher.
     await page.goto("/");
