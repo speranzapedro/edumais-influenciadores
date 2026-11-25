@@ -18,7 +18,7 @@ export const viewport: Viewport = { themeColor: COR_MARCA, width: "device-width"
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={jakarta.variable}>
-      <body className="min-h-dvh bg-[#e9e8f3] antialiased">
+      <body className="min-h-dvh bg-moldura antialiased">
         <RastreadorNavegacao />
         <ProvedorAulaFa>{children}</ProvedorAulaFa>
       </body>

@@ -134,8 +134,8 @@ export function AnelProgresso({
   valor,
   tamanho = 160,
   espessura = 16,
-  cor = "#6c5ce7",
-  trilho = "#ebe7ff",
+  cor = "var(--color-marca-600)",
+  trilho = "var(--color-marca-100)",
   children,
   className,
 }: {
@@ -153,18 +153,17 @@ export function AnelProgresso({
   return (
     <div className={cn("relative grid place-items-center", className)} style={{ width: tamanho, height: tamanho }}>
       <svg width={tamanho} height={tamanho} className="-rotate-90" aria-hidden="true">
-        <circle cx={tamanho / 2} cy={tamanho / 2} r={r} fill="none" stroke={trilho} strokeWidth={espessura} />
+        <circle cx={tamanho / 2} cy={tamanho / 2} r={r} fill="none" strokeWidth={espessura} style={{ stroke: trilho }} />
         <circle
           cx={tamanho / 2}
           cy={tamanho / 2}
           r={r}
           fill="none"
-          stroke={cor}
           strokeWidth={espessura}
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={c * (1 - v / 100)}
-          style={{ transition: "stroke-dashoffset 1s cubic-bezier(.22,1,.36,1)" }}
+          style={{ stroke: cor, transition: "stroke-dashoffset 1s cubic-bezier(.22,1,.36,1)" }}
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">{children}</div>

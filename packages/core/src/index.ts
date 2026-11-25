@@ -6,6 +6,7 @@ export * from "./escapes";
 export * from "./gamificacao";
 export * from "./orientacao";
 export * from "./revisao";
+export * from "./tema";
 export * from "./tour-estudio";
 export * from "./validacao";
 export * from "./vendas";
