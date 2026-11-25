@@ -8,9 +8,9 @@ import {
   excluirProduto,
   exigirProdutoDoCriador,
   listarProdutos,
-  produtoPadrao,
   publicarProduto,
   reordenarProdutos,
+  resumoProdutos,
   salvarIdentidadeProduto,
   salvarProduto,
 } from "../src/produtos";
@@ -116,7 +116,7 @@ describe("produtos do criador", () => {
     const b = await criarProduto(c.escopo, { nome: "Produto B" });
     await reordenarProdutos(c.escopo, [b.id, a.id, c.produto.id]);
     expect((await listarProdutos(c.escopo)).map((p) => p.id)).toEqual([b.id, a.id, c.produto.id]);
-    expect(await produtoPadrao(c.escopo)).toMatchObject({ id: b.id });
+    expect((await listarProdutos(c.escopo))[0]).toMatchObject({ id: b.id });
 
     const outro = await novoCriador();
     await expect(reordenarProdutos(c.escopo, [outro.produto.id])).rejects.toThrow(ErroPermissao);
@@ -128,12 +128,18 @@ describe("produtos do criador", () => {
     expect((await listarProdutos(c.escopo)).map((p) => p.id)).toEqual([a.id, c.produto.id]);
   });
 
-  it("produto padrão: o primeiro da página; cria um se o criador não tiver nenhum", async () => {
-    const c = await novoCriador({ nome: "Duda Física" });
-    await excluirProduto(c.escopo, c.produto.id);
-    expect(await listarProdutos(c.escopo)).toEqual([]);
-    const p = await produtoPadrao(c.escopo);
-    expect(p).toMatchObject({ nome: "Trilhas de Duda", slug: "trilhas-de-duda" });
-    expect((await produtoPadrao(c.escopo)).id).toBe(p.id);
+  it("resumo dos produtos: trilhas por produto, sem contar as arquivadas", async () => {
+    const c = await novoCriador();
+    const outro = await criarProduto(c.escopo, { nome: "Outro produto" });
+    await trilhaPronta(c.escopo, { produtoId: c.produto.id });
+    await trilhaPronta(c.escopo, { produtoId: c.produto.id, publicar: false });
+    const arquivada = await trilhaPronta(c.escopo, { produtoId: outro.id });
+    await db().from("trilhas").update({ status: "arquivada" }).eq("id", arquivada.id);
+    const resumo = await resumoProdutos(c.escopo);
+    expect(resumo.map((p) => [p.id, p.totalTrilhas, p.trilhasPublicadas])).toEqual([
+      [c.produto.id, 2, 1],
+      [outro.id, 0, 0],
+    ]);
+    expect(await resumoProdutos((await novoCriador()).escopo)).toHaveLength(1);
   });
 });

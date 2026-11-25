@@ -109,7 +109,7 @@ export async function editarDados(
   await atualizarTrilha(trilhaId, { titulo, orientacao_objetivo: objetivo, descricao: d.descricao.trim().slice(0, 500) || null, cor: d.cor, icone: d.icone });
   atualizarTutorDepois(trilhaId);
   revalidatePath(caminho(trilhaId), "layout");
-  revalidatePath("/trilhas");
+  revalidatePath("/produtos", "layout");
   return { ok: true };
 }
 
@@ -139,7 +139,7 @@ export async function publicar(trilhaId: string) {
   await registrarAuditoria({ ator: e.usuario.id, acao: "trilha.publicada", entidade: "trilhas", entidadeId: trilhaId });
   atualizarTutorDepois(trilhaId);
   revalidatePath(caminho(trilhaId), "layout");
-  revalidatePath("/trilhas");
+  revalidatePath("/produtos", "layout");
 }
 
 export async function despublicar(trilhaId: string) {
@@ -147,15 +147,16 @@ export async function despublicar(trilhaId: string) {
   await despublicarTrilha(trilhaId);
   await registrarAuditoria({ ator: e.usuario.id, acao: "trilha.despublicada", entidade: "trilhas", entidadeId: trilhaId });
   revalidatePath(caminho(trilhaId), "layout");
-  revalidatePath("/trilhas");
+  revalidatePath("/produtos", "layout");
 }
 
 export async function arquivar(trilhaId: string) {
-  const e = await comTrilha(trilhaId);
+  const e = await exigirCriador();
+  const { produtoId } = await exigirTrilhaDoCriador(e, trilhaId);
   await arquivarTrilha(trilhaId);
   await registrarAuditoria({ ator: e.usuario.id, acao: "trilha.arquivada", entidade: "trilhas", entidadeId: trilhaId });
-  revalidatePath("/trilhas");
-  redirect("/trilhas");
+  revalidatePath("/produtos", "layout");
+  redirect(`/produtos/${produtoId}`);
 }
 
 /** Cópia em rascunho no mesmo produto. */

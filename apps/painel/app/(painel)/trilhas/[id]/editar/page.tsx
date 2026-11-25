@@ -27,7 +27,12 @@ export default async function EstudioPage({ params }: { params: Promise<{ id: st
   return (
     <EstudioCriador
       estado={estado}
-      produto={{ nome: produto.nome, publicado: produto.status === "publicado" && e.perfil.pagina_status === "publicada", assinantes: assinantes.count ?? 0 }}
+      produto={{
+        id: produto.id,
+        nome: produto.nome,
+        publicado: produto.status === "publicado" && e.perfil.pagina_status === "publicada",
+        assinantes: assinantes.count ?? 0,
+      }}
       usuario={{ id: e.usuario.id, nome: e.perfil.nome_publico }}
       linkPagina={linkPublico(e.perfil.handle)}
       tutor={tutor === undefined ? undefined : tutor && { status: tutor.status, trechos: tutor.trechos, indexado_em: tutor.indexado_em, erro: tutor.erro }}

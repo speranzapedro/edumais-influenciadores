@@ -3,45 +3,53 @@ import { criadorNoAr, novoCriador, novoFa, recarregar, trilhaPronta } from "@edu
 import { expect, test } from "@playwright/test";
 import { entrarNoPainel } from "../apoio";
 
-test("perfil e produto: salvar e publicar a página", async ({ page }) => {
+test("perfil: dados públicos, preço e publicação da página (que exige produto publicado)", async ({ page }) => {
   const c = await novoCriador();
   await entrarNoPainel(page, c.email);
   await page.goto("/perfil");
+  await expect(page.getByRole("heading", { name: "Perfil", exact: true })).toBeVisible();
+  // O produto não é mais editado aqui.
+  await expect(page.getByLabel("Nome do produto")).toHaveCount(0);
 
   await page.getByLabel("Sobre você").fill("Ensino finanças pessoais sem complicação.");
   await page.getByRole("button", { name: "Salvar perfil" }).click();
   await expect(page.getByText("Perfil salvo.")).toBeVisible();
 
-  await page.getByLabel("Nome do produto").fill("Finanças sem Mistério");
-  await page.getByRole("button", { name: "Salvar produto" }).click();
-  await expect(page.getByText("Produto salvo.")).toBeVisible();
+  await page.getByLabel("Preço da assinatura (R$/mês)").fill("29,90");
+  await page.getByRole("button", { name: "Salvar preço" }).click();
+  await expect(page.getByText("Preço salvo.")).toBeVisible();
 
-  // Sem trilha publicada, a página não abre para os fãs.
+  // Sem produto publicado, a página não abre para os fãs.
   await page.getByRole("button", { name: "Publicar minha página" }).click();
-  await expect(page.getByText("Publique pelo menos uma trilha deste produto")).toBeVisible();
+  await expect(page.getByText("Publique pelo menos um produto")).toBeVisible();
 
-  await trilhaPronta(c.escopo);
-  await page.reload();
+  // Produto publicado (com trilha), a página abre.
+  await trilhaPronta(c.escopo, { produtoId: c.produto.id });
+  await page.goto(`/produtos/${c.produto.id}`);
+  await page.getByRole("button", { name: "Publicar produto" }).click();
+  await expect(page.getByText("Produto publicado!")).toBeVisible();
+  await page.goto("/perfil");
   await page.getByRole("button", { name: "Publicar minha página" }).click();
   await expect(page.getByText("Página publicada!")).toBeVisible();
 
   const r = await recarregar(c);
-  expect(r.produto).toMatchObject({ nome: "Finanças sem Mistério", status: "publicado" });
-  expect(r.escopo.perfil.pagina_status).toBe("publicada");
+  expect(r.produto.status).toBe("publicado");
+  expect(r.escopo.perfil).toMatchObject({ pagina_status: "publicada", preco_centavos: 2990 });
 
   await page.goto("/divulgar");
   await expect(page.getByText(`/c/${c.escopo.perfil.handle}`).first()).toBeVisible();
 });
 
-test("primeira trilha: tour do estúdio, depois o formulário e o estúdio", async ({ page }) => {
+test("primeira trilha: tour do estúdio, depois o formulário do produto e o estúdio", async ({ page }) => {
   const c = await novoCriador();
   await entrarNoPainel(page, c.email);
-  await page.goto("/trilhas/nova");
+  await page.goto(`/produtos/${c.produto.id}`);
+  await page.getByRole("link", { name: "Nova trilha" }).click();
 
   // Na primeira vez, o tour com a trilha de exemplo vem antes (nada ali é salvo).
   await expect(page).toHaveURL(/\/trilhas\/tour/);
   await page.getByRole("dialog").getByRole("button", { name: "Pular tour" }).click();
-  await expect(page).toHaveURL(/\/trilhas\/nova$/);
+  await expect(page).toHaveURL(new RegExp(`/produtos/${c.produto.id}/trilhas/nova$`));
 
   await page.locator('input[name="titulo"]').fill("Orçamento do zero");
   await page.locator('textarea[name="objetivo"]').fill("Ao final, o aluno monta o próprio orçamento mensal e separa uma reserva de emergência.");
@@ -49,10 +57,12 @@ test("primeira trilha: tour do estúdio, depois o formulário e o estúdio", asy
 
   await expect(page).toHaveURL(/\/trilhas\/[0-9a-f-]{36}\/editar$/);
   await expect(page.getByText("Orçamento do zero").first()).toBeVisible();
+  const { data: trilha } = await db().from("trilhas").select("produto_id").eq("titulo", "Orçamento do zero").eq("criador_id", c.usuario.id).single();
+  expect(trilha?.produto_id).toBe(c.produto.id);
 
-  // O tour não volta na segunda trilha.
+  // O tour não volta na segunda trilha; o endereço antigo leva ao único produto.
   await page.goto("/trilhas/nova");
-  await expect(page).toHaveURL(/\/trilhas\/nova$/);
+  await expect(page).toHaveURL(new RegExp(`/produtos/${c.produto.id}/trilhas/nova$`));
 });
 
 test("publicar a trilha avisa os assinantes e mostra a prévia", async ({ page }) => {

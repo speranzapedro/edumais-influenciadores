@@ -1,7 +1,7 @@
 "use server";
 
 import { lerPrecoEmCentavos } from "@edu/core";
-import { produtoPadrao, publicarPagina, publicarProduto, salvarPerfilCriador, salvarPrecoAssinatura, salvarProduto, trocarSenha } from "@edu/db";
+import { publicarPagina, salvarPerfilCriador, salvarPrecoAssinatura, trocarSenha } from "@edu/db";
 import { revalidatePath } from "next/cache";
 import { exigirCriador, tentar } from "@/lib/sessao";
 
@@ -21,7 +21,8 @@ export async function salvarPerfil(form: FormData) {
   return r;
 }
 
-export async function salvarDadosProduto(form: FormData) {
+/** Preço mensal da assinatura da página (vale para todos os produtos). */
+export async function salvarPreco(form: FormData) {
   const e = await exigirCriador();
   let preco: number | null;
   try {
@@ -29,23 +30,15 @@ export async function salvarDadosProduto(form: FormData) {
   } catch (err) {
     return { erro: (err as Error).message };
   }
-  // Até a tela de Produtos (fase 3): o formulário edita o primeiro produto, e o preço é do criador.
-  const r = await tentar(async () => {
-    const produto = await produtoPadrao(e);
-    await salvarProduto(e, produto.id, { nome: texto(form, "nome"), slug: produto.slug, descricao: texto(form, "descricao") });
-    await salvarPrecoAssinatura(e, preco);
-  });
+  const r = await tentar(() => salvarPrecoAssinatura(e, preco));
   revalidatePath("/", "layout");
   return r;
 }
 
-/** Abre a página publicando também o primeiro produto (até a tela de Produtos); fechar só fecha a página. */
-export async function alternarPublicacao(publicar: boolean) {
+/** Abre a página para novos fãs (exige um produto publicado) ou fecha. */
+export async function alternarPagina(publicar: boolean) {
   const e = await exigirCriador();
-  const r = await tentar(async () => {
-    if (publicar) await publicarProduto(e, (await produtoPadrao(e)).id, true);
-    await publicarPagina(e, publicar);
-  });
+  const r = await tentar(() => publicarPagina(e, publicar));
   revalidatePath("/", "layout");
   return r;
 }

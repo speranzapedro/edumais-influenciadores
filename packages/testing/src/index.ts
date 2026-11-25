@@ -19,15 +19,16 @@ import {
   blocoDaLinha,
   cadastrarCriador,
   cadastrarFa,
+  criarProduto,
   criarTrilha,
   db,
   type EscopoCriador,
   escopoCriador,
   getUsuario,
+  listarProdutos,
   marcarRevisao,
   ok,
   type Produto,
-  produtoPadrao,
   publicarPagina,
   publicarProduto,
   publicarTrilha,
@@ -77,16 +78,17 @@ export interface CriadorDeTeste {
   usuario: Usuario;
   escopo: EscopoCriador;
   email: string;
-  /** O primeiro produto (o cadastro cria um em rascunho). */
+  /** O primeiro produto, em rascunho (o cadastro não cria produto; a fábrica cria um como o criador faria). */
   produto: Produto;
 }
 
-/** Criador cadastrado pelo fluxo real, com o escopo (perfil) e o primeiro produto prontos. */
+/** Criador cadastrado pelo fluxo real, com o escopo (perfil) e um primeiro produto prontos. */
 export async function novoCriador(p: { nome?: string; handle?: string } = {}): Promise<CriadorDeTeste> {
   const email = emailUnico("criador");
-  const { usuario } = await cadastrarCriador({ nome: p.nome ?? "Bia Criadora", email, senha: SENHA, handle: p.handle ?? handleUnico(), ip: ipUnico() });
+  const nome = p.nome ?? "Bia Criadora";
+  const { usuario } = await cadastrarCriador({ nome, email, senha: SENHA, handle: p.handle ?? handleUnico(), ip: ipUnico() });
   const escopo = (await escopoCriador(usuario))!;
-  return { usuario, escopo, email, produto: await produtoPadrao(escopo) };
+  return { usuario, escopo, email, produto: await criarProduto(escopo, { nome: `Trilhas de ${nome.split(" ")[0]}` }) };
 }
 
 /** Recarrega o escopo e o primeiro produto (depois de mudar perfil ou produto). */
@@ -103,7 +105,7 @@ export async function recarregar(c: CriadorDeTeste): Promise<CriadorDeTeste> {
  */
 export async function trilhaPronta(e: EscopoCriador, p: { titulo?: string; publicar?: boolean; aulas?: AulasDraft; produtoId?: string } = {}) {
   const trilha = await criarTrilha({
-    produtoId: p.produtoId ?? (await produtoPadrao(e)).id,
+    produtoId: p.produtoId ?? (await listarProdutos(e))[0].id,
     criadorId: e.usuario.id,
     titulo: p.titulo ?? "Eletricidade básica",
     cor: "laranja",

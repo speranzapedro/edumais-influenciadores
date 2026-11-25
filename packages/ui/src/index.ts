@@ -1,3 +1,4 @@
+export * from "./components/abas";
 export * from "./components/base";
 export * from "./components/confirmar";
 export * from "./components/formulario";

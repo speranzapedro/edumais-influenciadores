@@ -7,7 +7,6 @@ import {
   type PainelVendas,
   resumirVendas,
   STATUS_COM_ACESSO,
-  slugDoNome,
   usoDoAssinante,
   validarHandle,
 } from "@edu/core";
@@ -15,7 +14,6 @@ import { apagarConta, criarConta, normalizarNome, registrarAuditoria, registrarT
 import { db, ok, talvez } from "./client";
 import type { AssinaturaStatusDb, Json, JsonNaoNulo, Row } from "./database.types";
 import { ErroAcesso, ErroPermissao } from "./erros";
-import { slugLivre } from "./produtos";
 
 /**
  * Criador de conteúdo: tem uma página pública (/c/@handle) com vários PRODUTOS, cada um com trilhas. O
@@ -58,7 +56,7 @@ const HANDLE_EM_USO = "Este @ já está em uso na Edu+. Escolha outro.";
 
 /**
  * Cadastro do criador pelo link secreto (o app confere a chave antes). A conta nasce confirmada, com
- * a página e um primeiro produto em rascunho. Qualquer falha desfaz tudo (apagar a conta cascateia).
+ * a página em rascunho; os produtos ele cria depois, no painel. Qualquer falha desfaz tudo (apagar a conta cascateia).
  */
 export async function cadastrarCriador(p: { nome: string; email: string; senha: string; handle?: string; ip: string }) {
   const email = p.email.trim().toLowerCase();
@@ -88,13 +86,6 @@ export async function cadastrarCriador(p: { nome: string; email: string; senha: 
       .insert({ user_id: usuario.id, handle, nome_publico: nome.slice(0, 80) });
     if (perfil.error?.code === "23505") throw new ErroAcesso(HANDLE_EM_USO);
     ok(perfil, "perfil criador");
-    const nomeProduto = `Trilhas de ${nome.split(" ")[0]}`;
-    ok(
-      await db()
-        .from("produtos")
-        .insert({ criador_id: usuario.id, nome: nomeProduto, slug: await slugLivre(usuario.id, slugDoNome(nomeProduto)) }),
-      "produto",
-    );
   } catch (e) {
     await apagarConta(usuario.auth_user_id);
     throw e;

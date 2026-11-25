@@ -19,10 +19,10 @@ export default async function TrilhaPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const e = await exigirCriador();
   let previa: Awaited<ReturnType<typeof previaDaTrilha>>;
-  let nomeProduto: string;
+  let produto: { id: string; nome: string };
   try {
     const { produtoId } = await exigirTrilhaDoCriador(e, id);
-    [previa, { nome: nomeProduto }] = await Promise.all([previaDaTrilha(e, id), exigirProdutoDoCriador(e, produtoId)]);
+    [previa, produto] = await Promise.all([previaDaTrilha(e, id), exigirProdutoDoCriador(e, produtoId)]);
   } catch (err) {
     if (err instanceof ErroPermissao) notFound();
     throw err;
@@ -38,11 +38,11 @@ export default async function TrilhaPage({ params }: { params: Promise<{ id: str
     <div className="pb-12">
       <Topo
         titulo={trilha.titulo}
-        subtitulo={<>Como a trilha aparece no app do aluno · {nomeProduto}</>}
+        subtitulo={<>Como a trilha aparece no app do aluno · {produto.nome}</>}
         acoes={
           <>
-            <Link href="/trilhas" className={classesBotao("contorno", "md")}>
-              <ArrowLeft className="size-4" /> Trilhas
+            <Link href={`/produtos/${produto.id}`} className={classesBotao("contorno", "md")}>
+              <ArrowLeft className="size-4" /> {produto.nome}
             </Link>
             <Link href={`/trilhas/${id}/editar`} className={classesBotao("primario", "md")}>
               <Pencil className="size-4" /> Editar
