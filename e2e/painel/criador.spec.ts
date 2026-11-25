@@ -18,15 +18,16 @@ test("perfil e produto: salvar e publicar a página", async ({ page }) => {
 
   // Sem trilha publicada, a página não abre para os fãs.
   await page.getByRole("button", { name: "Publicar minha página" }).click();
-  await expect(page.getByText("Publique pelo menos uma trilha antes de abrir sua página")).toBeVisible();
+  await expect(page.getByText("Publique pelo menos uma trilha deste produto")).toBeVisible();
 
   await trilhaPronta(c.escopo);
   await page.reload();
   await page.getByRole("button", { name: "Publicar minha página" }).click();
   await expect(page.getByText("Página publicada!")).toBeVisible();
 
-  const produto = (await recarregar(c)).escopo.produto;
-  expect(produto).toMatchObject({ nome: "Finanças sem Mistério", status: "publicado" });
+  const r = await recarregar(c);
+  expect(r.produto).toMatchObject({ nome: "Finanças sem Mistério", status: "publicado" });
+  expect(r.escopo.perfil.pagina_status).toBe("publicada");
 
   await page.goto("/divulgar");
   await expect(page.getByText(`/c/${c.escopo.perfil.handle}`).first()).toBeVisible();
@@ -57,7 +58,7 @@ test("primeira trilha: tour do estúdio, depois o formulário e o estúdio", asy
 test("publicar a trilha avisa os assinantes e mostra a prévia", async ({ page }) => {
   // A página só abre com uma trilha publicada; o fã entra antes da segunda trilha.
   const c = await criadorNoAr();
-  const fa = await novoFa(c.escopo.produto.id, { origem: "instagram" });
+  const fa = await novoFa(c.usuario.id, { origem: "instagram" });
   const trilha = await trilhaPronta(c.escopo, { titulo: "Investir com calma", publicar: false });
 
   await entrarNoPainel(page, c.email);
@@ -81,9 +82,9 @@ test("publicar a trilha avisa os assinantes e mostra a prévia", async ({ page }
 
 test("vendas e assinantes mostram a origem de cada assinatura", async ({ page }) => {
   const c = await criadorNoAr({ nome: "Caio Vendas" });
-  await novoFa(c.escopo.produto.id, { origem: "instagram" });
-  await novoFa(c.escopo.produto.id, { origem: "instagram" });
-  await novoFa(c.escopo.produto.id, { origem: "tiktok" });
+  await novoFa(c.usuario.id, { origem: "instagram" });
+  await novoFa(c.usuario.id, { origem: "instagram" });
+  await novoFa(c.usuario.id, { origem: "tiktok" });
 
   await entrarNoPainel(page, c.email);
   await page.goto("/vendas");
@@ -92,7 +93,7 @@ test("vendas e assinantes mostram a origem de cada assinatura", async ({ page })
   await expect(page.getByText("2 · 67%")).toBeVisible();
 
   await page.goto("/assinantes");
-  await expect(page.getByText("3 pessoa(s) assinaram")).toBeVisible();
+  await expect(page.getByText("3 pessoa(s) assinam a sua página")).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: "Fã de Teste" })).toHaveCount(3);
   await expect(page.getByRole("row").filter({ hasText: "TikTok" })).toHaveCount(1);
 });

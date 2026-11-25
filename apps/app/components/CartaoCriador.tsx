@@ -3,7 +3,7 @@ import { Avatar, Cartao } from "@edu/ui";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-/** Criador que o fã assina: foto, nome, @ e o produto. Leva à página pública dele. */
+/** Criador que o fã assina: foto, nome, @ e os produtos. Leva à página pública dele. */
 export function CartaoCriador({ criador }: { criador: CriadorDoFa }) {
   return (
     <Link href={`/c/${criador.handle}`} className="block">
@@ -12,7 +12,8 @@ export function CartaoCriador({ criador }: { criador: CriadorDoFa }) {
         <div className="min-w-0 flex-1">
           <div className="truncate font-bold">{criador.nome}</div>
           <div className="truncate text-xs text-suave">
-            @{criador.handle} · {criador.produto}
+            @{criador.handle}
+            {criador.produtos.length > 0 && ` · ${criador.produtos.join(", ")}`}
           </div>
         </div>
         <ChevronRight className="size-4 shrink-0 text-suave" />

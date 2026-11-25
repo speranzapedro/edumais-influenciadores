@@ -1,4 +1,4 @@
-import { trilhasDoCriador } from "@edu/db";
+import { produtoPadrao, trilhasDoCriador } from "@edu/db";
 import { Cartao, classesBotao, Icone, Pill, TileIcone, tomDe } from "@edu/ui";
 import { Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -12,12 +12,12 @@ const ETAPAS = ["ementa", "cards", "aulas"] as const;
 
 export default async function TrilhasPage() {
   const e = await exigirCriador();
-  const trilhas = await trilhasDoCriador(e);
+  const [trilhas, produto] = await Promise.all([trilhasDoCriador(e), produtoPadrao(e)]);
   return (
     <>
       <Topo
         titulo="Trilhas"
-        subtitulo={`As trilhas de ${e.produto.nome}. O aluno que assina vê todas as publicadas.`}
+        subtitulo={`As trilhas de ${produto.nome}. O aluno que assina vê todas as publicadas.`}
         acoes={
           <Link href="/trilhas/nova" className={classesBotao("primario", "md")}>
             <Plus className="size-4" /> Nova trilha

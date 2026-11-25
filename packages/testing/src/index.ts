@@ -26,6 +26,9 @@ import {
   getUsuario,
   marcarRevisao,
   ok,
+  type Produto,
+  produtoPadrao,
+  publicarPagina,
   publicarProduto,
   publicarTrilha,
   responderDesafio,
@@ -74,28 +77,33 @@ export interface CriadorDeTeste {
   usuario: Usuario;
   escopo: EscopoCriador;
   email: string;
+  /** O primeiro produto (o cadastro cria um em rascunho). */
+  produto: Produto;
 }
 
-/** Criador cadastrado pelo fluxo real, com o escopo (perfil + produto) pronto. */
+/** Criador cadastrado pelo fluxo real, com o escopo (perfil) e o primeiro produto prontos. */
 export async function novoCriador(p: { nome?: string; handle?: string } = {}): Promise<CriadorDeTeste> {
   const email = emailUnico("criador");
   const { usuario } = await cadastrarCriador({ nome: p.nome ?? "Bia Criadora", email, senha: SENHA, handle: p.handle ?? handleUnico(), ip: ipUnico() });
-  return { usuario, escopo: (await escopoCriador(usuario))!, email };
+  const escopo = (await escopoCriador(usuario))!;
+  return { usuario, escopo, email, produto: await produtoPadrao(escopo) };
 }
 
-/** Recarrega o escopo (depois de mudar perfil ou produto). */
+/** Recarrega o escopo e o primeiro produto (depois de mudar perfil ou produto). */
 export async function recarregar(c: CriadorDeTeste): Promise<CriadorDeTeste> {
   const usuario = (await getUsuario(c.usuario.id))!;
-  return { ...c, usuario, escopo: (await escopoCriador(usuario))! };
+  const escopo = (await escopoCriador(usuario))!;
+  const produto = ok(await db().from("produtos").select("*").eq("id", c.produto.id).single(), "produto");
+  return { ...c, usuario, escopo, produto };
 }
 
 /**
  * Trilha com as quatro etapas aprovadas a partir da trilha de exemplo e, por padrão, publicada —
  * o caminho do estúdio inteiro, sem a IA.
  */
-export async function trilhaPronta(e: EscopoCriador, p: { titulo?: string; publicar?: boolean; aulas?: AulasDraft } = {}) {
+export async function trilhaPronta(e: EscopoCriador, p: { titulo?: string; publicar?: boolean; aulas?: AulasDraft; produtoId?: string } = {}) {
   const trilha = await criarTrilha({
-    produtoId: e.produto.id,
+    produtoId: p.produtoId ?? (await produtoPadrao(e)).id,
     criadorId: e.usuario.id,
     titulo: p.titulo ?? "Eletricidade básica",
     cor: "laranja",
@@ -120,11 +128,12 @@ export async function trilhaPronta(e: EscopoCriador, p: { titulo?: string; publi
   return trilha;
 }
 
-/** Criador com uma trilha publicada e a página no ar. */
+/** Criador com uma trilha publicada no primeiro produto, o produto publicado e a página no ar. */
 export async function criadorNoAr(p: { nome?: string } = {}) {
   const c = await novoCriador(p);
-  const trilha = await trilhaPronta(c.escopo);
-  await publicarProduto(c.escopo, true);
+  const trilha = await trilhaPronta(c.escopo, { produtoId: c.produto.id });
+  await publicarProduto(c.escopo, c.produto.id, true);
+  await publicarPagina(c.escopo, true);
   return { ...(await recarregar(c)), trilha };
 }
 
@@ -171,10 +180,18 @@ export async function aulasDaTrilha(trilhaId: string) {
   return ok(await db().from("aulas").select("id, codigo, titulo").eq("trilha_id", trilhaId).is("arquivada_em", null).order("ordem"), "aulas da trilha");
 }
 
-/** Fã que entrou pela página de um produto publicado. */
-export async function novoFa(produtoId: string, p: { origem?: string } = {}) {
+/** Fã que assinou um criador com a página no ar (opcionalmente entrando por um produto). */
+export async function novoFa(criadorId: string, p: { origem?: string; produtoEntradaId?: string } = {}) {
   const email = emailUnico("fa");
-  const usuario = await cadastrarFa({ produtoId, nome: "Fã de Teste", email, senha: SENHA, origem: p.origem, ip: ipUnico() });
+  const usuario = await cadastrarFa({
+    criadorId,
+    produtoEntradaId: p.produtoEntradaId,
+    nome: "Fã de Teste",
+    email,
+    senha: SENHA,
+    origem: p.origem,
+    ip: ipUnico(),
+  });
   return { usuario, email };
 }
 

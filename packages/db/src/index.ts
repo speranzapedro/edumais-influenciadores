@@ -8,5 +8,6 @@ export * from "./erros";
 export * from "./estudio";
 export { FonteMateriaisDb } from "./fonte";
 export * from "./previa";
+export * from "./produtos";
 export type { AppSessao } from "./sessao";
 export { ArmazemTutorDb, ConsultorTutorDb, contextoTutor, definirEduAtivo, estadoIndiceTutor, historicoTutor, registrarTrocaTutor } from "./tutor";

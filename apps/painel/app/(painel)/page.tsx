@@ -1,5 +1,5 @@
 import { formatarCentavos } from "@edu/core";
-import { painelVendas, trilhasDoCriador } from "@edu/db";
+import { painelVendas, produtoPadrao, trilhasDoCriador } from "@edu/db";
 import { Cartao, classesBotao, GraficoArea, Pill, TileIcone } from "@edu/ui";
 import { BadgeDollarSign, Check, Map as IconeMapa, Megaphone, Rocket, Sparkles, UserRound, Users } from "lucide-react";
 import Link from "next/link";
@@ -16,7 +16,7 @@ export default async function InicioPage() {
     { feito: !!e.perfil.bio, titulo: "Monte seu perfil público", href: "/perfil", icone: <UserRound /> },
     { feito: trilhas.length > 0, titulo: "Crie a primeira trilha com o Edu", href: "/trilhas/nova", icone: <Sparkles /> },
     { feito: publicadas > 0, titulo: "Publique a trilha", href: "/trilhas", icone: <IconeMapa /> },
-    { feito: e.produto.status === "publicado", titulo: "Abra sua página para os alunos", href: "/perfil#produto", icone: <Rocket /> },
+    { feito: e.perfil.pagina_status === "publicada", titulo: "Abra sua página para os alunos", href: "/perfil#produto", icone: <Rocket /> },
     { feito: vendas.cortesias + vendas.ativas > 0, titulo: "Divulgue seu link", href: "/divulgar", icone: <Megaphone /> },
   ];
   const pendentes = passos.filter((p) => !p.feito).length;
@@ -24,7 +24,7 @@ export default async function InicioPage() {
 
   return (
     <>
-      <Topo titulo={`Olá, ${primeiroNome}!`} subtitulo={`${e.produto.nome} · @${e.perfil.handle}`} />
+      <Topo titulo={`Olá, ${primeiroNome}!`} subtitulo={`${(await produtoPadrao(e)).nome} · @${e.perfil.handle}`} />
       <div className="space-y-6 px-8 pb-10 pt-4">
         {pendentes > 0 && (
           <Cartao className="p-6">

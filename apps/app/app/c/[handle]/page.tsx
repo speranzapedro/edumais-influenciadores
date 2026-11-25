@@ -15,9 +15,10 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
   const { handle } = await params;
   const v = await vitrinePorHandle(handle);
   if (!v) return { title: "Edu+" };
+  const unico = v.produtos.length === 1 ? v.produtos[0] : null;
   return {
-    title: `${v.produto.nome} · ${v.criador.nome} · Edu+`,
-    description: v.produto.descricao ?? `Aprenda com ${v.criador.nome} em microaulas gamificadas no Edu+.`,
+    title: unico ? `${unico.nome} · ${v.criador.nome} · Edu+` : `${v.criador.nome} · Edu+`,
+    description: unico?.descricao ?? `Aprenda com ${v.criador.nome} em microaulas gamificadas no Edu+.`,
   };
 }
 
@@ -29,8 +30,11 @@ export default async function PaginaDoCriador({ params, searchParams }: { params
   const origem = limparOrigem(sp.origem);
   const proximo = `/c/${v.criador.handle}${origem ? `?origem=${origem}` : ""}`;
   const aluno = await usuarioDaSessao("app");
-  const jaAssina = aluno ? await faTemAcesso(aluno.id, v.produto.id) : false;
-  const totalAulas = v.trilhas.reduce((s, t) => s + t.totalAulas, 0);
+  const jaAssina = aluno ? await faTemAcesso(aluno.id, v.criador.id) : false;
+  // Até a vitrine nova (fase 5): com um produto, a página mostra o produto; com vários, o criador.
+  const unico = v.produtos.length === 1 ? v.produtos[0] : null;
+  const trilhas = v.produtos.flatMap((p) => p.trilhas);
+  const totalAulas = trilhas.reduce((s, t) => s + t.totalAulas, 0);
 
   return (
     <main className="mx-auto min-h-dvh max-w-[440px] bg-fundo pb-10">
@@ -40,13 +44,13 @@ export default async function PaginaDoCriador({ params, searchParams }: { params
         <div className="flex flex-col items-center text-center">
           <Avatar nome={v.criador.nome} semente={v.criador.id} tamanho={84} className="ring-4 ring-white/40" />
           <div className="mt-3 text-sm font-semibold text-white/80">@{v.criador.handle}</div>
-          <h1 className="mt-1 text-[26px] font-extrabold leading-tight tracking-tight">{v.produto.nome}</h1>
-          <p className="mt-1 text-sm text-white/85">com {v.criador.nome}</p>
+          <h1 className="mt-1 text-[26px] font-extrabold leading-tight tracking-tight">{unico?.nome ?? v.criador.nome}</h1>
+          {unico && <p className="mt-1 text-sm text-white/85">com {v.criador.nome}</p>}
         </div>
       </div>
 
       <div className="px-5">
-        {!v.produto.publicado ? (
+        {!v.publicada ? (
           <Cartao className="mt-6 p-8 text-center">
             <Sparkles className="mx-auto size-10 text-marca-300" />
             <h2 className="mt-3 text-lg font-extrabold">Em breve</h2>
@@ -54,9 +58,9 @@ export default async function PaginaDoCriador({ params, searchParams }: { params
           </Cartao>
         ) : (
           <>
-            {(v.produto.descricao || v.criador.bio) && (
+            {(unico?.descricao || v.criador.bio) && (
               <Cartao className="mt-6 space-y-2 p-5 text-sm leading-relaxed text-tinta-2">
-                {v.produto.descricao && <p className="font-semibold text-tinta">{v.produto.descricao}</p>}
+                {unico?.descricao && <p className="font-semibold text-tinta">{unico.descricao}</p>}
                 {v.criador.bio && <p>{v.criador.bio}</p>}
               </Cartao>
             )}
@@ -74,13 +78,13 @@ export default async function PaginaDoCriador({ params, searchParams }: { params
               ))}
             </div>
 
-            {v.trilhas.length > 0 && (
+            {trilhas.length > 0 && (
               <section className="mt-6">
                 <h2 className="mb-3 text-base font-bold">
-                  {v.trilhas.length} {v.trilhas.length === 1 ? "trilha" : "trilhas"} · {totalAulas} aulas
+                  {trilhas.length} {trilhas.length === 1 ? "trilha" : "trilhas"} · {totalAulas} aulas
                 </h2>
                 <div className="space-y-2.5">
-                  {v.trilhas.map((t) => (
+                  {trilhas.map((t) => (
                     <Cartao key={t.id} className="flex items-center gap-3 p-3.5">
                       <TileIcone tom={tomDe(t.cor)}>
                         <Icone nome={t.icone} />

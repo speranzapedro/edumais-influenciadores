@@ -7,9 +7,10 @@ import { redirect } from "next/navigation";
 
 const pagina = (handle: string, origem?: string | null) => `/c/${encodeURIComponent(handle)}${origem ? `?origem=${encodeURIComponent(origem)}` : ""}`;
 
-async function produtoDo(handle: string) {
+/** Página aberta para novos fãs (a assinatura é do criador e libera todos os produtos publicados). */
+async function paginaDo(handle: string) {
   const v = await vitrinePorHandle(handle);
-  if (!v?.produto.publicado) throw new ErroAcesso("Este conteúdo ainda não está disponível.");
+  if (!v?.publicada) throw new ErroAcesso("Este conteúdo ainda não está disponível.");
   return v;
 }
 
@@ -18,8 +19,8 @@ export async function comecar(handle: string, origem: string | null): Promise<Es
   const aluno = await usuarioDaSessao("app");
   if (!aluno) redirect(`/login?next=${encodeURIComponent(pagina(handle, origem))}`);
   try {
-    const v = await produtoDo(handle);
-    await assinar({ aluno, produtoId: v.produto.id, origem });
+    const v = await paginaDo(handle);
+    await assinar({ aluno, criadorId: v.criador.id, origem });
   } catch (e) {
     if (e instanceof ErroAcesso) return { erro: e.message };
     throw e;
@@ -41,9 +42,9 @@ export async function criarConta(handle: string, origem: string | null, _: Estad
   if (form.get("termos") !== "on") return { erro: "Para continuar, aceite os termos de uso e a política de privacidade." };
   const email = String(form.get("email") ?? "");
   try {
-    const v = await produtoDo(handle);
+    const v = await paginaDo(handle);
     await cadastrarFa({
-      produtoId: v.produto.id,
+      criadorId: v.criador.id,
       nome: String(form.get("nome") ?? ""),
       email,
       senha,

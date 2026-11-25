@@ -73,10 +73,15 @@ export type Database = {
           bio: string | null;
           foto_url: string | null;
           redes: JsonNaoNulo;
+          /** Preço mensal da assinatura do criador (libera todos os produtos publicados). */
+          preco_centavos: number | null;
+          /** A página /@criador aceita novos fãs só quando publicada. */
+          pagina_status: "rascunho" | "publicada";
+          pagina_publicada_em: string | null;
           created_at: string;
           updated_at: string;
         },
-        "bio" | "foto_url" | "redes" | "created_at" | "updated_at",
+        "bio" | "foto_url" | "redes" | "preco_centavos" | "pagina_status" | "pagina_publicada_em" | "created_at" | "updated_at",
         [Rel<"criador_perfis_user_id_fkey", "user_id", "users">]
       >;
       produtos: Tabela<
@@ -85,19 +90,30 @@ export type Database = {
           criador_id: string;
           nome: string;
           descricao: string | null;
-          preco_centavos: number | null;
+          /** Endereço do produto na página do criador (/@criador/<slug>); único por criador. */
+          slug: string;
+          /** Caminho no bucket de marcas (criadores/<criador>/<arquivo>.png|jpg|webp). */
+          logo_path: string | null;
+          /** Cor principal (#rrggbb); o tema do app do fã sai dela (gerarTema em @edu/core). */
+          cor_primaria: string;
+          cor_destaque: string | null;
+          /** Ordem do produto na página do criador. */
+          ordem: number;
           status: "rascunho" | "publicado";
           publicado_em: string | null;
           created_at: string;
           updated_at: string;
         },
-        "id" | "descricao" | "preco_centavos" | "status" | "publicado_em" | "created_at" | "updated_at",
+        "id" | "descricao" | "logo_path" | "cor_primaria" | "cor_destaque" | "ordem" | "status" | "publicado_em" | "created_at" | "updated_at",
         [Rel<"produtos_criador_id_fkey", "criador_id", "users">]
       >;
       assinaturas: Tabela<
         {
           id: string;
-          produto_id: string;
+          /** O fã assina o criador: libera todos os produtos publicados dele. */
+          criador_id: string;
+          /** Produto pelo qual o fã entrou (relatório "entrou por"); null se veio pela página do criador. */
+          produto_id: string | null;
           aluno_id: string;
           status: AssinaturaStatus;
           valor_centavos: number;
@@ -111,6 +127,7 @@ export type Database = {
           updated_at: string;
         },
         | "id"
+        | "produto_id"
         | "status"
         | "valor_centavos"
         | "origem"
@@ -121,7 +138,11 @@ export type Database = {
         | "referencia_externa"
         | "created_at"
         | "updated_at",
-        [Rel<"assinaturas_produto_id_fkey", "produto_id", "produtos">, Rel<"assinaturas_aluno_id_fkey", "aluno_id", "users">]
+        [
+          Rel<"assinaturas_criador_id_fkey", "criador_id", "users">,
+          Rel<"assinaturas_produto_id_fkey", "produto_id", "produtos">,
+          Rel<"assinaturas_aluno_id_fkey", "aluno_id", "users">,
+        ]
       >;
       trilhas: Tabela<
         {

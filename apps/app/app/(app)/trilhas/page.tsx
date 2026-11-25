@@ -33,7 +33,7 @@ export default async function TrilhasPage() {
             <Avatar nome={g.criador.nome} semente={g.criador.id} tamanho={32} />
             <div className="min-w-0">
               <div className="truncate text-sm font-bold">{g.criador.nome}</div>
-              <div className="truncate text-[11px] text-suave">{g.criador.produto}</div>
+              <div className="truncate text-[11px] text-suave">{g.criador.produtos.join(", ")}</div>
             </div>
           </Link>
           <ListaTrilhas trilhas={g.trilhas} />

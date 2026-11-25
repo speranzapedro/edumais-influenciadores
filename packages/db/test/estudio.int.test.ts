@@ -2,7 +2,7 @@ import { assinaturaModulo, type Ementa, visaoDaEmenta } from "@edu/core";
 import { aulasDaTrilha, limparBanco, novoCriador, novoFa, TRILHA_EXEMPLO, trilhaPronta } from "@edu/testing";
 import { beforeAll, describe, expect, it } from "vitest";
 import { db } from "../src/client";
-import { publicarProduto } from "../src/criador";
+import { publicarPagina } from "../src/criador";
 import { ErroPermissao } from "../src/erros";
 import {
   aplicarVisaoNaEmenta,
@@ -37,22 +37,23 @@ import {
   tentarTravarEtapa,
 } from "../src/estudio";
 import { FonteMateriaisDb } from "../src/fonte";
+import { criarProduto, publicarProduto } from "../src/produtos";
 
 beforeAll(limparBanco);
 
 const novaTrilha = async (titulo = "Trilha nova") => {
   const c = await novoCriador();
-  const t = await criarTrilha({ produtoId: c.escopo.produto.id, criadorId: c.usuario.id, titulo, cor: "azul", icone: "book-open" });
+  const t = await criarTrilha({ produtoId: c.produto.id, criadorId: c.usuario.id, titulo, cor: "azul", icone: "book-open" });
   return { c, t };
 };
 
 describe("criar e editar trilha", () => {
   it("cria no fim da lista do produto, com as quatro etapas pendentes", async () => {
     const { c, t } = await novaTrilha("Primeira");
-    const t2 = await criarTrilha({ produtoId: c.escopo.produto.id, criadorId: c.usuario.id, titulo: "Segunda", cor: "verde", icone: "zap" });
+    const t2 = await criarTrilha({ produtoId: c.produto.id, criadorId: c.usuario.id, titulo: "Segunda", cor: "verde", icone: "zap" });
     expect([t.ordem, t2.ordem]).toEqual([1, 2]);
     const estudio = (await getEstudio(t.id))!;
-    expect(estudio.produto).toEqual({ id: c.escopo.produto.id, nome: c.escopo.produto.nome });
+    expect(estudio.produto).toEqual({ id: c.produto.id, nome: c.produto.nome });
     expect(Object.values(estudio.etapas).map((e) => e.status)).toEqual(["pendente", "pendente", "pendente", "pendente"]);
     expect(estudio.rascunhos.ementa).toEqual(snapshotVazio("ementa"));
     expect(await getEstudio("00000000-0000-0000-0000-000000000000")).toBeNull();
@@ -61,7 +62,7 @@ describe("criar e editar trilha", () => {
   it("não cria trilha no produto de outro criador", async () => {
     const a = await novoCriador();
     const b = await novoCriador();
-    await expect(criarTrilha({ produtoId: a.escopo.produto.id, criadorId: b.usuario.id, titulo: "Invasão", cor: "azul", icone: "zap" })).rejects.toThrow(
+    await expect(criarTrilha({ produtoId: a.produto.id, criadorId: b.usuario.id, titulo: "Invasão", cor: "azul", icone: "zap" })).rejects.toThrow(
       ErroPermissao,
     );
   });
@@ -76,7 +77,7 @@ describe("criar e editar trilha", () => {
     });
     const entrada = await getEntradaAgente(t.id);
     expect(entrada.contexto).toEqual({
-      produto: c.escopo.produto.nome,
+      produto: c.produto.nome,
       titulo: "Revolução Francesa",
       descricao: null,
       objetivo: "Entender as causas.",
@@ -88,12 +89,12 @@ describe("criar e editar trilha", () => {
 
   it("reordena as trilhas do produto e recusa trilha de outro produto", async () => {
     const { c, t } = await novaTrilha("A");
-    const t2 = await criarTrilha({ produtoId: c.escopo.produto.id, criadorId: c.usuario.id, titulo: "B", cor: "azul", icone: "zap" });
-    await reordenarTrilhas(c.escopo.produto.id, [t2.id, t.id]);
-    const { data } = await db().from("trilhas").select("id, ordem").eq("produto_id", c.escopo.produto.id).order("ordem");
+    const t2 = await criarTrilha({ produtoId: c.produto.id, criadorId: c.usuario.id, titulo: "B", cor: "azul", icone: "zap" });
+    await reordenarTrilhas(c.produto.id, [t2.id, t.id]);
+    const { data } = await db().from("trilhas").select("id, ordem").eq("produto_id", c.produto.id).order("ordem");
     expect(data?.map((x) => x.id)).toEqual([t2.id, t.id]);
     const outra = await novaTrilha();
-    await expect(reordenarTrilhas(c.escopo.produto.id, [outra.t.id])).rejects.toThrow(ErroPermissao);
+    await expect(reordenarTrilhas(c.produto.id, [outra.t.id])).rejects.toThrow(ErroPermissao);
   });
 });
 
@@ -204,11 +205,12 @@ describe("publicação", () => {
     await expect(publicarTrilha("00000000-0000-0000-0000-000000000000")).rejects.toThrow("Trilha não encontrada");
   });
 
-  it("materializa cards e aulas e avisa os fãs do produto só na primeira publicação", async () => {
+  it("materializa cards e aulas e avisa os fãs do criador só na primeira publicação", async () => {
     const c = await novoCriador();
     const primeira = await trilhaPronta(c.escopo, { titulo: "Primeira" });
-    await publicarProduto(c.escopo, true);
-    const { usuario: fa } = await novoFa(c.escopo.produto.id);
+    await publicarProduto(c.escopo, c.produto.id, true);
+    await publicarPagina(c.escopo, true);
+    const { usuario: fa } = await novoFa(c.usuario.id);
 
     const nova = await trilhaPronta(c.escopo, { titulo: "Segunda" });
     const { data: cards } = await db().from("skill_cards").select("codigo").eq("trilha_id", nova.id);
@@ -232,6 +234,11 @@ describe("publicação", () => {
     await marcarNotificacoesLidas(fa.id);
     expect((await listarNotificacoes(fa.id)).naoLidas).toBe(0);
     expect(primeira.id).not.toBe(nova.id);
+
+    // Trilha num produto ainda em rascunho: ninguém é avisado (ela não aparece para os fãs).
+    const emPreparo = await criarProduto(c.escopo, { nome: "Em preparo" });
+    await trilhaPronta(c.escopo, { produtoId: emPreparo.id, titulo: "Escondida" });
+    expect((await listarNotificacoes(fa.id)).naoLidas).toBe(0);
   });
 
   it("republicar mantém o id das aulas e arquiva as que saíram", async () => {
@@ -253,7 +260,7 @@ describe("publicação", () => {
     const t = await trilhaPronta(c.escopo, { publicar: false });
     await atualizarTrilha(t.id, { orientacao_objetivo: "Objetivo copiado." });
     const copia = await duplicarTrilha(t.id);
-    expect(copia).toMatchObject({ produto_id: c.escopo.produto.id, titulo: "Eletricidade básica (cópia)", status: "rascunho" });
+    expect(copia).toMatchObject({ produto_id: c.produto.id, titulo: "Eletricidade básica (cópia)", status: "rascunho" });
     const e = (await getEstudio(copia.id))!;
     expect(e.trilha.orientacao_objetivo).toBe("Objetivo copiado.");
     expect(e.etapas.aulas.versao_atual).toBe(1);
