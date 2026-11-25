@@ -93,7 +93,7 @@ test("vendas e assinantes mostram a origem de cada assinatura", async ({ page })
   await expect(page.getByText("2 · 67%")).toBeVisible();
 
   await page.goto("/assinantes");
-  await expect(page.getByText("3 pessoa(s) assinaram")).toBeVisible();
+  await expect(page.getByText("3 pessoa(s) assinam a sua página")).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: "Fã de Teste" })).toHaveCount(3);
   await expect(page.getByRole("row").filter({ hasText: "TikTok" })).toHaveCount(1);
 });
