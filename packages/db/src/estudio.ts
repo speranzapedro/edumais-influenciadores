@@ -93,8 +93,9 @@ export async function reordenarTrilhas(produtoId: string, ids: string[]) {
  * está publicado (num produto em rascunho a trilha ainda não aparece para ninguém).
  */
 async function avisarAssinantes(p: { produtoId: string; trilhaId: string; titulo: string }) {
-  const produto = ok(await db().from("produtos").select("criador_id, status").eq("id", p.produtoId).single(), "produto da trilha");
+  const produto = ok(await db().from("produtos").select("criador_id, status, slug").eq("id", p.produtoId).single(), "produto da trilha");
   if (produto.status !== "publicado") return;
+  const perfil = ok(await db().from("criador_perfis").select("handle").eq("user_id", produto.criador_id).single(), "perfil do criador");
   const ass = ok(
     await db()
       .from("assinaturas")
@@ -104,7 +105,14 @@ async function avisarAssinantes(p: { produtoId: string; trilhaId: string; titulo
     "assinantes a avisar",
   );
   await notificar(
-    ass.map((a) => ({ userId: a.aluno_id, tipo: "trilha_nova", titulo: "Trilha nova liberada!", corpo: p.titulo, link: `/trilhas/${p.trilhaId}` })),
+    ass.map((a) => ({
+      userId: a.aluno_id,
+      criadorId: produto.criador_id,
+      tipo: "trilha_nova",
+      titulo: "Trilha nova liberada!",
+      corpo: p.titulo,
+      link: `/@${perfil.handle}/${produto.slug}/trilha/${p.trilhaId}`,
+    })),
   );
 }
 
@@ -609,27 +617,45 @@ function rascunhoVazio(etapa: Etapa, s: Snapshot) {
 
 // ─────────────────────────── Notificações ───────────────────────────
 
-export async function notificar(lista: { userId: string; tipo: string; titulo: string; corpo?: string | null; link?: string | null }[]) {
+export interface NovaNotificacao {
+  userId: string;
+  /** Criador do aviso: o fã vê no app daquele criador. Sem criador, é um aviso geral (ex.: painel). */
+  criadorId?: string | null;
+  tipo: string;
+  titulo: string;
+  corpo?: string | null;
+  link?: string | null;
+}
+
+export async function notificar(lista: NovaNotificacao[]) {
   for (let i = 0; i < lista.length; i += 500) {
     ok(
       await db()
         .from("notificacoes")
-        .insert(lista.slice(i, i + 500).map((n) => ({ user_id: n.userId, tipo: n.tipo, titulo: n.titulo, corpo: n.corpo ?? null, link: n.link ?? null }))),
+        .insert(
+          lista
+            .slice(i, i + 500)
+            .map((n) => ({ user_id: n.userId, criador_id: n.criadorId ?? null, tipo: n.tipo, titulo: n.titulo, corpo: n.corpo ?? null, link: n.link ?? null })),
+        ),
       "notificar",
     );
   }
 }
 
-export async function listarNotificacoes(userId: string, limite = 20) {
+/** Avisos da pessoa; com criador, só os daquele criador e os gerais (o app do fã é isolado por criador). */
+export async function listarNotificacoes(userId: string, limite = 20, criadorId?: string) {
+  const doCriador = <Q extends { or: (f: string) => Q }>(q: Q) => (criadorId ? q.or(`criador_id.eq.${criadorId},criador_id.is.null`) : q);
   const [lista, naoLidas] = await Promise.all([
-    db().from("notificacoes").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(limite),
-    db().from("notificacoes").select("id", { count: "exact", head: true }).eq("user_id", userId).is("lida_em", null),
+    doCriador(db().from("notificacoes").select("*").eq("user_id", userId)).order("created_at", { ascending: false }).limit(limite),
+    doCriador(db().from("notificacoes").select("id", { count: "exact", head: true }).eq("user_id", userId).is("lida_em", null)),
   ]);
   return { lista: ok(lista, "notificacoes"), naoLidas: naoLidas.count ?? 0 };
 }
 
-export async function marcarNotificacoesLidas(userId: string) {
-  ok(await db().from("notificacoes").update({ lida_em: new Date().toISOString() }).eq("user_id", userId).is("lida_em", null), "ler notificacoes");
+export async function marcarNotificacoesLidas(userId: string, criadorId?: string) {
+  let q = db().from("notificacoes").update({ lida_em: new Date().toISOString() }).eq("user_id", userId).is("lida_em", null);
+  if (criadorId) q = q.or(`criador_id.eq.${criadorId},criador_id.is.null`);
+  ok(await q, "ler notificacoes");
 }
 
 /** Avisa o criador da trilha (fim de uma geração longa do agente, por exemplo). */

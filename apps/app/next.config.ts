@@ -15,7 +15,7 @@ const config: NextConfig = {
     return {
       beforeFiles: [
         { source: "/@:handle", destination: "/c/:handle" },
-        { source: "/@:handle/:produto", destination: "/c/:handle/:produto" },
+        { source: "/@:handle/:caminho+", destination: "/c/:handle/:caminho+" },
       ],
       afterFiles: [],
       fallback: [],
@@ -25,7 +25,7 @@ const config: NextConfig = {
   async redirects() {
     return [
       { source: "/c/:handle", destination: "/@:handle", permanent: true },
-      { source: "/c/:handle/:produto", destination: "/@:handle/:produto", permanent: true },
+      { source: "/c/:handle/:caminho+", destination: "/@:handle/:caminho+", permanent: true },
     ];
   },
 };

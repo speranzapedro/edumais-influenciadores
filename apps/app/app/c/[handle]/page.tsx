@@ -1,5 +1,5 @@
 import { limparOrigem } from "@edu/core";
-import { faTemAcesso, urlDaMarca, vitrinePorHandle } from "@edu/db";
+import { appDoCriador, faTemAcesso, urlDaMarca, vitrinePorHandle } from "@edu/db";
 import { usuarioDaSessao } from "@edu/db/next";
 import { Cartao, Marca } from "@edu/ui";
 import { ChevronRight, Clock, Flame, Sparkles, Trophy } from "lucide-react";
@@ -8,6 +8,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { corDoTema, EstiloMarca } from "@/components/EstiloMarca";
 import { MarcaDoProduto } from "@/components/MarcaDoProduto";
+import { ShellCriador } from "@/components/ShellCriador";
+import { TelaInicio } from "@/components/telas/TelaInicio";
 import { BlocoEntrada, FotoCriador } from "./BlocoEntrada";
 
 export const dynamic = "force-dynamic";
@@ -33,10 +35,10 @@ export async function generateViewport({ params }: Params): Promise<Viewport> {
 }
 
 /**
- * Página pública do criador (/@criador): o link que ele divulga nas redes. Mostra os produtos
- * publicados e a entrada do fã; a assinatura é do criador e libera todos eles.
+ * /@criador: para quem assina, o início do app do criador; para os outros, a página pública (o link
+ * que ele divulga nas redes) com os produtos publicados e a entrada do fã.
  */
-export default async function PaginaDoCriador({ params, searchParams }: Params & { searchParams: Promise<{ origem?: string }> }) {
+export default async function PaginaDoCriador({ params, searchParams }: Params & { searchParams: Promise<{ origem?: string; bemvindo?: string }> }) {
   const [{ handle }, sp] = await Promise.all([params, searchParams]);
   const v = await vitrinePorHandle(handle);
   if (!v) notFound();
@@ -44,6 +46,16 @@ export default async function PaginaDoCriador({ params, searchParams }: Params &
   const proximo = `/@${v.criador.handle}${origem ? `?origem=${origem}` : ""}`;
   const aluno = await usuarioDaSessao("app");
   const jaAssina = aluno ? await faTemAcesso(aluno.id, v.criador.id) : false;
+  if (aluno && jaAssina) {
+    // Assinante: os produtos publicados valem mesmo com a página fechada para novos fãs.
+    const app = (await appDoCriador(handle))!;
+    const base = `/@${app.criador.handle}`;
+    return (
+      <ShellCriador base={base} marca={app.produtos[0]}>
+        <TelaInicio aluno={aluno} criador={app.criador} base={base} bemvindo={!!sp.bemvindo} />
+      </ShellCriador>
+    );
+  }
   // A página usa a marca do primeiro produto (cada produto tem a sua na própria página).
   const marca = v.produtos[0];
 

@@ -27,7 +27,8 @@ test.describe("página do criador", () => {
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "Criar conta e começar" }).click();
 
-    await expect(page).toHaveURL(/\/\?bemvindo=1$/);
+    // Entra direto no app do criador.
+    await page.waitForURL((u) => u.pathname === `/@${c.escopo.perfil.handle}` && u.search === "?bemvindo=1");
     await expect(page.getByText("Tudo pronto!")).toBeVisible();
     await expect(page.getByText(c.trilha.titulo).first()).toBeVisible();
 
@@ -55,15 +56,18 @@ test.describe("página do criador", () => {
     await entrarNoApp(page, email);
     await page.goto(`/@${segundo.escopo.perfil.handle}?origem=youtube`);
     await page.getByRole("button", { name: "Começar agora" }).click();
-    await expect(page).toHaveURL(/\/\?bemvindo=1$/);
+    // A página já estava em /@segundo: o ?bemvindo=1 só aparece depois de assinar.
+    await page.waitForURL((u) => u.pathname === `/@${segundo.escopo.perfil.handle}` && u.search === "?bemvindo=1");
 
-    await page.goto("/criadores");
+    // Com dois criadores, a entrada do app pede para escolher.
+    await page.goto("/");
+    await expect(page.getByText("Com quem você quer estudar agora?")).toBeVisible();
     await expect(page.getByText("Primeira Criadora")).toBeVisible();
     await expect(page.getByText("Segundo Criador")).toBeVisible();
 
-    // Já assina: a página do criador leva de volta ao início.
+    // Já assina: a página do criador é o início do app dele.
     await page.goto(`/@${segundo.escopo.perfil.handle}`);
-    await expect(page.getByText("Você já tem acesso a este conteúdo.")).toBeVisible();
+    await expect(page.getByText("Bora aprender com Segundo?")).toBeVisible();
   });
 });
 
@@ -99,15 +103,17 @@ test("aula do começo ao fim: acertos, XP e a próxima aula liberada", async ({ 
   const blocos = (linhas ?? []).map((l) => ({ ...(l.conteudo as object), tipo: l.tipo }) as Bloco);
 
   await entrarNoApp(page, email);
+  // O endereço antigo da trilha leva ao endereço dentro do produto.
   await page.goto(`/trilhas/${c.trilha.id}`);
+  await page.waitForURL((u) => u.pathname === `/@${c.escopo.perfil.handle}/${c.produto.slug}/trilha/${c.trilha.id}`);
   await expect(page.getByText("Uma trilha de")).toBeVisible();
-  await page.locator(`a[href="/aula/${primeira.id}"]`).click();
-  await expect(page).toHaveURL(new RegExp(`/aula/${primeira.id}$`));
+  await page.locator(`a[href="/@${c.escopo.perfil.handle}/${c.produto.slug}/aula/${primeira.id}"]`).click();
+  await expect(page).toHaveURL(new RegExp(`/${c.produto.slug}/aula/${primeira.id}$`));
 
   await jogarAula(page, blocos);
   await expect(page.getByRole("link", { name: "Próxima aula" })).toBeVisible();
 
-  const painel = await painelDoAluno(usuario.id);
+  const painel = await painelDoAluno(usuario.id, c.usuario.id);
   expect(painel.xpTotal).toBeGreaterThan(0);
   const { data: conclusao } = await db().from("aula_conclusoes").select("acertos, total").eq("user_id", usuario.id).eq("aula_id", primeira.id).single();
   expect(conclusao?.acertos).toBe(conclusao?.total);
@@ -122,7 +128,7 @@ test("trilha nova publicada chega como notificação e abre a trilha", async ({ 
   await expect(page.getByRole("link", { name: "Notificações" })).toContainText("1");
   await page.getByRole("link", { name: "Notificações" }).click();
   await page.getByText("Trilha nova liberada!").click();
-  await expect(page).toHaveURL(new RegExp(`/trilhas/${nova.id}$`));
+  await expect(page).toHaveURL(new RegExp(`/${c.produto.slug}/trilha/${nova.id}$`));
   await expect(page.getByRole("heading", { name: "Segunda trilha do criador" })).toBeVisible();
 });
 
@@ -133,8 +139,14 @@ test("fã não abre trilha nem aula de criador que não assina", async ({ page }
   const [aulaAlheia] = await aulasDaTrilha(outro.trilha.id);
 
   await entrarNoApp(page, email);
+  // Sem assinatura, a trilha e a aula do outro criador levam só à página pública dele.
   await page.goto(`/trilhas/${outro.trilha.id}`);
-  await expect(page.getByText("Página não encontrada")).toBeVisible();
+  await page.waitForURL((u) => u.pathname === `/@${outro.escopo.perfil.handle}`);
+  await expect(page.getByRole("button", { name: "Começar agora" })).toBeVisible();
+  await expect(page.getByText(outro.trilha.titulo)).toHaveCount(0);
   await page.goto(`/aula/${aulaAlheia.id}`);
+  await page.waitForURL((u) => u.pathname === `/@${outro.escopo.perfil.handle}`);
+  // Trilha de outro criador pendurada no endereço do meu produto não abre.
+  await page.goto(`/@${meu.escopo.perfil.handle}/${meu.produto.slug}/trilha/${outro.trilha.id}`);
   await expect(page.getByText("Página não encontrada")).toBeVisible();
 });

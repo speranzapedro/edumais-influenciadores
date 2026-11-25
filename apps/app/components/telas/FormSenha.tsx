@@ -3,7 +3,7 @@
 import { Aviso, Botao, CampoSenha, cn } from "@edu/ui";
 import { ChevronDown } from "lucide-react";
 import { useActionState, useState } from "react";
-import { alterarSenha } from "./actions";
+import { alterarSenha } from "./perfilActions";
 
 function Secao({ titulo, descricao, children }: { titulo: string; descricao: string; children: React.ReactNode }) {
   const [aberta, setAberta] = useState(false);

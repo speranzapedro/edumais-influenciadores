@@ -26,8 +26,8 @@ import {
 } from "@edu/core";
 import type { Usuario } from "./acesso";
 import { db, ok, talvez } from "./client";
-import { perfilIADaTrilha, trilhasDasAssinaturas } from "./criador";
-import type { Json } from "./database.types";
+import { perfilIADaTrilha, produtoDaTrilha, trilhasDasAssinaturas } from "./criador";
+import type { Json, Row } from "./database.types";
 import { notificar } from "./estudio";
 
 const tz = () => process.env.APP_TIMEZONE || TIMEZONE_PADRAO;
@@ -35,8 +35,8 @@ export const hojeLocal = () => diaLocal(new Date(), tz());
 
 // ─────────────────────────── Acesso do fã ───────────────────────────
 
-/** Ids das trilhas publicadas que o fã acessa: as dos produtos que ele assina. */
-const trilhasLiberadas = (aluno: Usuario) => trilhasDasAssinaturas(aluno.id);
+/** Ids das trilhas publicadas que o fã acessa (dos criadores que assina; filtrável por criador ou produto). */
+const trilhasLiberadas = (aluno: Usuario, f: { criadorId?: string; produtoId?: string } = {}) => trilhasDasAssinaturas(aluno.id, f);
 
 export async function trilhaLiberada(aluno: Usuario, trilhaId: string) {
   return (await trilhasLiberadas(aluno)).includes(trilhaId);
@@ -52,6 +52,8 @@ export interface TrilhaResumo {
   icone: string;
   /** Criador que preparou a trilha. */
   criador: { id: string; handle: string; nome: string; foto_url: string | null } | null;
+  /** Produto da trilha (o endereço da trilha é /@criador/<produto>/trilha/<id>). */
+  produto: { id: string; slug: string; nome: string };
   publicada_em: string | null;
   totalAulas: number;
   concluidas: number;
@@ -59,15 +61,25 @@ export interface TrilhaResumo {
   proximaAula: { id: string; titulo: string; ordem: number } | null;
 }
 
-export async function trilhasDoAluno(aluno: Usuario): Promise<TrilhaResumo[]> {
-  const ids = await trilhasLiberadas(aluno);
+/** Trilhas que o fã acessa, com o progresso (de um criador ou de um produto, se informado). */
+export async function trilhasDoAluno(aluno: Usuario, f: { criadorId?: string; produtoId?: string } = {}): Promise<TrilhaResumo[]> {
+  const ids = await trilhasLiberadas(aluno, f);
   if (ids.length === 0) return [];
   const [trilhas, aulas, concl] = await Promise.all([
-    db().from("trilhas").select("id, titulo, descricao, cor, icone, publicada_em, criador_id").in("id", ids).order("ordem").order("publicada_em"),
+    db()
+      .from("trilhas")
+      .select("id, titulo, descricao, cor, icone, publicada_em, criador_id, produto:produtos(id, slug, nome, ordem)")
+      .in("id", ids)
+      .order("ordem")
+      .order("publicada_em"),
     db().from("aulas").select("id, trilha_id, titulo, ordem").in("trilha_id", ids).is("arquivada_em", null).order("ordem"),
     db().from("aula_conclusoes").select("aula_id").eq("user_id", aluno.id),
   ]);
-  const lista = ok(trilhas, "trilhas");
+  const lista = (
+    ok(trilhas, "trilhas") as unknown as (Omit<Row<"trilhas">, "produto"> & { produto: { id: string; slug: string; nome: string; ordem: number } })[]
+  )
+    // Na ordem da página: produto, depois a trilha dentro dele.
+    .sort((a, b) => a.produto.ordem - b.produto.ordem);
   const perfis = ok(
     await db()
       .from("criador_perfis")
@@ -89,6 +101,7 @@ export async function trilhasDoAluno(aluno: Usuario): Promise<TrilhaResumo[]> {
       cor: t.cor,
       icone: t.icone,
       criador: p ? { id: p.user_id, handle: p.handle, nome: p.nome_publico, foto_url: p.foto_url } : null,
+      produto: { id: t.produto.id, slug: t.produto.slug, nome: t.produto.nome },
       publicada_em: t.publicada_em,
       totalAulas: minhas.length,
       concluidas,
@@ -421,13 +434,26 @@ export interface PainelAluno {
   xpPorDia: { dia: string; xp: number }[];
 }
 
-export async function painelDoAluno(alunoId: string): Promise<PainelAluno> {
+/** Aulas e trilhas (ids) de um criador: o progresso do fã é contado dentro de cada criador. */
+async function idsDoCriador(criadorId: string) {
+  const trilhas = ok(await db().from("trilhas").select("id").eq("criador_id", criadorId), "trilhas do criador").map((t) => t.id);
+  const aulas = trilhas.length ? ok(await db().from("aulas").select("id").in("trilha_id", trilhas), "aulas do criador").map((a) => a.id) : [];
+  return { trilhas, aulas };
+}
+
+/** Placar do fã num criador: XP, nível, ofensiva, conquistas e estatísticas só daquele criador. */
+export async function painelDoAluno(alunoId: string, criadorId: string): Promise<PainelAluno> {
+  const ids = await idsDoCriador(criadorId);
   const [xp, dias, concl, trilhas, conq] = await Promise.all([
-    db().from("xp_eventos").select("pontos, criado_em").eq("user_id", alunoId),
-    db().from("dias_ativos").select("dia").eq("user_id", alunoId),
-    db().from("aula_conclusoes").select("acertos, total").eq("user_id", alunoId),
-    db().from("trilha_conclusoes").select("trilha_id").eq("user_id", alunoId),
-    db().from("conquistas_usuario").select("conquista_key, desbloqueada_em").eq("user_id", alunoId),
+    db().from("xp_eventos").select("pontos, criado_em").eq("user_id", alunoId).eq("criador_id", criadorId),
+    db().from("dias_ativos_criador").select("dia").eq("user_id", alunoId).eq("criador_id", criadorId),
+    ids.aulas.length
+      ? db().from("aula_conclusoes").select("acertos, total").eq("user_id", alunoId).in("aula_id", ids.aulas)
+      : Promise.resolve({ data: [] as { acertos: number; total: number }[], error: null }),
+    ids.trilhas.length
+      ? db().from("trilha_conclusoes").select("trilha_id").eq("user_id", alunoId).in("trilha_id", ids.trilhas)
+      : Promise.resolve({ data: [] as { trilha_id: string }[], error: null }),
+    db().from("conquistas_criador").select("conquista_key, desbloqueada_em").eq("user_id", alunoId).eq("criador_id", criadorId),
   ]);
   const eventos = ok(xp, "xp");
   const listaDias = ok(dias, "dias").map((d) => d.dia);
@@ -484,6 +510,8 @@ export async function concluirAula(aluno: Usuario, aulaId: string, tentativa: st
   if (!ctx || ctx.estado === "bloqueada") throw new ErroAula("Aula indisponível.");
   const alunoId = aluno.id;
   const trilhaId = ctx.trilhaId;
+  // XP, ofensiva e conquistas contam no criador da trilha.
+  const criadorId = ctx.caminho.trilha.criador_id;
 
   const [blocos, respostas] = await Promise.all([
     // A pergunta aberta é formativa: fica fora de acertos/total e não bloqueia a conclusão.
@@ -503,10 +531,10 @@ export async function concluirAula(aluno: Usuario, aulaId: string, tentativa: st
 
   const [anterior, dias, aulasTrilha, trilhaFeita, conqAntes] = await Promise.all([
     db().from("aula_conclusoes").select("*").eq("user_id", alunoId).eq("aula_id", aulaId).maybeSingle(),
-    db().from("dias_ativos").select("dia").eq("user_id", alunoId),
+    db().from("dias_ativos_criador").select("dia").eq("user_id", alunoId).eq("criador_id", criadorId),
     db().from("aulas").select("id").eq("trilha_id", trilhaId).is("arquivada_em", null),
     db().from("trilha_conclusoes").select("trilha_id").eq("user_id", alunoId).eq("trilha_id", trilhaId).maybeSingle(),
-    db().from("conquistas_usuario").select("conquista_key").eq("user_id", alunoId),
+    db().from("conquistas_criador").select("conquista_key").eq("user_id", alunoId).eq("criador_id", criadorId),
   ]);
   const ja = talvez(anterior, "anterior");
   const agora = new Date().toISOString();
@@ -529,15 +557,16 @@ export async function concluirAula(aluno: Usuario, aulaId: string, tentativa: st
     trilhaCompletaAgora,
     diasAtivosAntes: ok(dias, "dias").map((d) => d.dia),
     hoje,
+    escopo: criadorId,
   });
 
-  ok(await db().from("dias_ativos").upsert({ user_id: alunoId, dia: hoje }, { ignoreDuplicates: true }), "dia ativo");
+  ok(await db().from("dias_ativos_criador").upsert({ user_id: alunoId, criador_id: criadorId, dia: hoje }, { ignoreDuplicates: true }), "dia ativo");
   if (r.eventos.length) {
     ok(
       await db()
         .from("xp_eventos")
         .upsert(
-          r.eventos.map((e) => ({ user_id: alunoId, ...e, criado_em: agora })),
+          r.eventos.map((e) => ({ user_id: alunoId, criador_id: criadorId, ...e, criado_em: agora })),
           { onConflict: "user_id,fonte,ref_key", ignoreDuplicates: true },
         ),
       "xp",
@@ -547,23 +576,25 @@ export async function concluirAula(aluno: Usuario, aulaId: string, tentativa: st
     ok(await db().from("trilha_conclusoes").insert({ user_id: alunoId, trilha_id: trilhaId, concluida_em: agora }), "trilha concluida");
   }
 
-  const painel = await painelDoAluno(alunoId);
+  const painel = await painelDoAluno(alunoId, criadorId);
   const antes = new Set(ok(conqAntes, "conq").map((c) => c.conquista_key));
   const novas = conquistasAtingidas(painel.stats).filter((k) => !antes.has(k));
   if (novas.length) {
     ok(
       await db()
-        .from("conquistas_usuario")
-        .insert(novas.map((k) => ({ user_id: alunoId, conquista_key: k, desbloqueada_em: agora }))),
+        .from("conquistas_criador")
+        .insert(novas.map((k) => ({ user_id: alunoId, criador_id: criadorId, conquista_key: k, desbloqueada_em: agora }))),
       "conquistas",
     );
+    const marca = await produtoDaTrilha(trilhaId);
     await notificar(
       novas.map((k) => ({
         userId: alunoId,
+        criadorId,
         tipo: "conquista",
         titulo: `Conquista desbloqueada: ${CONQUISTAS.find((c) => c.key === k)?.titulo ?? k}`,
         corpo: CONQUISTAS.find((c) => c.key === k)?.descricao ?? null,
-        link: "/progresso",
+        link: marca ? `/@${marca.handle}/progresso` : "/progresso",
       })),
     ).catch(() => {});
   }

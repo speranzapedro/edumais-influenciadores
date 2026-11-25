@@ -35,7 +35,7 @@ export async function comecar(e: Entrada): Promise<EstadoForm> {
     throw err;
   }
   revalidatePath("/", "layout");
-  redirect("/?bemvindo=1");
+  redirect(`/@${encodeURIComponent(e.handle)}?bemvindo=1`);
 }
 
 /** "Não é você?": encerra a sessão aberta no aparelho e volta para a mesma página. */
@@ -67,5 +67,5 @@ export async function criarConta(e: Entrada, _: EstadoForm, form: FormData): Pro
   }
   const erro = await entrarComSenha("app", email, senha);
   if (erro) return { erro: `Conta criada! Entre com seu e-mail e senha. (${erro})` };
-  redirect("/?bemvindo=1");
+  redirect(`/@${encodeURIComponent(e.handle)}?bemvindo=1`);
 }

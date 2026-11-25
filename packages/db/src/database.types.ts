@@ -242,10 +242,12 @@ export type Database = {
           titulo: string;
           corpo: string | null;
           link: string | null;
+          /** Criador do aviso (o fã vê no app daquele criador); null = aviso geral. */
+          criador_id: string | null;
           lida_em: string | null;
           created_at: string;
         },
-        "id" | "corpo" | "link" | "lida_em" | "created_at"
+        "id" | "corpo" | "link" | "criador_id" | "lida_em" | "created_at"
       >;
       audit_log: Tabela<
         {
@@ -386,11 +388,14 @@ export type Database = {
       aula_blocos: Tabela<{ id: string; aula_id: string; ordem: number; tipo: string; conteudo: JsonNaoNulo }, "id">;
       aula_conclusoes: Tabela<{ user_id: string; aula_id: string; acertos: number; total: number; concluida_em: string }, "acertos" | "total" | "concluida_em">;
       trilha_conclusoes: Tabela<{ user_id: string; trilha_id: string; concluida_em: string }, "concluida_em">;
-      dias_ativos: Tabela<{ user_id: string; dia: string }>;
+      /** Dias em que o fã estudou com cada criador (a ofensiva é por criador). */
+      dias_ativos_criador: Tabela<{ user_id: string; criador_id: string; dia: string }>;
       xp_eventos: Tabela<
         {
           id: string;
           user_id: string;
+          /** O XP é por criador: cada criador tem o próprio placar do fã. */
+          criador_id: string;
           fonte: string;
           ref_key: string;
           pontos: number;
@@ -399,7 +404,7 @@ export type Database = {
         },
         "id" | "descricao" | "criado_em"
       >;
-      conquistas_usuario: Tabela<{ user_id: string; conquista_key: string; desbloqueada_em: string }, "desbloqueada_em">;
+      conquistas_criador: Tabela<{ user_id: string; criador_id: string; conquista_key: string; desbloqueada_em: string }, "desbloqueada_em">;
       tutor_indices: Tabela<
         {
           trilha_id: string;
