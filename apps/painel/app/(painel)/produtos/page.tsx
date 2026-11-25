@@ -1,10 +1,10 @@
-import { gerarTema } from "@edu/core";
 import { resumoProdutos } from "@edu/db";
 import { Cartao, classesBotao, Pill } from "@edu/ui";
 import { ArrowDown, ArrowUp, Package, Plus } from "lucide-react";
 import Link from "next/link";
 import { Topo } from "@/components/Topo";
 import { exigirCriador } from "@/lib/sessao";
+import { MarcaProduto } from "./[id]/cabecalho";
 import { moverProduto } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -43,13 +43,7 @@ export default async function ProdutosPage() {
             {produtos.map((p, i) => (
               <li key={p.id}>
                 <Cartao className="flex items-center gap-4 p-4 sm:p-5">
-                  <div
-                    className="grid size-12 shrink-0 place-items-center rounded-2xl text-lg font-extrabold text-white"
-                    style={{ background: gerarTema({ primaria: p.cor_primaria }).corTema }}
-                    aria-hidden="true"
-                  >
-                    {p.nome.charAt(0).toUpperCase()}
-                  </div>
+                  <MarcaProduto produto={p} className="size-12 text-lg" />
                   <Link href={`/produtos/${p.id}`} className="min-w-0 flex-1 group">
                     <div className="truncate font-bold group-hover:text-marca-700">{p.nome}</div>
                     <div className="truncate text-xs text-suave">

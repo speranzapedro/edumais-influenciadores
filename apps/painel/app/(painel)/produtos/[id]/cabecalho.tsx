@@ -1,5 +1,5 @@
 import { gerarTema } from "@edu/core";
-import { type EscopoCriador, exigirProdutoDoCriador, type Produto } from "@edu/db";
+import { type EscopoCriador, exigirProdutoDoCriador, type Produto, urlDaMarca } from "@edu/db";
 import { Abas, Pill } from "@edu/ui";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
@@ -32,13 +32,7 @@ export function CabecalhoProduto({ e, produto, ativa, totalTrilhas }: { e: Escop
       </div>
       <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-4">
-          <div
-            className="grid size-14 shrink-0 place-items-center rounded-2xl text-xl font-extrabold text-white shadow-flutuante"
-            style={{ background: gerarTema({ primaria: produto.cor_primaria }).corTema }}
-            aria-hidden="true"
-          >
-            {produto.nome.charAt(0).toUpperCase()}
-          </div>
+          <MarcaProduto produto={produto} className="size-14 text-xl shadow-flutuante" />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="truncate text-[26px] font-extrabold tracking-tight">{produto.nome}</h1>
@@ -57,9 +51,29 @@ export function CabecalhoProduto({ e, produto, ativa, totalTrilhas }: { e: Escop
         ativa={ativa}
         itens={[
           { href: base, rotulo: "Trilhas", contagem: totalTrilhas },
+          { href: `${base}/identidade`, rotulo: "Identidade visual" },
           { href: `${base}/detalhes`, rotulo: "Detalhes" },
         ]}
       />
     </header>
+  );
+}
+
+/** Logo do produto (ou a inicial sobre a cor principal, já com contraste garantido). */
+export function MarcaProduto({ produto, className }: { produto: Pick<Produto, "nome" | "cor_primaria" | "logo_path">; className?: string }) {
+  if (produto.logo_path)
+    return (
+      <div className={`grid shrink-0 place-items-center overflow-hidden rounded-2xl border border-linha bg-white ${className ?? ""}`}>
+        <img src={urlDaMarca(produto.logo_path)} alt="" className="size-full object-contain p-1" />
+      </div>
+    );
+  return (
+    <div
+      className={`grid shrink-0 place-items-center rounded-2xl font-extrabold text-white ${className ?? ""}`}
+      style={{ background: gerarTema({ primaria: produto.cor_primaria }).corTema }}
+      aria-hidden="true"
+    >
+      {produto.nome.charAt(0).toUpperCase()}
+    </div>
   );
 }

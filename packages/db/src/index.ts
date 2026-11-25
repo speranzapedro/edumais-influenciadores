@@ -7,6 +7,7 @@ export * from "./edu";
 export * from "./erros";
 export * from "./estudio";
 export { FonteMateriaisDb } from "./fonte";
+export * from "./marca";
 export * from "./previa";
 export * from "./produtos";
 export type { AppSessao } from "./sessao";

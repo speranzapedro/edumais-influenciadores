@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Topo } from "@/components/Topo";
 import { exigirCriador, linkPublico } from "@/lib/sessao";
 import { BotaoPublicar, FormPerfil, FormPreco, FormSenha } from "./Formularios";
+import { FotoPerfil } from "./FotoPerfil";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,9 @@ export default async function PerfilPage({ searchParams }: { searchParams: Promi
           )}
           <Cartao className="p-6">
             <h2 className="mb-4 font-extrabold">Perfil público</h2>
+            <div className="mb-5">
+              <FotoPerfil url={e.perfil.foto_url} />
+            </div>
             <FormPerfil perfil={{ nome: e.perfil.nome_publico, handle: e.perfil.handle, bio: e.perfil.bio, redes: lerRedes(e.perfil.redes) }} />
           </Cartao>
           <Cartao className="h-fit p-6">
