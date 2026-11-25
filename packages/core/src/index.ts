@@ -4,6 +4,7 @@ export * from "./conteudo";
 export * from "./criador";
 export * from "./escapes";
 export * from "./gamificacao";
+export * from "./marca";
 export * from "./orientacao";
 export * from "./produto";
 export * from "./revisao";

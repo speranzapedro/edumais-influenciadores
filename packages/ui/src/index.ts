@@ -4,6 +4,7 @@ export * from "./components/confirmar";
 export * from "./components/formulario";
 export * from "./components/graficos";
 export * from "./components/icones";
+export * from "./components/marca-campos";
 export * from "./components/modal";
 export * from "./components/navegacao";
 export * from "./components/termos";

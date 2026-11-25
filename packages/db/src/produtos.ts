@@ -1,9 +1,10 @@
-import { normalizarHex, normalizarSlug, slugDoNome, slugNumerado, validarSlugProduto } from "@edu/core";
+import { CAMINHO_MARCA, normalizarHex, normalizarSlug, slugDoNome, slugNumerado, validarSlugProduto } from "@edu/core";
 import { normalizarNome, registrarAuditoria } from "./acesso";
 import { db, ok, talvez } from "./client";
 import type { EscopoCriador } from "./criador";
 import type { Row } from "./database.types";
 import { ErroAcesso, ErroPermissao } from "./erros";
+import { removerMarca } from "./marca";
 
 /**
  * Produtos do criador. Cada produto agrupa trilhas e tem endereço (/@criador/<slug>), logo e cores
@@ -85,8 +86,6 @@ export async function salvarProduto(e: EscopoCriador, produtoId: string, p: { no
   ok(r, "salvar produto");
 }
 
-const LOGO_PATH = /^criadores\/([0-9a-f-]{36})\/[0-9a-f-]{36}\.(png|jpg|webp)$/;
-
 /**
  * Identidade visual do produto: cor principal, destaque opcional e logo (caminho já enviado ao bucket
  * de marcas; `undefined` mantém o atual). As cores só aceitam #rrggbb; o contraste é resolvido na hora
@@ -97,13 +96,13 @@ export async function salvarIdentidadeProduto(
   produtoId: string,
   p: { corPrimaria: string; corDestaque: string | null; logoPath?: string | null },
 ) {
-  await exigirProdutoDoCriador(e, produtoId);
+  const atual = await exigirProdutoDoCriador(e, produtoId);
   const primaria = normalizarHex(p.corPrimaria);
   if (!primaria) throw new ErroAcesso("Escolha a cor principal no formato #RRGGBB.");
   const destaque = p.corDestaque?.trim() ? normalizarHex(p.corDestaque) : null;
   if (p.corDestaque?.trim() && !destaque) throw new ErroAcesso("Escolha a cor de destaque no formato #RRGGBB.");
   if (p.logoPath) {
-    const m = LOGO_PATH.exec(p.logoPath);
+    const m = CAMINHO_MARCA.exec(p.logoPath);
     if (!m || m[1] !== e.usuario.id) throw new ErroPermissao("Logo inválido.");
   }
   ok(
@@ -118,6 +117,8 @@ export async function salvarIdentidadeProduto(
       .eq("id", produtoId),
     "identidade do produto",
   );
+  // Logo trocado ou retirado: o arquivo antigo sai do bucket.
+  if (p.logoPath !== undefined && atual.logo_path && atual.logo_path !== p.logoPath) await removerMarca(e, atual.logo_path);
 }
 
 async function contarTrilhasPublicadas(produtoId: string) {
