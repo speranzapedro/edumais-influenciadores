@@ -1,21 +1,25 @@
 "use client";
 
 import { cn } from "@edu/ui";
-import { BarChart3, Home, Map as IconeMapa, UserRound, UsersRound } from "lucide-react";
+import { BarChart3, Bell, Home, Map as IconeMapa, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const ITENS = [
-  { href: "/trilhas", rotulo: "Trilhas", Icone: IconeMapa },
-  { href: "/progresso", rotulo: "Progresso", Icone: BarChart3 },
-  { href: "/", rotulo: "Início", Icone: Home, central: true },
-  { href: "/criadores", rotulo: "Criadores", Icone: UsersRound },
-  { href: "/perfil", rotulo: "Perfil", Icone: UserRound },
-];
-
-export function BarraNavegacao() {
+/** Menu do app de um criador (`base` = /@criador): tudo ali é só daquele criador. */
+export function BarraNavegacao({ base }: { base: string }) {
   const path = usePathname();
-  const ativo = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const ITENS = [
+    { href: `${base}/trilhas`, rotulo: "Trilhas", Icone: IconeMapa },
+    { href: `${base}/progresso`, rotulo: "Progresso", Icone: BarChart3 },
+    { href: base, rotulo: "Início", Icone: Home, central: true },
+    { href: `${base}/notificacoes`, rotulo: "Avisos", Icone: Bell },
+    { href: `${base}/perfil`, rotulo: "Perfil", Icone: UserRound },
+  ];
+  // O início vale só no endereço exato; as trilhas valem também dentro dos produtos.
+  const ativo = (href: string) =>
+    href === base
+      ? path === base
+      : path.startsWith(href) || (href === `${base}/trilhas` && path.startsWith(`${base}/`) && !ITENS.some((i) => i.href !== base && path.startsWith(i.href)));
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[440px] px-3 pb-[max(env(safe-area-inset-bottom),10px)]">

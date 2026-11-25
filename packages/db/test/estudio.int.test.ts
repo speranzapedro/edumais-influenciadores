@@ -222,7 +222,12 @@ describe("publicação", () => {
 
     let n = await listarNotificacoes(fa.id);
     expect(n.naoLidas).toBe(1);
-    expect(n.lista[0]).toMatchObject({ tipo: "trilha_nova", corpo: "Segunda", link: `/trilhas/${nova.id}` });
+    expect(n.lista[0]).toMatchObject({
+      tipo: "trilha_nova",
+      corpo: "Segunda",
+      criador_id: c.usuario.id,
+      link: `/@${c.escopo.perfil.handle}/${c.produto.slug}/trilha/${nova.id}`,
+    });
 
     // Republicar não avisa de novo; despublicar e publicar de novo, sim.
     await publicarTrilha(nova.id);

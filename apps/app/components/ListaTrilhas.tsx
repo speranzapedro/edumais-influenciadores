@@ -3,13 +3,17 @@ import { AnelProgresso, Cartao, HEX_TOM, Icone, Pill, TileIcone, tomDe } from "@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
+/** Endereço da trilha dentro do app do criador: /@criador/<produto>/trilha/<id>. */
+export const hrefTrilha = (t: Pick<TrilhaResumo, "id" | "criador" | "produto">) =>
+  t.criador ? `/@${t.criador.handle}/${t.produto.slug}/trilha/${t.id}` : `/trilhas/${t.id}`;
+
 export function ListaTrilhas({ trilhas }: { trilhas: TrilhaResumo[] }) {
   return (
     <div className="space-y-4">
       {trilhas.map((t) => {
         const tom = tomDe(t.cor);
         return (
-          <Link key={t.id} href={`/trilhas/${t.id}`} className="block">
+          <Link key={t.id} href={hrefTrilha(t)} className="block">
             <Cartao className="p-4 transition hover:border-marca-200">
               <div className="flex items-start gap-3">
                 <TileIcone tom={tom} tamanho="lg">

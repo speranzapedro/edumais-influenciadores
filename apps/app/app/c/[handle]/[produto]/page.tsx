@@ -1,5 +1,5 @@
 import { limparOrigem } from "@edu/core";
-import { faTemAcesso, produtoPorHandleESlug, urlDaMarca } from "@edu/db";
+import { appDoCriador, faTemAcesso, produtoPorHandleESlug, trilhasDoAluno, urlDaMarca } from "@edu/db";
 import { usuarioDaSessao } from "@edu/db/next";
 import { Cartao, Icone, Marca, TileIcone, tomDe } from "@edu/ui";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -7,7 +7,9 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { corDoTema, EstiloMarca } from "@/components/EstiloMarca";
+import { ListaTrilhas } from "@/components/ListaTrilhas";
 import { MarcaDoProduto } from "@/components/MarcaDoProduto";
+import { ShellCriador } from "@/components/ShellCriador";
 import { BlocoEntrada, FotoCriador } from "../BlocoEntrada";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +26,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: r.produto.descricao ?? `Aprenda com ${r.criador.nome} em microaulas gamificadas no Edu+.`,
     applicationName: r.produto.nome,
     appleWebApp: { capable: true, title: r.produto.nome, statusBarStyle: "default" },
-    manifest: `/c/${r.criador.handle}/${r.produto.slug}/manifest.webmanifest`,
+    manifest: `/@${r.criador.handle}/${r.produto.slug}/manifest.webmanifest`,
     ...(logo ? { icons: { icon: logo, apple: logo } } : {}),
     openGraph: { title: r.produto.nome, description: r.produto.descricao ?? undefined, images: logo ? [logo] : undefined },
   };
@@ -36,9 +38,25 @@ export async function generateViewport({ params }: Params): Promise<Viewport> {
   return { themeColor: corDoTema(r?.produto.cor_primaria, r?.produto.cor_destaque) };
 }
 
-/** Página de um produto (/@criador/<produto>), com a marca dele. Entrar por aqui assina o criador. */
+/**
+ * /@criador/<produto>, com a marca do produto: para quem assina, as trilhas do produto com o progresso;
+ * para os outros, a página pública do produto (entrar por aqui assina o criador).
+ */
 export default async function PaginaDoProduto({ params, searchParams }: Params & { searchParams: Promise<{ origem?: string }> }) {
   const [{ handle, produto: slug }, sp] = await Promise.all([params, searchParams]);
+  const assinante = await usuarioDaSessao("app");
+  if (assinante) {
+    const app = await appDoCriador(handle);
+    const doApp = app?.produtos.find((p) => p.slug === slug.toLowerCase());
+    if (app && doApp && (await faTemAcesso(assinante.id, app.criador.id))) {
+      const trilhas = await trilhasDoAluno(assinante, { produtoId: doApp.id });
+      return (
+        <ShellCriador base={`/@${app.criador.handle}`} marca={doApp}>
+          <ProdutoDoAssinante produto={doApp} criador={app.criador} trilhas={trilhas} />
+        </ShellCriador>
+      );
+    }
+  }
   const r = await produtoPorHandleESlug(handle, slug);
   if (!r) notFound();
   const { criador, produto } = r;
@@ -123,5 +141,38 @@ function CartaoTrilha({
       </div>
       {seta && <ChevronRight className="size-4 shrink-0 text-suave" />}
     </Cartao>
+  );
+}
+
+/** Início do produto para quem assina: logo, nome e as trilhas com o progresso. */
+function ProdutoDoAssinante({
+  produto,
+  criador,
+  trilhas,
+}: {
+  produto: Parameters<typeof MarcaDoProduto>[0]["produto"] & { logo_path: string | null; descricao: string | null };
+  criador: { handle: string; nome: string };
+  trilhas: Awaited<ReturnType<typeof trilhasDoAluno>>;
+}) {
+  return (
+    <main>
+      <div className="gradiente-marca relative overflow-hidden rounded-b-[28px] px-5 pb-6 pt-6 text-white">
+        <div className="pointer-events-none absolute -right-12 -top-10 size-44 rounded-full bg-white/10" />
+        <Link href={`/@${criador.handle}`} className="inline-flex items-center gap-1 text-sm text-white/80">
+          <ChevronLeft className="size-4" /> Início
+        </Link>
+        <div className="mt-4 flex items-center gap-3">
+          <MarcaDoProduto produto={produto} logo={produto.logo_path ? urlDaMarca(produto.logo_path) : null} className="size-14 text-xl" />
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-extrabold leading-tight">{produto.nome}</h1>
+            <div className="text-xs text-white/80">com {criador.nome}</div>
+          </div>
+        </div>
+      </div>
+      <div className="px-5 pt-5">
+        {produto.descricao && <p className="mb-4 text-sm text-tinta-2">{produto.descricao}</p>}
+        <ListaTrilhas trilhas={trilhas} />
+      </div>
+    </main>
   );
 }

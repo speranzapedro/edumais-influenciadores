@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { getUsuario } from "../src/acesso";
 import { db } from "../src/client";
 import {
+  appDoCriador,
   assinantesDoCriador,
   cadastrarCriador,
   cotaDoAgente,
@@ -173,6 +174,10 @@ describe("perfil, preço e página", () => {
     expect(await produtoPorHandleESlug("ninguem.aqui.mesmo", "ingles-do-zero")).toBeNull();
     await publicarPagina(c.escopo, false);
     expect(await produtoPorHandleESlug(c.escopo.perfil.handle, "ingles-do-zero")).toBeNull();
+    // Por dentro (quem já assina), os produtos publicados continuam lá com a página fechada.
+    const app = await appDoCriador(c.escopo.perfil.handle);
+    expect(app?.produtos.map((p) => p.slug)).toEqual([c.produto.slug, "ingles-do-zero"]);
+    expect(await appDoCriador("ninguem.aqui.mesmo")).toBeNull();
   });
 
   it("produto e @ do criador de uma trilha (tema e endereço no app do fã)", async () => {

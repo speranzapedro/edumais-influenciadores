@@ -32,7 +32,7 @@ import { db } from "../src/client";
 import { assinar, cadastrarFa, criadorDaTrilha, criadoresDoFa, faTemAcesso, publicarPagina, trilhasDasAssinaturas } from "../src/criador";
 import { abrirEdu, avaliarRespostaEdu, ErroEdu, eduDisponivel, marcarAvisoEdu, prepararPerguntaEdu, registrarTrocaEdu } from "../src/edu";
 import { ErroAcesso } from "../src/erros";
-import { listarNotificacoes } from "../src/estudio";
+import { listarNotificacoes, marcarNotificacoesLidas } from "../src/estudio";
 import { aulaNaPrevia, contextoAbertaNaPrevia, corrigirNaPrevia, previaDaTrilha } from "../src/previa";
 import { criarProduto, publicarProduto } from "../src/produtos";
 import { ConsultorTutorDb, definirEduAtivo, estadoIndiceTutor, historicoTutor } from "../src/tutor";
@@ -238,11 +238,53 @@ describe("aulas", () => {
     expect(de_novo.aulaJaConcluida).toBe(true);
     expect(de_novo.xpTotal).toBe(r.xpTotal);
 
-    const painel = await painelDoAluno(fa.id);
+    const painel = await painelDoAluno(fa.id, c.usuario.id);
     expect(painel.stats.aulasConcluidas).toBe(1);
     expect(painel.streak.atual).toBe(1);
     expect(painel.xpPorDia).toHaveLength(30);
-    expect((await trilhasDoAluno(fa))[0]).toMatchObject({ concluidas: 1, proximaAula: { id: a2.id } });
+    expect((await trilhasDoAluno(fa))[0]).toMatchObject({
+      concluidas: 1,
+      proximaAula: { id: a2.id },
+      produto: { id: c.produto.id, slug: c.produto.slug },
+    });
+    // O aviso da conquista é do criador e leva ao progresso dele.
+    const aviso = (await listarNotificacoes(fa.id, 20, c.usuario.id)).lista.find((n) => n.tipo === "conquista");
+    expect(aviso).toMatchObject({ criador_id: c.usuario.id, link: `/@${c.escopo.perfil.handle}/progresso` });
+  });
+
+  it("isolado por criador: XP, ofensiva, conquistas e avisos de um criador não aparecem no outro", async () => {
+    const b = await criadorNoAr({ nome: "Outro Criador" });
+    await assinar({ aluno: fa, criadorId: b.usuario.id });
+    const [a1] = await aulasDaTrilha(c.trilha.id);
+    await concluirAula(fa, a1.id, await responderAula(fa, a1.id));
+
+    const emA = await painelDoAluno(fa.id, c.usuario.id);
+    const emB = await painelDoAluno(fa.id, b.usuario.id);
+    expect(emA.xpTotal).toBeGreaterThan(0);
+    expect(emA.streak.atual).toBe(1);
+    expect(emA.conquistas.length).toBeGreaterThan(0);
+    expect(emB).toMatchObject({ xpTotal: 0, conquistas: [], stats: { aulasConcluidas: 0, trilhasConcluidas: 0 } });
+    expect(emB.streak.atual).toBe(0);
+
+    // Estudar com o outro criador no mesmo dia conta a ofensiva e as conquistas lá também (sem colidir).
+    const [b1] = await aulasDaTrilha(b.trilha.id);
+    const rb = await concluirAula(fa, b1.id, await responderAula(fa, b1.id));
+    expect(rb.novoDiaAtivo).toBe(true);
+    expect(rb.novasConquistas.length).toBeGreaterThan(0);
+    const depoisB = await painelDoAluno(fa.id, b.usuario.id);
+    expect(depoisB.streak.atual).toBe(1);
+    expect(depoisB.xpTotal).toBe(emA.xpTotal);
+    expect((await painelDoAluno(fa.id, c.usuario.id)).xpTotal).toBe(emA.xpTotal);
+
+    // Trilhas e avisos filtrados pelo criador.
+    expect((await trilhasDoAluno(fa, { criadorId: b.usuario.id })).map((t) => t.id)).toEqual([b.trilha.id]);
+    expect((await trilhasDoAluno(fa, { produtoId: c.produto.id })).map((t) => t.id)).toEqual([c.trilha.id]);
+    const avisosA = (await listarNotificacoes(fa.id, 50, c.usuario.id)).lista;
+    expect(avisosA.length).toBeGreaterThan(0);
+    expect(avisosA.every((n) => n.criador_id === c.usuario.id || n.criador_id === null)).toBe(true);
+    await marcarNotificacoesLidas(fa.id, c.usuario.id);
+    expect((await listarNotificacoes(fa.id, 50, c.usuario.id)).naoLidas).toBe(0);
+    expect((await listarNotificacoes(fa.id, 50, b.usuario.id)).naoLidas).toBeGreaterThan(0);
   });
 
   it("reenvio na mesma tentativa devolve a correção registrada; erros vão para a revisão", async () => {
@@ -433,6 +475,6 @@ describe("ainda sem nada", () => {
     expect(await trilhasDoAluno(u)).toEqual([]);
     expect(await criadoresDoFa(u.id)).toEqual([]);
     expect(await faTemAcesso(u.id, randomUUID())).toBe(false);
-    expect((await painelDoAluno(u.id)).xpTotal).toBe(0);
+    expect((await painelDoAluno(u.id, randomUUID())).xpTotal).toBe(0);
   });
 });

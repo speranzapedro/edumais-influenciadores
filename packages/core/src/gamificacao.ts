@@ -77,6 +77,11 @@ export interface EntradaConclusao {
   trilhaCompletaAgora: boolean;
   diasAtivosAntes: Iterable<string>;
   hoje: string;
+  /**
+   * Placar a que os pontos pertencem (o criador): prefixa as chaves da ofensiva, que não têm id próprio,
+   * para o mesmo dia contar uma vez em cada criador. Aula e trilha já têm id único.
+   */
+  escopo?: string;
 }
 
 export interface ResultadoConclusao {
@@ -104,7 +109,7 @@ export function recompensasConclusao(e: EntradaConclusao): ResultadoConclusao {
   if (novoDiaAtivo) {
     eventos.push({
       fonte: "streak",
-      ref_key: `dia:${e.hoje}`,
+      ref_key: `${e.escopo ? `${e.escopo}:` : ""}dia:${e.hoje}`,
       pontos: XP.diaStreak,
       descricao: `Streak de ${streak.atual} ${streak.atual === 1 ? "dia" : "dias"}`,
     });
@@ -112,7 +117,7 @@ export function recompensasConclusao(e: EntradaConclusao): ResultadoConclusao {
       marcoAtingido = streak.atual;
       eventos.push({
         fonte: "streak_bonus",
-        ref_key: `${streak.atual}:${streak.inicioAtual}`,
+        ref_key: `${e.escopo ? `${e.escopo}:` : ""}${streak.atual}:${streak.inicioAtual}`,
         pontos: XP.bonusStreak[streak.atual],
         descricao: `Bônus: ${streak.atual} dias seguidos!`,
       });

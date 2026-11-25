@@ -341,6 +341,16 @@ export async function vitrinePorHandle(handleBruto: string): Promise<Vitrine | n
   return { criador: criadorDaVitrine(perfil), publicada: produtos.length > 0, produtos };
 }
 
+/**
+ * App do criador para quem já assina (/@handle por dentro): o criador e os produtos publicados, mesmo com
+ * a página fechada para novos fãs (fechar a página não tira o acesso de quem já assina).
+ */
+export async function appDoCriador(handleBruto: string): Promise<{ criador: CriadorVitrine; produtos: ProdutoVitrine[] } | null> {
+  const perfil = await perfilPorHandle(handleBruto);
+  if (!perfil) return null;
+  return { criador: criadorDaVitrine(perfil), produtos: await produtosPublicados(perfil.user_id) };
+}
+
 /** Página de um produto (/@handle/<slug>): null se a página ou o produto não estão publicados. */
 export async function produtoPorHandleESlug(handleBruto: string, slugBruto: string): Promise<{ criador: CriadorVitrine; produto: ProdutoVitrine } | null> {
   const slug = slugBruto.trim().toLowerCase();

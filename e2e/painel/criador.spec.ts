@@ -82,7 +82,11 @@ test("publicar a trilha avisa os assinantes e mostra a prévia", async ({ page }
 
   const { data: avisos } = await db().from("notificacoes").select("titulo, corpo, link").eq("user_id", fa.usuario.id);
   expect(avisos).toHaveLength(1);
-  expect(avisos?.[0]).toMatchObject({ titulo: "Trilha nova liberada!", corpo: "Investir com calma", link: `/trilhas/${trilha.id}` });
+  expect(avisos?.[0]).toMatchObject({
+    titulo: "Trilha nova liberada!",
+    corpo: "Investir com calma",
+    link: `/@${c.escopo.perfil.handle}/${c.produto.slug}/trilha/${trilha.id}`,
+  });
 
   // Publicada, a trilha abre como o fã vê; a aula abre no player, sem gravar progresso.
   await page.goto(`/trilhas/${trilha.id}`);

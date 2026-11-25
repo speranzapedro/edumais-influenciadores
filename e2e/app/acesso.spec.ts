@@ -47,7 +47,8 @@ test("redefinição de senha pelo e-mail no app", async ({ page }) => {
   await page.getByLabel("Nova senha").fill(nova);
   await page.getByLabel("Repita a senha").fill(nova);
   await page.getByRole("button", { name: "Salvar nova senha" }).click();
-  await expect(page).toHaveURL(/localhost:3007\/$/);
+  // Com um criador só, a entrada do app leva direto ao app dele.
+  await page.waitForURL((u) => u.pathname === `/@${c.escopo.perfil.handle}`);
 
   await page.goto("/perfil");
   await page.getByRole("button", { name: "Sair" }).click();

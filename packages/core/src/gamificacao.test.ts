@@ -30,6 +30,15 @@ describe("calcularStreak", () => {
 });
 
 describe("recompensasConclusao", () => {
+  it("com escopo (criador), as chaves da ofensiva levam o criador; aula e trilha não mudam", () => {
+    const r = recompensasConclusao({ ...base, trilhaCompletaAgora: true, diasAtivosAntes: [], hoje: "2026-10-01", escopo: "criador-a" });
+    expect(r.eventos.find((e) => e.fonte === "streak")?.ref_key).toBe("criador-a:dia:2026-10-01");
+    expect(r.eventos.find((e) => e.fonte === "aula")?.ref_key).toBe(base.aulaId);
+    expect(r.eventos.find((e) => e.fonte === "trilha")?.ref_key).toBe(base.trilhaId);
+    const marco = recompensasConclusao({ ...base, diasAtivosAntes: diasSeguidos("2026-09-30", 6), hoje: "2026-10-01", escopo: "criador-a" });
+    expect(marco.eventos.find((e) => e.fonte === "streak_bonus")?.ref_key).toMatch(/^criador-a:7:/);
+  });
+
   it("primeira aula do dia 1: +10 da aula e +5 do streak", () => {
     const r = recompensasConclusao({ ...base, diasAtivosAntes: [], hoje: "2026-10-01" });
     expect(r.eventos.map((e) => [e.fonte, e.pontos])).toEqual([

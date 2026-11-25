@@ -28,13 +28,15 @@ test("página do produto com a marca dele: cores, barra do navegador, manifesto 
   await page.getByLabel("Repita a senha").fill(SENHA);
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Criar conta e começar" }).click();
-  await expect(page).toHaveURL(/\/\?bemvindo=1$/);
+  await page.waitForURL((u) => u.pathname === `/@${handle}` && u.search === "?bemvindo=1");
   const { data: u } = await db().from("users").select("id").eq("email", email).single();
   const { data: ass } = await db().from("assinaturas").select("criador_id, produto_id, origem").eq("aluno_id", u!.id).single();
   expect(ass).toEqual({ criador_id: c.usuario.id, produto_id: c.produto.id, origem: "instagram" });
 
-  // Dentro do curso, a trilha também usa a marca do produto.
+  // Dentro do curso, o início, a trilha e o menu usam a marca do produto.
+  expect(await corDaMarca(page)).toBe("#1d4ed8");
   await page.goto(`/trilhas/${c.trilha.id}`);
+  await page.waitForURL((u) => u.pathname === `/@${handle}/${c.produto.slug}/trilha/${c.trilha.id}`);
   await expect(page.getByText(c.trilha.titulo).first()).toBeVisible();
   expect(await corDaMarca(page)).toBe("#1d4ed8");
 });
@@ -66,12 +68,13 @@ test("página do criador lista os produtos publicados; produto em rascunho não 
   await page.waitForURL((u) => u.pathname === `/@${handle}/${outro.slug}`);
 });
 
-test("quem já assina vê as trilhas do produto como links", async ({ page }) => {
+test("quem já assina vê o produto por dentro: trilhas com progresso, dentro do app do criador", async ({ page }) => {
   const c = await criadorNoAr();
   const { email } = await novoFa(c.usuario.id);
   await entrarNoApp(page, email);
   await page.goto(`/@${c.escopo.perfil.handle}/${c.produto.slug}`);
-  await expect(page.getByText("Você já tem acesso a este conteúdo.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: c.produto.nome })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Criar conta e começar" })).toHaveCount(0);
   await page.getByRole("link", { name: new RegExp(c.trilha.titulo) }).click();
-  await expect(page).toHaveURL(new RegExp(`/trilhas/${c.trilha.id}$`));
+  await page.waitForURL((u) => u.pathname === `/@${c.escopo.perfil.handle}/${c.produto.slug}/trilha/${c.trilha.id}`);
 });
