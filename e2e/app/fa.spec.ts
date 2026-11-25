@@ -14,8 +14,11 @@ test.describe("página do criador", () => {
   test("fã cria a conta pelo link com origem e cai no início com a trilha", async ({ page }) => {
     const c = await criadorNoAr({ nome: "Lia Finanças" });
     const email = emailUnico("e2e-fa");
+    // O link antigo (/c/<@>) leva ao novo (/@<@>), mantendo a origem.
     await page.goto(`/c/${c.escopo.perfil.handle}?origem=tiktok`);
-    await expect(page.getByRole("heading", { name: c.produto.nome })).toBeVisible();
+    await page.waitForURL((u) => u.pathname === `/@${c.escopo.perfil.handle}` && u.search === "?origem=tiktok");
+    await expect(page.getByRole("heading", { name: "Lia Finanças" })).toBeVisible();
+    await expect(page.getByRole("link", { name: new RegExp(c.produto.nome) })).toBeVisible();
 
     await page.getByLabel("Seu nome completo").fill("Rafa Fã");
     await page.getByLabel("E-mail").fill(email);
@@ -35,11 +38,11 @@ test.describe("página do criador", () => {
   });
 
   test("@ que não existe e página ainda em rascunho", async ({ page }) => {
-    await page.goto("/c/ninguem.por.aqui.e2e");
+    await page.goto("/@ninguem.por.aqui.e2e");
     await expect(page.getByText("Página não encontrada")).toBeVisible();
 
     const rascunho = await novoCriador();
-    await page.goto(`/c/${rascunho.escopo.perfil.handle}`);
+    await page.goto(`/@${rascunho.escopo.perfil.handle}`);
     await expect(page.getByRole("heading", { name: "Em breve" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Criar conta e começar" })).toHaveCount(0);
   });
@@ -50,7 +53,7 @@ test.describe("página do criador", () => {
     const segundo = await criadorNoAr({ nome: "Segundo Criador" });
 
     await entrarNoApp(page, email);
-    await page.goto(`/c/${segundo.escopo.perfil.handle}?origem=youtube`);
+    await page.goto(`/@${segundo.escopo.perfil.handle}?origem=youtube`);
     await page.getByRole("button", { name: "Começar agora" }).click();
     await expect(page).toHaveURL(/\/\?bemvindo=1$/);
 
@@ -59,7 +62,7 @@ test.describe("página do criador", () => {
     await expect(page.getByText("Segundo Criador")).toBeVisible();
 
     // Já assina: a página do criador leva de volta ao início.
-    await page.goto(`/c/${segundo.escopo.perfil.handle}`);
+    await page.goto(`/@${segundo.escopo.perfil.handle}`);
     await expect(page.getByText("Você já tem acesso a este conteúdo.")).toBeVisible();
   });
 });

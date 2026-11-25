@@ -94,7 +94,11 @@ export async function conferirSenha(app: AppSessao, usuario: Usuario, senha: str
  * Renova os cookies de sessão a cada request e manda para /login quem não está logado
  * (exceto rotas públicas). A autorização de verdade acontece nas páginas e actions.
  */
-export async function proxySessao(app: AppSessao, request: NextRequest, publicas: string[]) {
+/**
+ * Sessão no proxy do app: renova os cookies e manda para /login quem não está logado fora das rotas
+ * públicas (lista de prefixos ou uma função do caminho).
+ */
+export async function proxySessao(app: AppSessao, request: NextRequest, publicas: string[] | ((path: string) => boolean)) {
   let response = NextResponse.next({ request });
   const sb = clienteSessao(app, {
     getAll: () => request.cookies.getAll(),
@@ -106,7 +110,7 @@ export async function proxySessao(app: AppSessao, request: NextRequest, publicas
   });
   const { data } = await sb.auth.getClaims();
   const path = request.nextUrl.pathname;
-  const publica = publicas.some((p) => path === p || path.startsWith(`${p}/`));
+  const publica = typeof publicas === "function" ? publicas(path) : publicas.some((p) => path === p || path.startsWith(`${p}/`));
   if (!data?.claims && !publica) {
     if (path.startsWith("/api/")) return new NextResponse("Não autorizado", { status: 401 });
     const url = request.nextUrl.clone();

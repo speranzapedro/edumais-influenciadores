@@ -1,9 +1,10 @@
 import { AtalhoEduTrilha } from "@edu/aula-ui";
-import { type AulaNoCaminho, caminhoDaTrilha, eduDisponivel, trilhasDoAluno } from "@edu/db";
+import { type AulaNoCaminho, caminhoDaTrilha, eduDisponivel, produtoDaTrilha, trilhasDoAluno } from "@edu/db";
 import { Avatar, BarraProgresso, cn, Icone } from "@edu/ui";
 import { Check, ChevronLeft, Lock, Star } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EstiloMarca } from "@/components/EstiloMarca";
 import { exigirAluno } from "@/lib/sessao";
 
 export const dynamic = "force-dynamic";
@@ -14,11 +15,11 @@ const ZIGUE = [0, 52, 78, 52, 0, -52, -78, -52];
 export default async function CaminhoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const aluno = await exigirAluno();
-  const [dados, edu, resumos] = await Promise.all([caminhoDaTrilha(id, aluno), eduDisponivel(aluno, id), trilhasDoAluno(aluno)]);
+  const [dados, edu, resumos, marca] = await Promise.all([caminhoDaTrilha(id, aluno), eduDisponivel(aluno, id), trilhasDoAluno(aluno), produtoDaTrilha(id)]);
   if (!dados) notFound();
   const resumo = resumos.find((t) => t.id === id);
   const criador = resumo?.criador ?? null;
-  const autor = criador ? { id: criador.id, nome: criador.nome, href: `/c/${criador.handle}` } : null;
+  const autor = criador ? { id: criador.id, nome: criador.nome, href: `/@${criador.handle}` } : null;
   const { trilha, aulas } = dados;
   const feitas = aulas.filter((a) => a.concluida).length;
   const pct = aulas.length ? Math.round((feitas / aulas.length) * 100) : 0;
@@ -33,6 +34,7 @@ export default async function CaminhoPage({ params }: { params: Promise<{ id: st
 
   return (
     <main>
+      {marca && <EstiloMarca primaria={marca.produto.cor_primaria} destaque={marca.produto.cor_destaque} />}
       <div className="gradiente-marca relative overflow-hidden rounded-b-[28px] px-5 pb-6 pt-6 text-white">
         <div className="pointer-events-none absolute -right-12 -top-10 size-44 rounded-full bg-white/10" />
         <Link href="/trilhas" className="inline-flex items-center gap-1 text-sm text-white/80">

@@ -23,7 +23,18 @@ function BotaoCopiar({ texto }: { texto: string }) {
 }
 
 /** Links prontos por rede (cada um grava a origem na assinatura) e o QR do link principal. */
-export function LinksDivulgacao({ principal, porRede, handle }: { principal: string; porRede: { rede: string; link: string }[]; handle: string }) {
+export function LinksDivulgacao({
+  principal,
+  porRede,
+  porProduto,
+  handle,
+}: {
+  principal: string;
+  porRede: { rede: string; link: string }[];
+  /** Produtos publicados: o link leva direto à página do produto (e registra por onde o fã entrou). */
+  porProduto: { nome: string; link: string }[];
+  handle: string;
+}) {
   const [qr, setQr] = useState<string | null>(null);
   useEffect(() => {
     QRCode.toDataURL(principal, { margin: 1, width: 720, errorCorrectionLevel: "M" })
@@ -42,6 +53,21 @@ export function LinksDivulgacao({ principal, porRede, handle }: { principal: str
             <BotaoCopiar texto={principal} />
           </div>
         </Cartao>
+        {porProduto.length > 0 && (
+          <Cartao className="p-6">
+            <h2 className="font-extrabold">Um link para cada produto</h2>
+            <p className="text-sm text-suave">Abre direto a página do produto, com a marca dele. A assinatura continua liberando todos.</p>
+            <ul className="mt-4 divide-y divide-linha">
+              {porProduto.map((p) => (
+                <li key={p.link} className="flex flex-wrap items-center gap-3 py-3">
+                  <span className="w-40 truncate text-sm font-bold">{p.nome}</span>
+                  <code className="min-w-0 flex-1 break-all text-xs text-tinta-2">{p.link}</code>
+                  <BotaoCopiar texto={p.link} />
+                </li>
+              ))}
+            </ul>
+          </Cartao>
+        )}
         <Cartao className="p-6">
           <h2 className="font-extrabold">Um link para cada rede</h2>
           <p className="text-sm text-suave">Use o link da rede onde você posta: em Vendas você vê de onde vem cada assinante.</p>

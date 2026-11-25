@@ -1,11 +1,11 @@
 import { gerarTema } from "@edu/core";
 import { type EscopoCriador, exigirProdutoDoCriador, type Produto, urlDaMarca } from "@edu/db";
 import { Abas, Pill } from "@edu/ui";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Notificacoes } from "@/components/Notificacoes";
-import { exigirCriador } from "@/lib/sessao";
+import { exigirCriador, linkProduto } from "@/lib/sessao";
 import { BotaoPublicarProduto } from "./BotaoPublicarProduto";
 
 /** Criador logado e o produto da URL (404 se não for dele). */
@@ -38,9 +38,20 @@ export function CabecalhoProduto({ e, produto, ativa, totalTrilhas }: { e: Escop
               <h1 className="truncate text-[26px] font-extrabold tracking-tight">{produto.nome}</h1>
               {publicado ? <Pill tom="verde">Publicado</Pill> : <Pill tom="ambar">Rascunho</Pill>}
             </div>
-            <p className="text-sm text-suave">
-              @{e.perfil.handle}/{produto.slug}
-            </p>
+            {publicado && e.perfil.pagina_status === "publicada" ? (
+              <a
+                href={linkProduto(e.perfil.handle, produto.slug)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-marca-700 hover:underline"
+              >
+                @{e.perfil.handle}/{produto.slug} <ExternalLink className="size-3.5" />
+              </a>
+            ) : (
+              <p className="text-sm text-suave">
+                @{e.perfil.handle}/{produto.slug}
+              </p>
+            )}
           </div>
         </div>
         <BotaoPublicarProduto produtoId={produto.id} publicado={publicado} paginaPublicada={e.perfil.pagina_status === "publicada"} />
