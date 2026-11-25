@@ -13,6 +13,7 @@ import {
   limiteAgenteMes,
   painelVendas,
   perfilIADaTrilha,
+  produtoDaTrilha,
   produtoPorHandleESlug,
   publicarPagina,
   salvarPerfilCriador,
@@ -172,6 +173,18 @@ describe("perfil, preço e página", () => {
     expect(await produtoPorHandleESlug("ninguem.aqui.mesmo", "ingles-do-zero")).toBeNull();
     await publicarPagina(c.escopo, false);
     expect(await produtoPorHandleESlug(c.escopo.perfil.handle, "ingles-do-zero")).toBeNull();
+  });
+
+  it("produto e @ do criador de uma trilha (tema e endereço no app do fã)", async () => {
+    const c = await novoCriador();
+    await salvarIdentidadeProduto(c.escopo, c.produto.id, { corPrimaria: "#15803d", corDestaque: "#f59e0b" });
+    const t = await trilhaPronta(c.escopo, { produtoId: c.produto.id, publicar: false });
+    expect(await produtoDaTrilha(t.id)).toEqual({
+      handle: c.escopo.perfil.handle,
+      produto: { id: c.produto.id, nome: c.produto.nome, slug: c.produto.slug, logo_path: null, cor_primaria: "#15803d", cor_destaque: "#f59e0b" },
+    });
+    expect(await produtoDaTrilha("00000000-0000-0000-0000-000000000000")).toBeNull();
+    expect(await produtoDaTrilha("nao-e-uuid")).toBeNull();
   });
 
   it("@ inexistente ou inválido não tem página", async () => {

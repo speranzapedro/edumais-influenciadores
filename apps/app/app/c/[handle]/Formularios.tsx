@@ -3,9 +3,9 @@
 import { Aviso, Botao, Campo, CampoSenha, LinkTermos, TermosAluno, useFormulario } from "@edu/ui";
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { comecar, criarConta } from "./actions";
+import { comecar, criarConta, type Entrada } from "./actions";
 
-export function BotaoComecar({ handle, origem }: { handle: string; origem: string | null }) {
+export function BotaoComecar({ entrada }: { entrada: Entrada }) {
   const [pendente, iniciar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
   return (
@@ -16,7 +16,7 @@ export function BotaoComecar({ handle, origem }: { handle: string; origem: strin
         disabled={pendente}
         onClick={() =>
           iniciar(async () => {
-            const r = await comecar(handle, origem);
+            const r = await comecar(entrada);
             if (r?.erro) setErro(r.erro);
           })
         }
@@ -28,8 +28,8 @@ export function BotaoComecar({ handle, origem }: { handle: string; origem: strin
   );
 }
 
-export function FormContaDoCriador({ handle, origem, proximo }: { handle: string; origem: string | null; proximo: string }) {
-  const { estado, pendente, form } = useFormulario(criarConta.bind(null, handle, origem), null);
+export function FormContaDoCriador({ entrada, proximo }: { entrada: Entrada; proximo: string }) {
+  const { estado, pendente, form } = useFormulario(criarConta.bind(null, entrada), null);
   return (
     <form {...form} className="space-y-4">
       <Campo rotulo="Seu nome completo" name="nome" autoComplete="name" required minLength={3} />

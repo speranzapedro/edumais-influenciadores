@@ -29,7 +29,7 @@ export default async function TrilhasPage() {
 
       {grupos.map((g) => (
         <section key={g.criador.id} className="mt-6">
-          <Link href={`/c/${g.criador.handle}`} className="mb-3 flex items-center gap-2.5">
+          <Link href={`/@${g.criador.handle}`} className="mb-3 flex items-center gap-2.5">
             <Avatar nome={g.criador.nome} semente={g.criador.id} tamanho={32} />
             <div className="min-w-0">
               <div className="truncate text-sm font-bold">{g.criador.nome}</div>

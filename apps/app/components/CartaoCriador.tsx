@@ -6,7 +6,7 @@ import Link from "next/link";
 /** Criador que o fã assina: foto, nome, @ e os produtos. Leva à página pública dele. */
 export function CartaoCriador({ criador }: { criador: CriadorDoFa }) {
   return (
-    <Link href={`/c/${criador.handle}`} className="block">
+    <Link href={`/@${criador.handle}`} className="block">
       <Cartao className="flex items-center gap-3 p-4 transition hover:border-marca-200">
         <Avatar nome={criador.nome} semente={criador.id} tamanho={48} />
         <div className="min-w-0 flex-1">

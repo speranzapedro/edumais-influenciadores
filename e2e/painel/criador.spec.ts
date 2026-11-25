@@ -37,7 +37,9 @@ test("perfil: dados públicos, preço e publicação da página (que exige produ
   expect(r.escopo.perfil).toMatchObject({ pagina_status: "publicada", preco_centavos: 2990 });
 
   await page.goto("/divulgar");
-  await expect(page.getByText(`/c/${c.escopo.perfil.handle}`).first()).toBeVisible();
+  await expect(page.getByText(`/@${c.escopo.perfil.handle}`).first()).toBeVisible();
+  // Produto publicado ganha o próprio link.
+  await expect(page.getByText(`/@${c.escopo.perfil.handle}/${c.produto.slug}`).first()).toBeVisible();
 });
 
 test("primeira trilha: tour do estúdio, depois o formulário do produto e o estúdio", async ({ page }) => {

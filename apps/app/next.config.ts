@@ -9,6 +9,25 @@ loadEnvConfig(resolve(process.cwd(), "../.."), process.env.NODE_ENV !== "product
 const config: NextConfig = {
   transpilePackages: ["@edu/ui", "@edu/core", "@edu/db", "@edu/ai", "@edu/aula-ui"],
   images: { remotePatterns: [{ hostname: "api.dicebear.com" }] },
+  // Endereço público do criador: /@criador e /@criador/<produto>. Pasta com "@" no Next é rota paralela,
+  // então as páginas moram em /c/[handle] e o /@ é reescrito para lá (antes das páginas).
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: "/@:handle", destination: "/c/:handle" },
+        { source: "/@:handle/:produto", destination: "/c/:handle/:produto" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
+  // O endereço antigo /c/<criador> continua valendo, mas leva ao novo (links já divulgados).
+  async redirects() {
+    return [
+      { source: "/c/:handle", destination: "/@:handle", permanent: true },
+      { source: "/c/:handle/:produto", destination: "/@:handle/:produto", permanent: true },
+    ];
+  },
 };
 
 export default config;

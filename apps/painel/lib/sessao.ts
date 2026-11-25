@@ -33,8 +33,11 @@ export async function tentar<T>(fn: () => Promise<T>): Promise<{ erro: string } 
 /** Endereço do app dos fãs (página pública do criador). */
 export const urlAluno = () => (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3007").replace(/\/$/, "");
 
-/** Link público do criador, com a origem de divulgação opcional. */
-export const linkPublico = (handle: string, origem?: string) => `${urlAluno()}/c/${handle}${origem ? `?origem=${origem}` : ""}`;
+/** Link público do criador (/@criador), com a origem de divulgação opcional. */
+export const linkPublico = (handle: string, origem?: string) => `${urlAluno()}/@${handle}${origem ? `?origem=${origem}` : ""}`;
+
+/** Link público de um produto (/@criador/<produto>). */
+export const linkProduto = (handle: string, slug: string, origem?: string) => `${urlAluno()}/@${handle}/${slug}${origem ? `?origem=${origem}` : ""}`;
 
 /** Endereço público deste painel (links de e-mail). */
 export const urlPainel = () => (process.env.NEXT_PUBLIC_PAINEL_URL ?? "http://localhost:3006").replace(/\/$/, "");

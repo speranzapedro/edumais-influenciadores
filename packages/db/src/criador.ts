@@ -539,6 +539,23 @@ export async function criadoresDoFa(alunoId: string): Promise<CriadorDoFa[]> {
   });
 }
 
+export interface MarcaDaTrilha {
+  produto: { id: string; nome: string; slug: string; logo_path: string | null; cor_primaria: string; cor_destaque: string | null };
+  handle: string;
+}
+
+/** Produto (com a marca) e @ do criador de uma trilha: tema e endereço /@criador/<produto> no app do fã. */
+export async function produtoDaTrilha(trilhaId: string): Promise<MarcaDaTrilha | null> {
+  if (!ehUuid(trilhaId)) return null;
+  const t = talvez(
+    await db().from("trilhas").select("criador_id, produto:produtos(id, nome, slug, logo_path, cor_primaria, cor_destaque)").eq("id", trilhaId).maybeSingle(),
+    "trilha",
+  ) as { criador_id: string; produto: MarcaDaTrilha["produto"] | null } | null;
+  if (!t?.produto) return null;
+  const p = talvez(await db().from("criador_perfis").select("handle").eq("user_id", t.criador_id).maybeSingle(), "perfil");
+  return p ? { produto: t.produto, handle: p.handle } : null;
+}
+
 /** Criador (perfil público) dono de uma trilha, para o "Preparada por" no app do fã. */
 export async function criadorDaTrilha(trilhaId: string): Promise<{ handle: string; nome: string; foto_url: string | null } | null> {
   const t = talvez(await db().from("trilhas").select("criador_id").eq("id", trilhaId).maybeSingle(), "trilha");

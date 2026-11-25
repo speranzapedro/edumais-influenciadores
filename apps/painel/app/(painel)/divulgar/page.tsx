@@ -1,8 +1,9 @@
 import { nomeDaOrigem, ORIGENS_DIVULGACAO } from "@edu/core";
+import { listarProdutos } from "@edu/db";
 import { Aviso } from "@edu/ui";
 import Link from "next/link";
 import { Topo } from "@/components/Topo";
-import { exigirCriador, linkPublico } from "@/lib/sessao";
+import { exigirCriador, linkProduto, linkPublico } from "@/lib/sessao";
 import { LinksDivulgacao } from "./LinksDivulgacao";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function DivulgarPage() {
   const e = await exigirCriador();
   const handle = e.perfil.handle;
+  const publicados = (await listarProdutos(e)).filter((p) => p.status === "publicado");
   return (
     <>
       <Topo titulo="Divulgar" subtitulo="Leve seus seguidores para a sua trilha." />
@@ -27,6 +29,7 @@ export default async function DivulgarPage() {
           handle={handle}
           principal={linkPublico(handle)}
           porRede={ORIGENS_DIVULGACAO.map((o) => ({ rede: nomeDaOrigem(o), link: linkPublico(handle, o) }))}
+          porProduto={publicados.map((p) => ({ nome: p.nome, link: linkProduto(handle, p.slug) }))}
         />
       </div>
     </>
