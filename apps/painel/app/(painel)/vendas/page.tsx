@@ -23,7 +23,7 @@ export default async function VendasPage({ searchParams }: { searchParams: Promi
     <>
       <Topo
         titulo="Vendas"
-        subtitulo={`${e.produto.nome} · você fica com ${Math.round(PARTE_CRIADOR * 100)}% de cada venda`}
+        subtitulo={`Assinaturas da sua página · você fica com ${Math.round(PARTE_CRIADOR * 100)}% de cada venda`}
         acoes={
           <div className="flex rounded-xl border border-linha bg-superficie p-1 text-sm font-semibold">
             {PERIODOS.map((d) => (

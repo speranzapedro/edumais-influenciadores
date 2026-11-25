@@ -13,19 +13,21 @@ import {
   limiteAgenteMes,
   painelVendas,
   perfilIADaTrilha,
-  publicarProduto,
+  produtoPorHandleESlug,
+  publicarPagina,
   salvarPerfilCriador,
-  salvarProduto,
+  salvarPrecoAssinatura,
   trilhasDoCriador,
   vitrinePorHandle,
 } from "../src/criador";
 import { ErroAcesso, ErroPermissao } from "../src/erros";
 import { registrarExecucao } from "../src/estudio";
+import { criarProduto, listarProdutos, publicarProduto, salvarIdentidadeProduto, salvarProduto } from "../src/produtos";
 
 beforeAll(limparBanco);
 
 describe("cadastro do criador", () => {
-  it("cria a conta de criador com perfil público e produto em rascunho", async () => {
+  it("cria a conta de criador com a página e um produto em rascunho", async () => {
     const base = handleUnico("bia");
     const { usuario, handle } = await cadastrarCriador({
       nome: "Bia História",
@@ -37,8 +39,10 @@ describe("cadastro do criador", () => {
     expect(handle).toBe(base);
     expect(usuario.role).toBe("criador");
     const e = (await escopoCriador(usuario))!;
-    expect(e.perfil).toMatchObject({ handle: base, nome_publico: "Bia História" });
-    expect(e.produto).toMatchObject({ criador_id: usuario.id, status: "rascunho", nome: "Trilhas de Bia" });
+    expect(e.perfil).toMatchObject({ handle: base, nome_publico: "Bia História", pagina_status: "rascunho", preco_centavos: null });
+    expect(await listarProdutos(e)).toEqual([
+      expect.objectContaining({ criador_id: usuario.id, status: "rascunho", nome: "Trilhas de Bia", slug: "trilhas-de-bia", cor_primaria: "#6c5ce7" }),
+    ]);
   });
 
   it("sem @, sugere um a partir do nome e evita repetição", async () => {
@@ -68,13 +72,13 @@ describe("cadastro do criador", () => {
 
   it("conta de fã ou desativada não tem escopo de criador", async () => {
     const c = await criadorNoAr();
-    const { usuario: fa } = await novoFa(c.escopo.produto.id);
+    const { usuario: fa } = await novoFa(c.usuario.id);
     expect(await escopoCriador(fa)).toBeNull();
     expect(await escopoCriador({ ...c.usuario, status: "inativo" })).toBeNull();
   });
 });
 
-describe("perfil público e produto", () => {
+describe("perfil, preço e página", () => {
   it("salva o perfil com redes limpas e a foto também no usuário", async () => {
     const c = await novoCriador();
     const novo = handleUnico("novo");
@@ -107,34 +111,69 @@ describe("perfil público e produto", () => {
     await expect(salvarPerfilCriador(b.escopo, { nomePublico: "B", handle: b.escopo.perfil.handle, bio: null, redes: {} })).rejects.toThrow(ErroAcesso);
   });
 
-  it("salva nome, descrição e preço do produto", async () => {
+  it("salva o preço da assinatura no perfil do criador", async () => {
     const c = await novoCriador();
-    await salvarProduto(c.escopo, { nome: "  Revoluções  ", descricao: " Do Iluminismo a 1848. ", precoCentavos: 2990 });
-    expect((await recarregar(c)).escopo.produto).toMatchObject({ nome: "Revoluções", descricao: "Do Iluminismo a 1848.", preco_centavos: 2990 });
-    await expect(salvarProduto(c.escopo, { nome: "ab", descricao: null, precoCentavos: null })).rejects.toThrow("nome");
-    await expect(salvarProduto(c.escopo, { nome: "Válido", descricao: null, precoCentavos: -1 })).rejects.toThrow("Preço inválido");
+    await salvarPrecoAssinatura(c.escopo, 2990);
+    expect((await recarregar(c)).escopo.perfil.preco_centavos).toBe(2990);
+    await salvarPrecoAssinatura(c.escopo, null);
+    expect((await recarregar(c)).escopo.perfil.preco_centavos).toBeNull();
+    await expect(salvarPrecoAssinatura(c.escopo, -1)).rejects.toThrow("Preço inválido");
+    await expect(salvarPrecoAssinatura(c.escopo, 9.5)).rejects.toThrow("Preço inválido");
   });
 
-  it("página em rascunho: sem trilhas; publicar exige trilha publicada", async () => {
+  it("página em rascunho: sem produtos; abrir exige produto publicado, que exige trilha publicada", async () => {
     const c = await novoCriador();
     let vitrine = await vitrinePorHandle(c.escopo.perfil.handle);
-    expect(vitrine?.produto.publicado).toBe(false);
-    expect(vitrine?.trilhas).toEqual([]);
+    expect(vitrine).toMatchObject({ publicada: false, produtos: [] });
     expect(JSON.stringify(vitrine)).not.toContain(c.email);
-    await expect(publicarProduto(c.escopo, true)).rejects.toThrow("Publique pelo menos uma trilha");
+    await expect(publicarPagina(c.escopo, true)).rejects.toThrow("Publique pelo menos um produto");
+    await expect(publicarProduto(c.escopo, c.produto.id, true)).rejects.toThrow("Publique pelo menos uma trilha");
 
-    const trilha = await trilhaPronta(c.escopo);
-    await trilhaPronta(c.escopo, { titulo: "Ainda em rascunho", publicar: false });
-    await publicarProduto(c.escopo, true);
+    const trilha = await trilhaPronta(c.escopo, { produtoId: c.produto.id });
+    await trilhaPronta(c.escopo, { produtoId: c.produto.id, titulo: "Ainda em rascunho", publicar: false });
+    await publicarProduto(c.escopo, c.produto.id, true);
+    // Produto publicado, mas a página ainda fechada: ninguém vê.
+    expect(await vitrinePorHandle(c.escopo.perfil.handle)).toMatchObject({ publicada: false, produtos: [] });
+    await publicarPagina(c.escopo, true);
+
     vitrine = await vitrinePorHandle(`@${c.escopo.perfil.handle.toUpperCase()}`);
-    expect(vitrine?.produto.publicado).toBe(true);
-    expect(vitrine?.trilhas.map((t) => t.id)).toEqual([trilha.id]);
-    expect(vitrine?.trilhas[0].totalAulas).toBe(7);
+    expect(vitrine?.publicada).toBe(true);
+    expect(vitrine?.produtos.map((p) => p.id)).toEqual([c.produto.id]);
+    expect(vitrine?.produtos[0].trilhas.map((t) => t.id)).toEqual([trilha.id]);
+    expect(vitrine?.produtos[0].trilhas[0].totalAulas).toBe(7);
 
     const r = await recarregar(c);
-    expect(r.escopo.produto.publicado_em).not.toBeNull();
-    await publicarProduto(r.escopo, false);
-    expect((await recarregar(c)).escopo.produto).toMatchObject({ status: "rascunho", publicado_em: r.escopo.produto.publicado_em });
+    expect(r.escopo.perfil.pagina_publicada_em).not.toBeNull();
+    await publicarPagina(r.escopo, false);
+    expect((await recarregar(c)).escopo.perfil).toMatchObject({ pagina_status: "rascunho", pagina_publicada_em: r.escopo.perfil.pagina_publicada_em });
+    expect(await vitrinePorHandle(c.escopo.perfil.handle)).toMatchObject({ publicada: false, produtos: [] });
+  });
+
+  it("vitrine com vários produtos: só os publicados, na ordem, com marca; e a página de cada um", async () => {
+    const c = await criadorNoAr();
+    const ingles = await criarProduto(c.escopo, { nome: "Inglês do Zero", descricao: "Do básico à conversa." });
+    await salvarIdentidadeProduto(c.escopo, ingles.id, { corPrimaria: "#1D4ED8", corDestaque: "#06b6d4" });
+    const t = await trilhaPronta(c.escopo, { produtoId: ingles.id, titulo: "Verbos" });
+    const rascunho = await criarProduto(c.escopo, { nome: "Ainda não" });
+    await trilhaPronta(c.escopo, { produtoId: rascunho.id });
+
+    let v = await vitrinePorHandle(c.escopo.perfil.handle);
+    expect(v?.produtos.map((p) => p.id)).toEqual([c.produto.id]);
+    await publicarProduto(c.escopo, ingles.id, true);
+    v = await vitrinePorHandle(c.escopo.perfil.handle);
+    expect(v?.produtos.map((p) => p.slug)).toEqual([c.produto.slug, "ingles-do-zero"]);
+    expect(v?.produtos[1]).toMatchObject({ nome: "Inglês do Zero", cor_primaria: "#1d4ed8", cor_destaque: "#06b6d4", logo_path: null });
+    expect(v?.produtos[1].trilhas.map((x) => x.id)).toEqual([t.id]);
+
+    const pagina = await produtoPorHandleESlug(`@${c.escopo.perfil.handle}`, "Ingles-do-Zero");
+    expect(pagina?.produto.id).toBe(ingles.id);
+    expect(pagina?.criador.handle).toBe(c.escopo.perfil.handle);
+    expect(await produtoPorHandleESlug(c.escopo.perfil.handle, rascunho.slug)).toBeNull();
+    expect(await produtoPorHandleESlug(c.escopo.perfil.handle, "nao-existe")).toBeNull();
+    expect(await produtoPorHandleESlug(c.escopo.perfil.handle, "../x")).toBeNull();
+    expect(await produtoPorHandleESlug("ninguem.aqui.mesmo", "ingles-do-zero")).toBeNull();
+    await publicarPagina(c.escopo, false);
+    expect(await produtoPorHandleESlug(c.escopo.perfil.handle, "ingles-do-zero")).toBeNull();
   });
 
   it("@ inexistente ou inválido não tem página", async () => {
@@ -145,7 +184,7 @@ describe("perfil público e produto", () => {
 });
 
 describe("trilhas e isolamento", () => {
-  it("lista as trilhas do produto por status, com etapas e aulas", async () => {
+  it("lista as trilhas do criador por status e por produto, com etapas e aulas", async () => {
     const c = await novoCriador();
     const pub = await trilhaPronta(c.escopo, { titulo: "Publicada" });
     const rasc = await trilhaPronta(c.escopo, { titulo: "Rascunho", publicar: false });
@@ -154,6 +193,10 @@ describe("trilhas e isolamento", () => {
     expect(todas.find((t) => t.id === pub.id)).toMatchObject({ totalAulas: 7 });
     expect(todas.find((t) => t.id === rasc.id)?.etapas).toHaveLength(4);
     expect((await trilhasDoCriador(c.escopo, { status: "publicada" })).map((t) => t.id)).toEqual([pub.id]);
+    const outro = await criarProduto(c.escopo, { nome: "Outro produto" });
+    const noOutro = await trilhaPronta(c.escopo, { produtoId: outro.id, publicar: false });
+    expect((await trilhasDoCriador(c.escopo)).map((t) => t.id)).toContain(noOutro.id);
+    expect((await trilhasDoCriador(c.escopo, { produtoId: outro.id })).map((t) => t.id)).toEqual([noOutro.id]);
     expect(await trilhasDoCriador((await novoCriador()).escopo)).toEqual([]);
   });
 
@@ -161,7 +204,7 @@ describe("trilhas e isolamento", () => {
     const a = await novoCriador();
     const b = await novoCriador();
     const t = await trilhaPronta(a.escopo, { publicar: false });
-    await expect(exigirTrilhaDoCriador(a.escopo, t.id)).resolves.toBeUndefined();
+    await expect(exigirTrilhaDoCriador(a.escopo, t.id)).resolves.toEqual({ produtoId: a.produto.id });
     await expect(exigirTrilhaDoCriador(b.escopo, t.id)).rejects.toThrow(ErroPermissao);
     await expect(exigirTrilhaDoCriador(b.escopo, "nao-e-uuid")).rejects.toThrow(ErroPermissao);
     expect((await trilhasDoCriador(b.escopo)).some((x) => x.id === t.id)).toBe(false);
@@ -169,11 +212,11 @@ describe("trilhas e isolamento", () => {
 });
 
 describe("painel comercial", () => {
-  it("vendas e assinantes do produto, sem misturar criadores e sem e-mail", async () => {
+  it("vendas e assinantes do criador, sem misturar criadores e sem e-mail", async () => {
     const a = await criadorNoAr();
     const b = await criadorNoAr();
-    const { usuario: fa } = await novoFa(a.escopo.produto.id, { origem: "Instagram!" });
-    await novoFa(b.escopo.produto.id, { origem: "tiktok" });
+    const { usuario: fa } = await novoFa(a.usuario.id, { origem: "Instagram!", produtoEntradaId: a.produto.id });
+    await novoFa(b.usuario.id, { origem: "tiktok" });
 
     const va = await painelVendas(a.escopo, 30);
     expect(va).toMatchObject({ cortesias: 1, ativas: 0, receitaMensal: 0, novasNoPeriodo: 1 });
@@ -181,13 +224,16 @@ describe("painel comercial", () => {
     expect(va.origens).toEqual([{ origem: "instagram", total: 1 }]);
     expect(va.conclusaoPorTrilha.map((t) => t.id)).toEqual([a.trilha.id]);
 
-    await db().from("assinaturas").update({ status: "ativa", valor_centavos: 2990 }).eq("produto_id", b.escopo.produto.id);
+    await db().from("assinaturas").update({ status: "ativa", valor_centavos: 2990 }).eq("criador_id", b.usuario.id);
     const vb = await painelVendas(b.escopo, 30);
     expect(vb).toMatchObject({ ativas: 1, cortesias: 0, receitaMensal: 2990, parteCriador: 2093 });
     expect(vb.origens).toEqual([{ origem: "tiktok", total: 1 }]);
 
     const assinantes = await assinantesDoCriador(a.escopo);
-    expect(assinantes).toEqual([expect.objectContaining({ id: fa.id, status: "cortesia", origem: "instagram", aulasConcluidas: 0, ultimaAula: null })]);
+    expect(assinantes).toEqual([
+      expect.objectContaining({ id: fa.id, status: "cortesia", origem: "instagram", aulasConcluidas: 0, ultimaAula: null, entrouPor: a.produto.nome }),
+    ]);
+    expect((await assinantesDoCriador(b.escopo))[0].entrouPor).toBeNull();
     expect(JSON.stringify(assinantes)).not.toContain("@edumais.test");
     expect(await assinantesDoCriador((await novoCriador()).escopo)).toEqual([]);
   });
@@ -197,8 +243,8 @@ describe("IA e cota do agente", () => {
   it("monta o perfil de IA do criador para a trilha", async () => {
     const c = await novoCriador();
     await salvarPerfilCriador(c.escopo, { nomePublico: "Bia História", handle: c.escopo.perfil.handle, bio: "Historiadora.", redes: {} });
-    await salvarProduto(c.escopo, { nome: "Revoluções", descricao: "Do Iluminismo a 1848.", precoCentavos: null });
-    const t = await trilhaPronta((await recarregar(c)).escopo, { publicar: false });
+    await salvarProduto(c.escopo, c.produto.id, { nome: "Revoluções", slug: "revolucoes", descricao: "Do Iluminismo a 1848." });
+    const t = await trilhaPronta((await recarregar(c)).escopo, { produtoId: c.produto.id, publicar: false });
     const ia = await perfilIADaTrilha(t.id);
     expect(ia?.produto).toBe("Revoluções");
     expect(ia?.perfil.nome).toBe("Bia História");

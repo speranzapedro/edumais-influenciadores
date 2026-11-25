@@ -14,7 +14,7 @@ export default async function DivulgarPage() {
     <>
       <Topo titulo="Divulgar" subtitulo="Leve seus seguidores para a sua trilha." />
       <div className="space-y-6 px-8 pb-10 pt-4">
-        {e.produto.status !== "publicado" && (
+        {e.perfil.pagina_status !== "publicada" && (
           <Aviso tom="ambar">
             Sua página ainda está em rascunho: quem abrir o link vê “em breve”. Publique em{" "}
             <Link href="/perfil#produto" className="font-bold underline">

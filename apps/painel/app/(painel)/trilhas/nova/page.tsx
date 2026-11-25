@@ -1,4 +1,5 @@
 import { LIMITES_ORIENTACAO, TOUR_ESTUDIO_VISTO } from "@edu/core";
+import { produtoPadrao } from "@edu/db";
 import { Aviso, Cartao, CORES, ICONES_DISCIPLINAS, Icone, TileIcone } from "@edu/ui";
 import { ChevronLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +25,9 @@ export default async function NovaTrilhaPage({ searchParams }: { searchParams: P
         <ChevronLeft className="size-4" /> Trilhas
       </Link>
       <h1 className="mt-4 text-[26px] font-extrabold tracking-tight">Nova trilha</h1>
-      <p className="text-sm text-suave">A trilha entra em {e.produto.nome}. Conte o objetivo; depois você envia seus conteúdos e o Edu faz o resto.</p>
+      <p className="text-sm text-suave">
+        A trilha entra em {(await produtoPadrao(e)).nome}. Conte o objetivo; depois você envia seus conteúdos e o Edu faz o resto.
+      </p>
 
       <form action={criar}>
         <Cartao className="mt-6 space-y-5 p-6">

@@ -4,7 +4,7 @@ import { entrarNoApp, linkDoEmail, SENHA } from "../apoio";
 
 test("login do fã: senha errada, página protegida com volta e sair", async ({ page }) => {
   const c = await criadorNoAr();
-  const { email } = await novoFa(c.escopo.produto.id);
+  const { email } = await novoFa(c.usuario.id);
 
   await page.goto("/progresso");
   await expect(page).toHaveURL(/\/login\?next=%2Fprogresso/);
@@ -33,7 +33,7 @@ test("conta de criador não entra no app do fã", async ({ page }) => {
 
 test("redefinição de senha pelo e-mail no app", async ({ page }) => {
   const c = await criadorNoAr();
-  const { email } = await novoFa(c.escopo.produto.id);
+  const { email } = await novoFa(c.usuario.id);
   await page.goto("/login");
   await page.getByRole("link", { name: "Esqueci minha senha" }).click();
   await page.getByLabel("E-mail").fill(email);

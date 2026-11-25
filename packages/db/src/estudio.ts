@@ -88,13 +88,18 @@ export async function reordenarTrilhas(produtoId: string, ids: string[]) {
     );
 }
 
-/** Avisa os fãs com acesso ao produto que uma trilha chegou para eles. */
+/**
+ * Avisa os fãs com acesso ao criador que uma trilha chegou para eles — só se o produto da trilha já
+ * está publicado (num produto em rascunho a trilha ainda não aparece para ninguém).
+ */
 async function avisarAssinantes(p: { produtoId: string; trilhaId: string; titulo: string }) {
+  const produto = ok(await db().from("produtos").select("criador_id, status").eq("id", p.produtoId).single(), "produto da trilha");
+  if (produto.status !== "publicado") return;
   const ass = ok(
     await db()
       .from("assinaturas")
       .select("aluno_id")
-      .eq("produto_id", p.produtoId)
+      .eq("criador_id", produto.criador_id)
       .in("status", [...STATUS_COM_ACESSO]),
     "assinantes a avisar",
   );

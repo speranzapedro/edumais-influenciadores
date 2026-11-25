@@ -7,6 +7,7 @@ import {
   type PainelVendas,
   resumirVendas,
   STATUS_COM_ACESSO,
+  slugDoNome,
   usoDoAssinante,
   validarHandle,
 } from "@edu/core";
@@ -14,33 +15,27 @@ import { apagarConta, criarConta, normalizarNome, registrarAuditoria, registrarT
 import { db, ok, talvez } from "./client";
 import type { AssinaturaStatusDb, Json, JsonNaoNulo, Row } from "./database.types";
 import { ErroAcesso, ErroPermissao } from "./erros";
+import { slugLivre } from "./produtos";
 
 /**
- * Criador de conteúdo: tem um perfil público (/c/@handle) e vende um PRODUTO com várias trilhas. O fã
- * entra pela página do criador e ganha uma ASSINATURA, que libera as trilhas publicadas do produto.
- * Sem pagamento ainda: toda entrada nasce como 'cortesia'.
+ * Criador de conteúdo: tem uma página pública (/c/@handle) com vários PRODUTOS, cada um com trilhas. O
+ * fã ASSINA O CRIADOR: um preço libera as trilhas publicadas de todos os produtos publicados dele; a
+ * assinatura guarda por qual produto o fã entrou. Sem pagamento ainda: toda entrada nasce 'cortesia'.
  */
 
 export type PerfilCriadorRow = Row<"criador_perfis">;
-export type Produto = Row<"produtos">;
 export type Assinatura = Row<"assinaturas">;
 
 export interface EscopoCriador {
   usuario: Usuario;
   perfil: PerfilCriadorRow;
-  produto: Produto;
 }
 
-/** Escopo do criador logado (null se a conta não é de criador ou ainda não tem perfil e produto). */
+/** Escopo do criador logado (null se a conta não é de criador ou ainda não tem perfil). */
 export async function escopoCriador(usuario: Usuario): Promise<EscopoCriador | null> {
   if (usuario.role !== "criador" || usuario.status !== "ativo") return null;
-  const [perfil, produto] = await Promise.all([
-    db().from("criador_perfis").select("*").eq("user_id", usuario.id).maybeSingle(),
-    db().from("produtos").select("*").eq("criador_id", usuario.id).order("created_at").limit(1).maybeSingle(),
-  ]);
-  const p = talvez(perfil, "perfil criador");
-  const prod = talvez(produto, "produto");
-  return p && prod ? { usuario, perfil: p, produto: prod } : null;
+  const perfil = talvez(await db().from("criador_perfis").select("*").eq("user_id", usuario.id).maybeSingle(), "perfil criador");
+  return perfil ? { usuario, perfil } : null;
 }
 
 // ─────────────────────────── Cadastro ───────────────────────────
@@ -63,7 +58,7 @@ const HANDLE_EM_USO = "Este @ já está em uso na Edu+. Escolha outro.";
 
 /**
  * Cadastro do criador pelo link secreto (o app confere a chave antes). A conta nasce confirmada, com
- * o perfil público e o produto em rascunho. Qualquer falha desfaz tudo (apagar a conta cascateia).
+ * a página e um primeiro produto em rascunho. Qualquer falha desfaz tudo (apagar a conta cascateia).
  */
 export async function cadastrarCriador(p: { nome: string; email: string; senha: string; handle?: string; ip: string }) {
   const email = p.email.trim().toLowerCase();
@@ -93,10 +88,11 @@ export async function cadastrarCriador(p: { nome: string; email: string; senha: 
       .insert({ user_id: usuario.id, handle, nome_publico: nome.slice(0, 80) });
     if (perfil.error?.code === "23505") throw new ErroAcesso(HANDLE_EM_USO);
     ok(perfil, "perfil criador");
+    const nomeProduto = `Trilhas de ${nome.split(" ")[0]}`;
     ok(
       await db()
         .from("produtos")
-        .insert({ criador_id: usuario.id, nome: `Trilhas de ${nome.split(" ")[0]}` }),
+        .insert({ criador_id: usuario.id, nome: nomeProduto, slug: await slugLivre(usuario.id, slugDoNome(nomeProduto)) }),
       "produto",
     );
   } catch (e) {
@@ -157,52 +153,43 @@ export async function salvarPerfilCriador(
   if (p.fotoUrl !== undefined) ok(await db().from("users").update({ avatar_url: p.fotoUrl, updated_at: agora }).eq("id", e.usuario.id), "foto");
 }
 
-export async function salvarProduto(e: EscopoCriador, p: { nome: string; descricao: string | null; precoCentavos: number | null }) {
-  const nome = normalizarNome(p.nome);
-  if (nome.length < 3) throw new ErroAcesso("Dê um nome ao seu produto.");
-  if (p.precoCentavos !== null && (!Number.isInteger(p.precoCentavos) || p.precoCentavos < 0)) throw new ErroAcesso("Preço inválido.");
+/** Preço mensal da assinatura do criador (null = ainda não definido). */
+export async function salvarPrecoAssinatura(e: EscopoCriador, precoCentavos: number | null) {
+  if (precoCentavos !== null && (!Number.isInteger(precoCentavos) || precoCentavos < 0)) throw new ErroAcesso("Preço inválido.");
   ok(
-    await db()
-      .from("produtos")
-      .update({
-        nome: nome.slice(0, 80),
-        descricao: p.descricao?.trim().slice(0, 600) || null,
-        preco_centavos: p.precoCentavos,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", e.produto.id),
-    "salvar produto",
+    await db().from("criador_perfis").update({ preco_centavos: precoCentavos, updated_at: new Date().toISOString() }).eq("user_id", e.usuario.id),
+    "preço da assinatura",
   );
 }
 
-async function contarTrilhasPublicadas(produtoId: string) {
-  const r = await db().from("trilhas").select("id", { count: "exact", head: true }).eq("produto_id", produtoId).eq("status", "publicada");
-  if (r.error) throw new Error(`[db] trilhas publicadas: ${r.error.message}`);
+async function contarProdutosPublicados(criadorId: string) {
+  const r = await db().from("produtos").select("id", { count: "exact", head: true }).eq("criador_id", criadorId).eq("status", "publicado");
+  if (r.error) throw new Error(`[db] produtos publicados: ${r.error.message}`);
   return r.count ?? 0;
 }
 
-/** Publica (ou tira do ar) a página do produto. Publicar exige ao menos uma trilha publicada. */
-export async function publicarProduto(e: EscopoCriador, publicar: boolean) {
-  if (publicar && !(await contarTrilhasPublicadas(e.produto.id))) {
-    throw new ErroAcesso("Publique pelo menos uma trilha antes de abrir sua página para os fãs.");
+/** Abre (ou fecha) a página do criador para novos fãs. Abrir exige ao menos um produto publicado. */
+export async function publicarPagina(e: EscopoCriador, publicar: boolean) {
+  if (publicar && !(await contarProdutosPublicados(e.usuario.id))) {
+    throw new ErroAcesso("Publique pelo menos um produto antes de abrir sua página para os fãs.");
   }
   const agora = new Date().toISOString();
   ok(
     await db()
-      .from("produtos")
+      .from("criador_perfis")
       .update({
-        status: publicar ? "publicado" : "rascunho",
-        publicado_em: publicar ? (e.produto.publicado_em ?? agora) : e.produto.publicado_em,
+        pagina_status: publicar ? "publicada" : "rascunho",
+        pagina_publicada_em: publicar ? (e.perfil.pagina_publicada_em ?? agora) : e.perfil.pagina_publicada_em,
         updated_at: agora,
       })
-      .eq("id", e.produto.id),
-    "publicar produto",
+      .eq("user_id", e.usuario.id),
+    "publicar página",
   );
   await registrarAuditoria({
     ator: e.usuario.id,
-    acao: publicar ? "produto.publicado" : "produto.despublicado",
-    entidade: "produtos",
-    entidadeId: e.produto.id,
+    acao: publicar ? "pagina.publicada" : "pagina.despublicada",
+    entidade: "criador_perfis",
+    entidadeId: e.usuario.id,
   });
 }
 
@@ -213,8 +200,13 @@ export interface TrilhaDoCriador extends Row<"trilhas"> {
   totalAulas: number;
 }
 
-export async function trilhasDoCriador(e: EscopoCriador, f: { status?: "rascunho" | "publicada" | "arquivada" | "todas" } = {}): Promise<TrilhaDoCriador[]> {
-  let q = db().from("trilhas").select("*").eq("produto_id", e.produto.id).order("ordem").order("updated_at", { ascending: false });
+/** Trilhas do criador (de um produto, se informado), na ordem da página. */
+export async function trilhasDoCriador(
+  e: EscopoCriador,
+  f: { status?: "rascunho" | "publicada" | "arquivada" | "todas"; produtoId?: string } = {},
+): Promise<TrilhaDoCriador[]> {
+  let q = db().from("trilhas").select("*").eq("criador_id", e.usuario.id).order("ordem").order("updated_at", { ascending: false });
+  if (f.produtoId) q = q.eq("produto_id", f.produtoId);
   q = !f.status || f.status === "todas" ? q.neq("status", "arquivada") : q.eq("status", f.status);
   const lista = ok(await q, "trilhas do criador");
   const ids = lista.map((t) => t.id);
@@ -232,24 +224,56 @@ export async function trilhasDoCriador(e: EscopoCriador, f: { status?: "rascunho
   }));
 }
 
-/** A trilha é do produto deste criador; senão, ErroPermissao (não revela se existe). */
-export async function exigirTrilhaDoCriador(e: EscopoCriador, trilhaId: string) {
+/** A trilha é deste criador; senão, ErroPermissao (não revela se existe). Devolve o produto dela. */
+export async function exigirTrilhaDoCriador(e: EscopoCriador, trilhaId: string): Promise<{ produtoId: string }> {
   const t = /^[0-9a-f-]{36}$/i.test(trilhaId)
     ? talvez(await db().from("trilhas").select("produto_id, criador_id").eq("id", trilhaId).maybeSingle(), "trilha")
     : null;
-  if (!t || t.criador_id !== e.usuario.id || t.produto_id !== e.produto.id) throw new ErroPermissao("Trilha não encontrada.");
+  if (!t || t.criador_id !== e.usuario.id) throw new ErroPermissao("Trilha não encontrada.");
+  return { produtoId: t.produto_id };
 }
 
 // ─────────────────────────── Página pública (vitrine) ───────────────────────────
 
-export interface Vitrine {
-  criador: { id: string; handle: string; nome: string; bio: string | null; foto_url: string | null; redes: RedesCriador };
-  produto: { id: string; nome: string; descricao: string | null; publicado: boolean };
-  trilhas: { id: string; titulo: string; descricao: string | null; cor: string; icone: string; totalAulas: number }[];
+export interface TrilhaVitrine {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  cor: string;
+  icone: string;
+  totalAulas: number;
 }
 
-/** O que qualquer pessoa vê em /c/@handle (sem e-mail; trilhas só com o produto publicado). */
-export async function vitrinePorHandle(handleBruto: string): Promise<Vitrine | null> {
+export interface ProdutoVitrine {
+  id: string;
+  slug: string;
+  nome: string;
+  descricao: string | null;
+  logo_path: string | null;
+  cor_primaria: string;
+  cor_destaque: string | null;
+  trilhas: TrilhaVitrine[];
+}
+
+export interface CriadorVitrine {
+  id: string;
+  handle: string;
+  nome: string;
+  bio: string | null;
+  foto_url: string | null;
+  redes: RedesCriador;
+  precoCentavos: number | null;
+}
+
+export interface Vitrine {
+  criador: CriadorVitrine;
+  /** A página aceita novos fãs: publicada e com ao menos um produto publicado. */
+  publicada: boolean;
+  /** Produtos publicados na ordem da página (vazio enquanto a página não está publicada). */
+  produtos: ProdutoVitrine[];
+}
+
+async function perfilPorHandle(handleBruto: string): Promise<PerfilCriadorRow | null> {
   let handle: string;
   try {
     handle = normalizarHandle(decodeURIComponent(handleBruto));
@@ -257,23 +281,46 @@ export async function vitrinePorHandle(handleBruto: string): Promise<Vitrine | n
     return null;
   }
   if (validarHandle(handle)) return null;
-  const perfil = talvez(await db().from("criador_perfis").select("*").eq("handle", handle).maybeSingle(), "criador");
-  if (!perfil) return null;
-  const produto = talvez(await db().from("produtos").select("*").eq("criador_id", perfil.user_id).order("created_at").limit(1).maybeSingle(), "produto");
-  if (!produto) return null;
-  const publicado = produto.status === "publicado";
-  const trilhas = publicado
-    ? ok(
-        await db()
-          .from("trilhas")
-          .select("id, titulo, descricao, cor, icone")
-          .eq("produto_id", produto.id)
-          .eq("status", "publicada")
-          .order("ordem")
-          .order("publicada_em"),
-        "trilhas da vitrine",
+  return talvez(await db().from("criador_perfis").select("*").eq("handle", handle).maybeSingle(), "criador");
+}
+
+function criadorDaVitrine(perfil: PerfilCriadorRow): CriadorVitrine {
+  return {
+    id: perfil.user_id,
+    handle: perfil.handle,
+    nome: perfil.nome_publico,
+    bio: perfil.bio,
+    foto_url: perfil.foto_url,
+    redes: lerRedes(perfil.redes),
+    precoCentavos: perfil.preco_centavos,
+  };
+}
+
+/** Produtos publicados do criador (ou só um, pelo slug), com as trilhas publicadas de cada um. */
+async function produtosPublicados(criadorId: string, slug?: string): Promise<ProdutoVitrine[]> {
+  let q = db()
+    .from("produtos")
+    .select("id, slug, nome, descricao, logo_path, cor_primaria, cor_destaque")
+    .eq("criador_id", criadorId)
+    .eq("status", "publicado")
+    .order("ordem")
+    .order("created_at");
+  if (slug !== undefined) q = q.eq("slug", slug);
+  const produtos = ok(await q, "produtos da vitrine");
+  if (!produtos.length) return [];
+  const trilhas = ok(
+    await db()
+      .from("trilhas")
+      .select("id, produto_id, titulo, descricao, cor, icone")
+      .in(
+        "produto_id",
+        produtos.map((p) => p.id),
       )
-    : [];
+      .eq("status", "publicada")
+      .order("ordem")
+      .order("publicada_em"),
+    "trilhas da vitrine",
+  );
   const aulas = trilhas.length
     ? ok(
         await db()
@@ -287,36 +334,70 @@ export async function vitrinePorHandle(handleBruto: string): Promise<Vitrine | n
         "aulas da vitrine",
       )
     : [];
-  return {
-    criador: {
-      id: perfil.user_id,
-      handle: perfil.handle,
-      nome: perfil.nome_publico,
-      bio: perfil.bio,
-      foto_url: perfil.foto_url,
-      redes: lerRedes(perfil.redes),
-    },
-    produto: { id: produto.id, nome: produto.nome, descricao: produto.descricao, publicado },
-    trilhas: trilhas.map((t) => ({ ...t, totalAulas: aulas.filter((a) => a.trilha_id === t.id).length })),
-  };
+  return produtos.map((p) => ({
+    ...p,
+    trilhas: trilhas
+      .filter((t) => t.produto_id === p.id)
+      .map(({ produto_id: _, ...t }) => ({ ...t, totalAulas: aulas.filter((a) => a.trilha_id === t.id).length })),
+  }));
+}
+
+/** O que qualquer pessoa vê em /c/@handle (sem e-mail; produtos só com a página publicada). */
+export async function vitrinePorHandle(handleBruto: string): Promise<Vitrine | null> {
+  const perfil = await perfilPorHandle(handleBruto);
+  if (!perfil) return null;
+  const produtos = perfil.pagina_status === "publicada" ? await produtosPublicados(perfil.user_id) : [];
+  return { criador: criadorDaVitrine(perfil), publicada: produtos.length > 0, produtos };
+}
+
+/** Página de um produto (/@handle/<slug>): null se a página ou o produto não estão publicados. */
+export async function produtoPorHandleESlug(handleBruto: string, slugBruto: string): Promise<{ criador: CriadorVitrine; produto: ProdutoVitrine } | null> {
+  const slug = slugBruto.trim().toLowerCase();
+  if (!/^[a-z0-9-]{3,40}$/.test(slug)) return null;
+  const perfil = await perfilPorHandle(handleBruto);
+  if (perfil?.pagina_status !== "publicada") return null;
+  const [produto] = await produtosPublicados(perfil.user_id, slug);
+  return produto ? { criador: criadorDaVitrine(perfil), produto } : null;
 }
 
 // ─────────────────────────── Assinaturas (lado do fã) ───────────────────────────
 
 const temAcessoDb = (s: AssinaturaStatusDb) => STATUS_COM_ACESSO.includes(s);
+const ehUuid = (id: string) => /^[0-9a-f-]{36}$/i.test(id);
+const INDISPONIVEL = "Este conteúdo ainda não está disponível.";
 
-async function produtoPublicado(produtoId: string) {
-  const p = /^[0-9a-f-]{36}$/i.test(produtoId) ? talvez(await db().from("produtos").select("*").eq("id", produtoId).maybeSingle(), "produto") : null;
-  if (p?.status !== "publicado") throw new ErroAcesso("Este conteúdo ainda não está disponível.");
-  return p;
+/** A página do criador aceita novos fãs (publicada e com produto publicado); senão, ErroAcesso. */
+async function exigirPaginaAberta(criadorId: string) {
+  const perfil = ehUuid(criadorId)
+    ? talvez(await db().from("criador_perfis").select("pagina_status").eq("user_id", criadorId).maybeSingle(), "página do criador")
+    : null;
+  if (perfil?.pagina_status !== "publicada" || !(await contarProdutosPublicados(criadorId))) throw new ErroAcesso(INDISPONIVEL);
 }
 
-/** Assinatura do fã no produto (idempotente). Sem pagamento ainda: nasce como cortesia. */
-export async function assinar(p: { aluno: Pick<Usuario, "id" | "role">; produtoId: string; origem?: string | null }): Promise<Assinatura> {
+/** Produto de entrada válido (publicado e do criador) ou null: só alimenta o relatório "entrou por". */
+async function produtoDeEntrada(criadorId: string, produtoId: string | null | undefined): Promise<string | null> {
+  if (!produtoId || !ehUuid(produtoId)) return null;
+  const p = talvez(await db().from("produtos").select("criador_id, status").eq("id", produtoId).maybeSingle(), "produto de entrada");
+  return p?.criador_id === criadorId && p.status === "publicado" ? produtoId : null;
+}
+
+const buscarAssinatura = async (criadorId: string, alunoId: string) =>
+  talvez(await db().from("assinaturas").select("*").eq("criador_id", criadorId).eq("aluno_id", alunoId).maybeSingle(), "assinatura");
+
+/**
+ * Assinatura do fã no criador (idempotente): libera todos os produtos publicados dele. Sem pagamento
+ * ainda: nasce como cortesia. `produtoEntradaId` registra por qual produto o fã chegou.
+ */
+export async function assinar(p: {
+  aluno: Pick<Usuario, "id" | "role">;
+  criadorId: string;
+  produtoEntradaId?: string | null;
+  origem?: string | null;
+}): Promise<Assinatura> {
   if (p.aluno.role !== "aluno") throw new ErroAcesso("Esta conta não pode assinar: use uma conta de fã.");
-  await produtoPublicado(p.produtoId);
+  await exigirPaginaAberta(p.criadorId);
   const agora = new Date().toISOString();
-  const existente = talvez(await db().from("assinaturas").select("*").eq("produto_id", p.produtoId).eq("aluno_id", p.aluno.id).maybeSingle(), "assinatura");
+  const existente = await buscarAssinatura(p.criadorId, p.aluno.id);
   if (existente) {
     if (temAcessoDb(existente.status)) return existente;
     // Volta depois de cancelar/expirar: reabre como cortesia.
@@ -337,39 +418,51 @@ export async function assinar(p: { aluno: Pick<Usuario, "id" | "role">; produtoI
       "reabrir assinatura",
     );
   }
+  const produtoId = await produtoDeEntrada(p.criadorId, p.produtoEntradaId);
   const nova = await db()
     .from("assinaturas")
-    .insert({ produto_id: p.produtoId, aluno_id: p.aluno.id, status: "cortesia", origem: limparOrigem(p.origem) })
+    .insert({ criador_id: p.criadorId, produto_id: produtoId, aluno_id: p.aluno.id, status: "cortesia", origem: limparOrigem(p.origem) })
     .select("*")
     .single();
   // Corrida (dois cliques): a outra requisição já criou.
-  if (nova.error?.code === "23505")
-    return ok(await db().from("assinaturas").select("*").eq("produto_id", p.produtoId).eq("aluno_id", p.aluno.id).single(), "assinatura");
+  if (nova.error?.code === "23505") {
+    const outra = await buscarAssinatura(p.criadorId, p.aluno.id);
+    if (outra) return outra;
+  }
   const a = ok(nova, "assinar");
   await registrarAuditoria({
     ator: p.aluno.id,
     acao: "assinatura.criada",
     entidade: "assinaturas",
     entidadeId: a.id,
-    dados: { produtoId: p.produtoId, origem: a.origem },
+    dados: { criadorId: p.criadorId, produtoId, origem: a.origem },
   });
   return a;
 }
 
-/** O fã tem acesso ao produto agora (assinatura cortesia, ativa ou inadimplente)? */
-export async function faTemAcesso(alunoId: string, produtoId: string) {
-  const a = talvez(await db().from("assinaturas").select("status").eq("produto_id", produtoId).eq("aluno_id", alunoId).maybeSingle(), "assinatura");
+/** O fã tem acesso ao criador agora (assinatura cortesia, ativa ou inadimplente)? */
+export async function faTemAcesso(alunoId: string, criadorId: string) {
+  if (!ehUuid(criadorId)) return false;
+  const a = talvez(await db().from("assinaturas").select("status").eq("criador_id", criadorId).eq("aluno_id", alunoId).maybeSingle(), "assinatura");
   return !!a && temAcessoDb(a.status);
 }
 
-/** Fã novo: cria a conta (confirmada) e a assinatura do produto. */
-export async function cadastrarFa(p: { produtoId: string; nome: string; email: string; senha: string; origem?: string | null; ip: string }) {
+/** Fã novo: cria a conta (confirmada) e a assinatura do criador. */
+export async function cadastrarFa(p: {
+  criadorId: string;
+  produtoEntradaId?: string | null;
+  nome: string;
+  email: string;
+  senha: string;
+  origem?: string | null;
+  ip: string;
+}) {
   const chave = `cadastro-fa:${p.ip}`;
   await verificarLimite(chave, 20, 60, { sucessos: true });
-  await produtoPublicado(p.produtoId);
+  await exigirPaginaAberta(p.criadorId);
   const usuario = await criarConta({ role: "aluno", nome: p.nome, email: p.email, senha: p.senha });
   try {
-    await assinar({ aluno: usuario, produtoId: p.produtoId, origem: p.origem });
+    await assinar({ aluno: usuario, criadorId: p.criadorId, produtoEntradaId: p.produtoEntradaId, origem: p.origem });
   } catch (e) {
     await apagarConta(usuario.auth_user_id);
     throw e;
@@ -378,19 +471,43 @@ export async function cadastrarFa(p: { produtoId: string; nome: string; email: s
   return usuario;
 }
 
-/** Trilhas publicadas dos produtos publicados que o fã assina (com acesso). */
-export async function trilhasDasAssinaturas(alunoId: string): Promise<string[]> {
+/** Criadores que o fã assina com acesso, na ordem em que assinou. */
+async function criadoresAssinados(alunoId: string): Promise<string[]> {
   const ass = ok(
     await db()
       .from("assinaturas")
-      .select("produto_id, produto:produtos!inner(status)")
+      .select("criador_id")
       .eq("aluno_id", alunoId)
-      .in("status", [...STATUS_COM_ACESSO]),
+      .in("status", [...STATUS_COM_ACESSO])
+      .order("iniciada_em"),
     "assinaturas do fã",
-  ) as unknown as { produto_id: string; produto: { status: string } }[];
-  const produtos = ass.filter((a) => a.produto.status === "publicado").map((a) => a.produto_id);
+  );
+  return ass.map((a) => a.criador_id);
+}
+
+/**
+ * Trilhas publicadas dos produtos publicados dos criadores que o fã assina (com acesso). Os filtros
+ * restringem a um criador ou a um produto.
+ */
+export async function trilhasDasAssinaturas(alunoId: string, f: { criadorId?: string; produtoId?: string } = {}): Promise<string[]> {
+  let criadores = await criadoresAssinados(alunoId);
+  if (f.criadorId) criadores = criadores.filter((c) => c === f.criadorId);
+  if (!criadores.length) return [];
+  let q = db().from("produtos").select("id").in("criador_id", criadores).eq("status", "publicado");
+  if (f.produtoId) q = q.eq("id", f.produtoId);
+  const produtos = ok(await q, "produtos assinados");
   if (!produtos.length) return [];
-  const t = ok(await db().from("trilhas").select("id").in("produto_id", produtos).eq("status", "publicada"), "trilhas assinadas");
+  const t = ok(
+    await db()
+      .from("trilhas")
+      .select("id")
+      .in(
+        "produto_id",
+        produtos.map((p) => p.id),
+      )
+      .eq("status", "publicada"),
+    "trilhas assinadas",
+  );
   return t.map((x) => x.id);
 }
 
@@ -400,34 +517,34 @@ export interface CriadorDoFa {
   nome: string;
   foto_url: string | null;
   bio: string | null;
-  produto: string;
+  /** Nomes dos produtos publicados, na ordem da página. */
+  produtos: string[];
 }
 
-/** Criadores que o fã assina (início e navegação do app). */
+/** Criadores que o fã assina (início e navegação do app): um por criador. */
 export async function criadoresDoFa(alunoId: string): Promise<CriadorDoFa[]> {
-  const ass = ok(
-    await db()
-      .from("assinaturas")
-      .select("produto:produtos!inner(nome, criador_id)")
-      .eq("aluno_id", alunoId)
-      .in("status", [...STATUS_COM_ACESSO])
-      .order("iniciada_em"),
-    "criadores do fã",
-  ) as unknown as { produto: { nome: string; criador_id: string } }[];
-  if (!ass.length) return [];
-  const perfis = ok(
-    await db()
-      .from("criador_perfis")
-      .select("user_id, handle, nome_publico, foto_url, bio")
-      .in(
-        "user_id",
-        ass.map((a) => a.produto.criador_id),
-      ),
-    "perfis",
-  );
-  return ass.flatMap((a) => {
-    const p = perfis.find((x) => x.user_id === a.produto.criador_id);
-    return p ? [{ id: p.user_id, handle: p.handle, nome: p.nome_publico, foto_url: p.foto_url, bio: p.bio, produto: a.produto.nome }] : [];
+  const ids = await criadoresAssinados(alunoId);
+  if (!ids.length) return [];
+  const [perfis, produtos] = await Promise.all([
+    db().from("criador_perfis").select("user_id, handle, nome_publico, foto_url, bio").in("user_id", ids),
+    db().from("produtos").select("criador_id, nome").in("criador_id", ids).eq("status", "publicado").order("ordem").order("created_at"),
+  ]);
+  const listaPerfis = ok(perfis, "perfis");
+  const listaProdutos = ok(produtos, "produtos dos criadores");
+  return ids.flatMap((id) => {
+    const p = listaPerfis.find((x) => x.user_id === id);
+    return p
+      ? [
+          {
+            id,
+            handle: p.handle,
+            nome: p.nome_publico,
+            foto_url: p.foto_url,
+            bio: p.bio,
+            produtos: listaProdutos.filter((x) => x.criador_id === id).map((x) => x.nome),
+          },
+        ]
+      : [];
   });
 }
 
@@ -445,8 +562,8 @@ export type { PainelVendas };
 
 export async function painelVendas(e: EscopoCriador, dias = 30): Promise<PainelVendas> {
   const [assRes, trilhasRes] = await Promise.all([
-    db().from("assinaturas").select("aluno_id, status, valor_centavos, origem, iniciada_em").eq("produto_id", e.produto.id),
-    db().from("trilhas").select("id, titulo").eq("produto_id", e.produto.id).eq("status", "publicada").order("ordem").order("publicada_em"),
+    db().from("assinaturas").select("aluno_id, status, valor_centavos, origem, iniciada_em").eq("criador_id", e.usuario.id),
+    db().from("trilhas").select("id, titulo").eq("criador_id", e.usuario.id).eq("status", "publicada").order("ordem").order("publicada_em"),
   ]);
   const assinaturas = ok(assRes, "assinaturas");
   const trilhas = ok(trilhasRes, "trilhas publicadas");
@@ -490,15 +607,17 @@ export interface LinhaAssinante {
   desde: string;
   aulasConcluidas: number;
   ultimaAula: string | null;
+  /** Produto pelo qual o fã entrou (null: pela página do criador). */
+  entrouPor: string | null;
 }
 
-/** Assinantes do produto (sem e-mail: o criador vê nome, status e uso). */
+/** Assinantes do criador (sem e-mail: o criador vê nome, status, por onde entrou e uso). */
 export async function assinantesDoCriador(e: EscopoCriador): Promise<LinhaAssinante[]> {
   const ass = ok(
     await db()
       .from("assinaturas")
-      .select("aluno_id, status, origem, iniciada_em, aluno:users!assinaturas_aluno_id_fkey(id, nome, avatar_url)")
-      .eq("produto_id", e.produto.id)
+      .select("aluno_id, status, origem, iniciada_em, produto:produtos(nome), aluno:users!assinaturas_aluno_id_fkey(id, nome, avatar_url)")
+      .eq("criador_id", e.usuario.id)
       .order("iniciada_em", { ascending: false }),
     "assinantes",
   ) as unknown as {
@@ -506,10 +625,11 @@ export async function assinantesDoCriador(e: EscopoCriador): Promise<LinhaAssina
     status: AssinaturaStatusDb;
     origem: string | null;
     iniciada_em: string;
+    produto: { nome: string } | null;
     aluno: { id: string; nome: string; avatar_url: string | null };
   }[];
   if (!ass.length) return [];
-  const trilhas = ok(await db().from("trilhas").select("id").eq("produto_id", e.produto.id), "trilhas");
+  const trilhas = ok(await db().from("trilhas").select("id").eq("criador_id", e.usuario.id), "trilhas");
   const aulas = trilhas.length
     ? ok(
         await db()
@@ -545,6 +665,7 @@ export async function assinantesDoCriador(e: EscopoCriador): Promise<LinhaAssina
     status: a.status,
     origem: a.origem,
     desde: a.iniciada_em,
+    entrouPor: a.produto?.nome ?? null,
     ...usoDoAssinante(a.aluno_id, conclusoes),
   }));
 }

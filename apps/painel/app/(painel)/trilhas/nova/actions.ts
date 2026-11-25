@@ -1,7 +1,7 @@
 "use server";
 
 import { erroOrientacao, normalizarOrientacao, objetivoDefinido } from "@edu/core";
-import { atualizarTrilha, criarTrilha, registrarAuditoria } from "@edu/db";
+import { atualizarTrilha, criarTrilha, produtoPadrao, registrarAuditoria } from "@edu/db";
 import { redirect } from "next/navigation";
 import { exigirCriador } from "@/lib/sessao";
 
@@ -16,8 +16,10 @@ export async function criar(form: FormData) {
   const erroObjetivo = erroOrientacao({ objetivo, conteudos: "", complementos: "" });
   if (erroObjetivo) voltar(erroObjetivo);
 
+  // Até a tela de Produtos (fase 3), a trilha nova entra no primeiro produto.
+  const produto = await produtoPadrao(e);
   const trilha = await criarTrilha({
-    produtoId: e.produto.id,
+    produtoId: produto.id,
     criadorId: e.usuario.id,
     titulo: titulo.slice(0, 120),
     descricao:
@@ -28,6 +30,6 @@ export async function criar(form: FormData) {
     icone: String(form.get("icone") ?? "book-open"),
   });
   await atualizarTrilha(trilha.id, { orientacao_objetivo: objetivo });
-  await registrarAuditoria({ ator: e.usuario.id, acao: "trilha.criada", entidade: "trilhas", entidadeId: trilha.id, dados: { produtoId: e.produto.id } });
+  await registrarAuditoria({ ator: e.usuario.id, acao: "trilha.criada", entidade: "trilhas", entidadeId: trilha.id, dados: { produtoId: produto.id } });
   redirect(`/trilhas/${trilha.id}/editar`);
 }

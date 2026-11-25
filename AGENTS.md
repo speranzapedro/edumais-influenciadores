@@ -60,6 +60,7 @@ Variáveis de ambiente: um único `.env.local` na raiz (modelo em `.env.example`
 
 - **Banco só no servidor**, com a chave secreta. Nada de chave de serviço no navegador.
 - **Migrations só aditivas** depois da migration base. Mudou o schema, atualize `packages/db/src/database.types.ts` (escrito à mão, com uniões literais) e rode `pnpm db:tipos`: o CI falha se divergir do banco.
+- **Mudança que quebra o código no ar vai em duas migrations** (expandir → contrair): a primeira só acrescenta e afrouxa, para o código antigo continuar funcionando e o novo poder ser validado com ela aplicada; a segunda (remoções, `not null`) é aplicada logo depois do deploy. Exemplo: `20261125120000_produtos_e_assinatura_do_criador.sql` e o `_contrato` de 20261126.
 - **Toda função nova do `@edu/db`** ganha teste de integração (`packages/db/test/*.int.test.ts`, com as fábricas de `@edu/testing`); toda regra pura nova ganha teste unitário. Regra de negócio que não precisa do banco (agregações, limites) vai para o `@edu/core`.
 - **A IA nunca é chamada nos testes**: use `definirClienteAnthropic` com o cliente falso de `packages/ai/src/teste/anthropic-falso.ts`, e `VOYAGE_API_URL` para o Voyage.
 - **Cobertura mínima**: 80% de linhas em `core`, `ai` e `ui`; 75% em `db` pelos testes de integração (o CI falha abaixo disso).

@@ -15,7 +15,7 @@ test.describe("página do criador", () => {
     const c = await criadorNoAr({ nome: "Lia Finanças" });
     const email = emailUnico("e2e-fa");
     await page.goto(`/c/${c.escopo.perfil.handle}?origem=tiktok`);
-    await expect(page.getByRole("heading", { name: c.escopo.produto.nome })).toBeVisible();
+    await expect(page.getByRole("heading", { name: c.produto.nome })).toBeVisible();
 
     await page.getByLabel("Seu nome completo").fill("Rafa Fã");
     await page.getByLabel("E-mail").fill(email);
@@ -46,7 +46,7 @@ test.describe("página do criador", () => {
 
   test("fã logado assina outro criador com um clique", async ({ page }) => {
     const primeiro = await criadorNoAr({ nome: "Primeira Criadora" });
-    const { email } = await novoFa(primeiro.escopo.produto.id);
+    const { email } = await novoFa(primeiro.usuario.id);
     const segundo = await criadorNoAr({ nome: "Segundo Criador" });
 
     await entrarNoApp(page, email);
@@ -90,7 +90,7 @@ async function jogarAula(page: Page, blocos: Bloco[]) {
 
 test("aula do começo ao fim: acertos, XP e a próxima aula liberada", async ({ page }) => {
   const c = await criadorNoAr();
-  const { usuario, email } = await novoFa(c.escopo.produto.id);
+  const { usuario, email } = await novoFa(c.usuario.id);
   const [primeira] = await aulasDaTrilha(c.trilha.id);
   const { data: linhas } = await db().from("aula_blocos").select("tipo, conteudo").eq("aula_id", primeira.id).order("ordem");
   const blocos = (linhas ?? []).map((l) => ({ ...(l.conteudo as object), tipo: l.tipo }) as Bloco);
@@ -112,7 +112,7 @@ test("aula do começo ao fim: acertos, XP e a próxima aula liberada", async ({ 
 
 test("trilha nova publicada chega como notificação e abre a trilha", async ({ page }) => {
   const c = await criadorNoAr();
-  const { email } = await novoFa(c.escopo.produto.id);
+  const { email } = await novoFa(c.usuario.id);
   const nova = await trilhaPronta(c.escopo, { titulo: "Segunda trilha do criador" });
 
   await entrarNoApp(page, email);
@@ -126,7 +126,7 @@ test("trilha nova publicada chega como notificação e abre a trilha", async ({ 
 test("fã não abre trilha nem aula de criador que não assina", async ({ page }) => {
   const meu = await criadorNoAr({ nome: "Criador Assinado" });
   const outro = await criadorNoAr({ nome: "Criador Alheio" });
-  const { email } = await novoFa(meu.escopo.produto.id);
+  const { email } = await novoFa(meu.usuario.id);
   const [aulaAlheia] = await aulasDaTrilha(outro.trilha.id);
 
   await entrarNoApp(page, email);

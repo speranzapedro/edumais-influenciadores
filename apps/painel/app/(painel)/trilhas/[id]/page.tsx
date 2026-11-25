@@ -1,5 +1,5 @@
 import { tutorHabilitado } from "@edu/ai/tutor";
-import { ErroPermissao, exigirTrilhaDoCriador, previaDaTrilha } from "@edu/db";
+import { ErroPermissao, exigirProdutoDoCriador, exigirTrilhaDoCriador, previaDaTrilha } from "@edu/db";
 import { Cartao, classesBotao, Pill } from "@edu/ui";
 import { ArrowLeft, BadgeDollarSign, Eye, Pencil } from "lucide-react";
 import Link from "next/link";
@@ -19,9 +19,10 @@ export default async function TrilhaPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const e = await exigirCriador();
   let previa: Awaited<ReturnType<typeof previaDaTrilha>>;
+  let nomeProduto: string;
   try {
-    await exigirTrilhaDoCriador(e, id);
-    previa = await previaDaTrilha(e, id);
+    const { produtoId } = await exigirTrilhaDoCriador(e, id);
+    [previa, { nome: nomeProduto }] = await Promise.all([previaDaTrilha(e, id), exigirProdutoDoCriador(e, produtoId)]);
   } catch (err) {
     if (err instanceof ErroPermissao) notFound();
     throw err;
@@ -37,7 +38,7 @@ export default async function TrilhaPage({ params }: { params: Promise<{ id: str
     <div className="pb-12">
       <Topo
         titulo={trilha.titulo}
-        subtitulo={<>Como a trilha aparece no app do aluno · {e.produto.nome}</>}
+        subtitulo={<>Como a trilha aparece no app do aluno · {nomeProduto}</>}
         acoes={
           <>
             <Link href="/trilhas" className={classesBotao("contorno", "md")}>

@@ -23,7 +23,7 @@ export default async function AssinantesPage() {
   const lista = await assinantesDoCriador(e);
   return (
     <>
-      <Topo titulo="Assinantes" subtitulo={`${lista.length} pessoa(s) assinaram ${e.produto.nome}.`} />
+      <Topo titulo="Assinantes" subtitulo={`${lista.length} pessoa(s) assinam a sua página.`} />
       <div className="px-8 pb-10 pt-4">
         <Cartao className="overflow-x-auto">
           {lista.length === 0 ? (

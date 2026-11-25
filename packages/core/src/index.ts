@@ -5,6 +5,7 @@ export * from "./criador";
 export * from "./escapes";
 export * from "./gamificacao";
 export * from "./orientacao";
+export * from "./produto";
 export * from "./revisao";
 export * from "./tema";
 export * from "./tour-estudio";

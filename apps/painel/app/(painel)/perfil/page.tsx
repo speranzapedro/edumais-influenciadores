@@ -1,4 +1,4 @@
-import { lerRedes } from "@edu/db";
+import { lerRedes, produtoPadrao } from "@edu/db";
 import { Aviso, Cartao, Pill } from "@edu/ui";
 import { ExternalLink } from "lucide-react";
 import { Topo } from "@/components/Topo";
@@ -12,7 +12,8 @@ const precoParaCampo = (c: number | null) => (c == null ? "" : (c / 100).toFixed
 export default async function PerfilPage({ searchParams }: { searchParams: Promise<{ "bem-vindo"?: string }> }) {
   const e = await exigirCriador();
   const sp = await searchParams;
-  const publicado = e.produto.status === "publicado";
+  const produto = await produtoPadrao(e);
+  const publicado = e.perfil.pagina_status === "publicada";
   const link = linkPublico(e.perfil.handle);
   return (
     <>
@@ -30,7 +31,7 @@ export default async function PerfilPage({ searchParams }: { searchParams: Promi
           </Cartao>
           <Cartao className="p-6" id="produto">
             <h2 className="mb-4 font-extrabold">Produto</h2>
-            <FormProduto produto={{ nome: e.produto.nome, descricao: e.produto.descricao, preco: precoParaCampo(e.produto.preco_centavos) }} />
+            <FormProduto produto={{ nome: produto.nome, descricao: produto.descricao, preco: precoParaCampo(e.perfil.preco_centavos) }} />
           </Cartao>
         </div>
         <div className="space-y-6">
