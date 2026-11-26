@@ -29,8 +29,8 @@ export async function entrarNoApp(page: Page, email: string, senha = SENHA) {
 const MAILPIT = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 
 /**
- * Espera o e-mail mais recente para `para` no Mailpit e devolve o primeiro link do Supabase Auth
- * (`/auth/v1/verify`) que ele traz.
+ * Espera o e-mail mais recente para `para` no Mailpit e devolve o link de confirmação que ele traz: direto para
+ * o app (`/auth/confirmar?…&token_hash=…`, o template de redefinição) ou pelo Supabase Auth (`/auth/v1/verify`).
  */
 export async function linkDoEmail(para: string, tentativas = 30): Promise<string> {
   if (!ehLocal(MAILPIT)) throw new Error("O Mailpit precisa ser local.");
@@ -41,7 +41,7 @@ export async function linkDoEmail(para: string, tentativas = 30): Promise<string
       if (messages?.length) {
         const msg = (await (await fetch(`${MAILPIT}/api/v1/message/${messages[0].ID}`)).json()) as { HTML?: string; Text?: string };
         const corpo = `${msg.HTML ?? ""} ${msg.Text ?? ""}`.replace(/&amp;/g, "&");
-        const link = corpo.match(/https?:\/\/[^\s"'<>]+\/auth\/v1\/verify[^\s"'<>]*/)?.[0];
+        const link = corpo.match(/https?:\/\/[^\s"'<>]+\/auth\/(?:confirmar|v1\/verify)[^\s"'<>]*/)?.[0];
         if (link) return link;
       }
     }

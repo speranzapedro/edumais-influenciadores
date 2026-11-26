@@ -72,7 +72,7 @@ test.describe("login", () => {
   });
 });
 
-test("redefinição de senha pelo e-mail", async ({ page }) => {
+test("redefinição de senha pelo e-mail, com o link aberto em outro navegador", async ({ page, browser }) => {
   const { email } = await novoCriador();
   await page.goto("/login");
   await page.getByRole("link", { name: "Esqueci minha senha" }).click();
@@ -81,21 +81,33 @@ test("redefinição de senha pelo e-mail", async ({ page }) => {
   // O Supabase Auth envia o e-mail antes de responder; o primeiro envio ao SMTP local pode demorar.
   await expect(page.getByText("Se houver uma conta com este e-mail")).toBeVisible({ timeout: 30_000 });
 
-  // O link do e-mail passa pelo Supabase Auth e volta para /auth/confirmar, que abre a sessão.
-  await page.goto(await linkDoEmail(email));
-  await expect(page).toHaveURL(/\/redefinir-senha/);
-  const nova = "NovaSenha456";
-  await page.getByLabel("Nova senha").fill(nova);
-  await page.getByLabel("Repita a senha").fill(nova);
-  await page.getByRole("button", { name: "Salvar nova senha" }).click();
-  await expect(page).toHaveURL(/localhost:3006\/$/);
+  // Quem pede no computador e abre o e-mail no celular: o link vai direto para /auth/confirmar e abre a sessão
+  // num navegador sem nenhum cookie do pedido.
+  const celular = await (await browser.newContext({ baseURL: "http://localhost:3006" })).newPage();
+  await celular.goto(await linkDoEmail(email));
+  await expect(celular).toHaveURL(/\/redefinir-senha/);
 
-  await page.getByTitle("Sair").click();
-  await entrarNoPainel(page, email, nova);
+  // A senha atual é recusada com o motivo certo (não "link expirado").
+  await celular.getByLabel("Nova senha").fill(SENHA);
+  await celular.getByLabel("Repita a senha").fill(SENHA);
+  await celular.getByRole("button", { name: "Salvar nova senha" }).click();
+  await expect(celular.getByText("Escolha uma senha diferente da atual.")).toBeVisible();
+
+  const nova = "NovaSenha456";
+  await celular.getByLabel("Nova senha").fill(nova);
+  await celular.getByLabel("Repita a senha").fill(nova);
+  await celular.getByRole("button", { name: "Salvar nova senha" }).click();
+  await expect(celular).toHaveURL(/localhost:3006\/$/);
+
+  await celular.getByTitle("Sair").click();
+  await entrarNoPainel(celular, email, nova);
 });
 
 test("link de redefinição inválido pede um novo", async ({ page }) => {
   await page.goto("/auth/confirmar?code=invalido&next=/redefinir-senha");
   await expect(page).toHaveURL(/\/esqueci-senha\?erro=link/);
   await expect(page.getByText("O link expirou ou já foi usado.")).toBeVisible();
+  // O formato novo do link (token_hash) vencido ou adulterado também.
+  await page.goto("/auth/confirmar?next=/redefinir-senha&token_hash=pkce_invalido&type=recovery");
+  await expect(page).toHaveURL(/\/esqueci-senha\?erro=link/);
 });
