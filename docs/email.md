@@ -24,14 +24,17 @@ A chave não deve ser enviada por chat, versionada ou registrada em logs. O exem
 Depois de ativar SMTP, em **Emails → Templates → Reset password**, definir:
 
 - Assunto: `Redefina sua senha do Edu+`.
-- Corpo: o conteúdo integral de `supabase/templates/recovery.html`, preservando `{{ .ConfirmationURL }}`.
+- Corpo: o conteúdo integral de `supabase/templates/recovery.html`. O botão aponta para `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery`: o link vai direto ao `/auth/confirmar` do app que pediu (painel ou app do fã) e vale em qualquer navegador. Não voltar para `{{ .ConfirmationURL }}`: com ele o link só funciona no navegador que fez o pedido (PKCE), e quem pede no computador e abre o e-mail no celular cai em "link expirado".
 
 Em **Authentication → Rate Limits**, definir **Rate limit for sending emails** como **100 e-mails/hora**, sem mudar os demais limites. Esse teto é compartilhado pelo projeto e não aumenta a franquia da Resend. Preservar o intervalo mínimo por usuário; pedidos feitos antes desse intervalo podem não gerar novos envios.
 
-Em **Authentication → URL Configuration**, manter o Site URL como `https://edumais-painel-pedro-speranzas-projects.vercel.app` e somente estes redirects em produção:
+Em **Authentication → URL Configuration** (desde a troca de domínios em 2026-11-26), o Site URL é `https://criador.edumais.app.br` e os redirects de produção são:
 
-- `https://edumais-painel-pedro-speranzas-projects.vercel.app/**`
-- `https://edumais-app-pedro-speranzas-projects.vercel.app/**`
+- `https://criador.edumais.app.br/**`
+- `https://aprenda.edumais.app.br/**`
+- `https://edumais-painel-pedro-speranzas-projects.vercel.app/**` e `https://edumais-app-pedro-speranzas-projects.vercel.app/**` (endereços antigos, mantidos por enquanto)
+
+O `redirectTo` enviado pelos apps (`NEXT_PUBLIC_PAINEL_URL` ou `NEXT_PUBLIC_APP_URL` + `/auth/confirmar?next=/redefinir-senha`) precisa estar nessa lista e trazer `?`, porque o template acrescenta `&token_hash=…`.
 
 Não cadastrar localhost no projeto de produção. Preservar **Allow new users to sign up** desligado, as notificações adicionais desligadas e as demais opções de autenticação. As contas são criadas pelo servidor com `email_confirm: true`, sem envio de confirmação; não é necessário desligar a opção **Confirm email** do Dashboard.
 
@@ -46,7 +49,7 @@ Executar `pnpm verificar`. Com Docker e Supabase local disponíveis, executar `p
 Usar contas dedicadas de criador e fã com endereços distintos sob controle do responsável. Antes de provisionar, conferir se já existem e se têm o papel esperado; não alterar o papel de contas existentes. Contas novas devem ser criadas pelas rotinas de servidor `cadastrarCriador` e `criarConta` (papel `aluno`), com senhas iniciais aleatórias e não registradas. Não executar seeds em produção nem publicar conteúdo para esse teste; a recuperação de senha do fã não exige assinatura.
 
 1. Solicitar recuperação pelo painel. O responsável confere remetente `Edu+ <nao-responda@edumais.app.br>`, assunto, português e SPF/DKIM como `PASS` nos cabeçalhos recebidos.
-2. Abrir o link no mesmo navegador que iniciou o pedido (PKCE), conferir o domínio do painel e a página `/redefinir-senha`. O responsável define a nova senha, encerra a sessão e confirma que consegue entrar novamente.
+2. Abrir o link (pode ser em outro navegador ou no celular), conferir o domínio do painel e a página `/redefinir-senha`. Tentar a senha atual primeiro: a tela deve dizer "Escolha uma senha diferente da atual." O responsável define a nova senha, encerra a sessão e confirma que consegue entrar novamente.
 3. Somente depois de concluir o painel, repetir no app do fã e conferir o domínio correspondente. A conta precisa ter o papel certo para o app.
 4. Confirmar o evento `Delivered` nos logs da Resend. Não copiar links de recuperação, códigos, tokens, senhas ou cookies para documentos, chat ou relatórios.
 5. Conferir o limite do aplicativo: três pedidos por e-mail em uma janela móvel de 60 minutos; o quarto deve retornar o bloqueio. Contabilizar pedidos anteriores e respeitar o intervalo mínimo do Supabase. O contador é compartilhado pelos dois apps para um mesmo e-mail. Não apagar contadores para acelerar o teste.
@@ -60,7 +63,7 @@ Se o e-mail não chegar, conferir os logs de Auth e Resend, o remetente, a chave
 
 Para reverter, restaurar os valores anteriores de template, limite e URLs e, se necessário, desligar Custom SMTP. O SMTP padrão do Supabase tem restrições de destinatários e volume; voltar a ele não garante entrega aos usuários.
 
-Na troca futura de domínios, atualizar `NEXT_PUBLIC_PAINEL_URL`, `NEXT_PUBLIC_APP_URL`, Site URL e a lista de redirects. Validar os dois fluxos antes de remover os endereços antigos. O remetente `nao-responda@edumais.app.br` permanece o mesmo.
+Na troca de domínios (feita em 2026-11-26), foram atualizados `NEXT_PUBLIC_PAINEL_URL`, `NEXT_PUBLIC_APP_URL`, Site URL e a lista de redirects. Validar os dois fluxos antes de remover os endereços antigos. O remetente `nao-responda@edumais.app.br` permanece o mesmo.
 
 ## Referências
 

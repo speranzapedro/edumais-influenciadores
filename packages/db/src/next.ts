@@ -15,6 +15,7 @@ import {
   verificarLimite,
 } from "./acesso";
 import { ErroAcesso } from "./erros";
+import { erroNovaSenha } from "./senha";
 import { type AppSessao, clienteSessao } from "./sessao";
 
 /**
@@ -130,7 +131,13 @@ export function destinoSeguro(next: unknown, padrao = "/") {
 
 // ─────────────────────────── Redefinição de senha por e-mail ───────────────────────────
 
-/** Envia o link de redefinição. Não revela se o e-mail tem conta. */
+/**
+ * Envia o link de redefinição. Não revela se o e-mail tem conta.
+ *
+ * O template (`supabase/templates/recovery.html`) monta o link como `{{ .RedirectTo }}&token_hash=…&type=recovery`:
+ * o `redirectTo` daqui precisa trazer `?` e estar na lista de Redirect URLs do Supabase. Com `token_hash`, o link
+ * vale em qualquer navegador (o `code` do PKCE só valia no navegador que fez o pedido).
+ */
 export async function pedirRedefinicao(app: AppSessao, email: string, urlBase: string) {
   const e = normalizarEmail(email);
   if (validarEmail(e)) return "Informe um e-mail válido.";
@@ -164,5 +171,5 @@ export async function redefinirSenha(app: AppSessao, senha: string) {
   if (erro) return erro;
   const sb = await supabaseServidor(app);
   const { error } = await sb.auth.updateUser({ password: senha });
-  return error ? "Link expirado ou inválido. Peça um novo e-mail de redefinição." : null;
+  return error ? erroNovaSenha(error) : null;
 }
